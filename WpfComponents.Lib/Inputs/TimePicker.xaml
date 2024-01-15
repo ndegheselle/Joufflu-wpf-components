@@ -6,13 +6,16 @@
     xmlns:local="clr-namespace:WpfComponents.Lib.Inputs"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    <Grid>
+    <Grid DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:TimePicker}}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
 
-        <TextBox />
+        <TextBox
+            PreviewTextInput="TextBox_PreviewTextInput"
+            SelectionChanged="TextBox_SelectionChanged"
+            Text="{Binding FormattedTime, Mode=OneWay}" />
         <Button Grid.Column="1" />
     </Grid>
 </UserControl>
