@@ -21,10 +21,7 @@ using System.Windows.Shapes;
 
 namespace WpfComponents.Lib.Inputs
 {
-    /// <summary>
-    /// Logique d'interaction pour TimePicker.xaml
-    /// Exemple : https://stackoverflow.com/questions/61099950/how-to-textbox-inputs-of-custom-format
-    /// </summary>
+    // XXX : use classic string format, only have to find a way to link the string format to the actual DateTime. or maybe using regex and group ?
     public partial class TimePicker : UserControl, INotifyPropertyChanged
     {
         #region Properties
