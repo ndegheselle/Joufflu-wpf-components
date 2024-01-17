@@ -12,10 +12,7 @@
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
 
-        <TextBox
-            PreviewTextInput="TextBox_PreviewTextInput"
-            SelectionChanged="TextBox_SelectionChanged"
-            Text="{Binding FormattedTime, Mode=OneWay}" />
+        <local:FormatedTextBox InputRegex="{}([0-9]{2}):([0-9]{2})" Text="{Binding TestDateTime, StringFormat={}{0:HH:mm}}" />
         <Button Grid.Column="1" />
     </Grid>
 </UserControl>
