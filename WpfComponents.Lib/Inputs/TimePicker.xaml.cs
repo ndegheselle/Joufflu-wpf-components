@@ -6,6 +6,7 @@ using System.DirectoryServices.ActiveDirectory;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -24,46 +25,45 @@ namespace WpfComponents.Lib.Inputs
 {
     public class FormatedTextBox : TextBox
     {
-        public string InputRegex { get; set; }
-        public event Action<List<string>> PartsChanged;
+        public string Format { get; set; } = "what{0:[0-9]{2}}inbetw:{1:[0-9]{2}}";
 
-        public FormatedTextBox()
+        public List<string> Parts { get; private set; } = new List<string>();
+
+        public FormatedTextBox() { ParseFormat(Format); }
+
+        public void ParseFormat(string format)
         {
-            Parts = new List<string>();
-        }     
+            Dictionary<int, string> groups = new Dictionary<int, string>();
+            StringBuilder outputFormat = new StringBuilder();
 
-        // Dependency property for List<string> Parts
-        public static readonly DependencyProperty PartsProperty = DependencyProperty.Register(
-            "Parts",
-            typeof(List<string>),
-            typeof(FormatedTextBox),
-            new PropertyMetadata(null));
+            StringBuilder group = new StringBuilder();
+            int depth = 0;
+            foreach(char c in format)
+            {
+                if(c == '}')
+                    depth -= 1;
 
+                if(depth > 0)
+                    group.Append(c);
+                else if (c != '{' && c != '}')
+                    outputFormat.Append(c);
 
-        public List<string> Parts
-        {
-            get { return (List<string>)GetValue(PartsProperty); }
-            set { SetValue(PartsProperty, value); }
-        }
+                if (c == '{')
+                    depth += 1;
 
-        protected override void OnTextChanged(TextChangedEventArgs e)
-        {
-            base.OnTextChanged(e);
+                if(depth == 0 && group.Length > 0)
+                {
+                    string newGroup = group.ToString();
+                    var groupParts = newGroup.Split(":", 2, StringSplitOptions.None);
+                    int index = Int32.Parse(groupParts[0]);
+                    groups.Add(index, groupParts[1]);
+                    outputFormat.Append("{" + index + "}");
+                    group.Clear();
+                }
+            }
 
-            if(InputRegex == null)
-                return;
-
-            // Get the parts based on the regex
-            Regex regex = new Regex(InputRegex);
-            Match match = regex.Match(Text);
-            if(!match.Success)
-                return;
-
-            List<string> parts = new List<string>();
-            foreach(Group group in match.Groups)
-                parts.Add(group.Value);
-            Parts = parts;
-            Debug.WriteLine("Parts : " + string.Join(", ", parts));
+            if(depth > 0)
+                throw new Exception("Invalid format");
         }
     }
 
@@ -91,7 +91,6 @@ namespace WpfComponents.Lib.Inputs
         public TimePicker() { InitializeComponent(); }
 
         #region UI Events
-
         private void TextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
             if(_isEditing)
