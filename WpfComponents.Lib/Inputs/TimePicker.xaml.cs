@@ -1,193 +1,219 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.DirectoryServices.ActiveDirectory;
+using System.ComponentModel.DataAnnotations;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Security.Principal;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using WpfComponents.Lib.Helpers;
 
 namespace WpfComponents.Lib.Inputs
 {
-    public class FormatedTextBox : TextBox
+    public class GroupParamsFactory
     {
-        public string Format { get; set; } = "what{0:[0-9]{2}}inbetw:{1:[0-9]{2}}";
+        Dictionary<string, Func<IEnumerable<string>, BaseGroupParams>> _types = new Dictionary<string, Func<IEnumerable<string>, BaseGroupParams>>(
+            )
+        { { "numeric", (options) => new NumericOptions(options) }, };
 
-        public List<string> Parts { get; private set; } = new List<string>();
-
-        public FormatedTextBox() { ParseFormat(Format); }
-
-        public void ParseFormat(string format)
+        public BaseGroupParams CreateParams(string stringParams, string? globalStringParams)
         {
-            Dictionary<int, string> groups = new Dictionary<int, string>();
-            StringBuilder outputFormat = new StringBuilder();
+            IEnumerable<string> splitParams = stringParams.Split("|");
+            if(splitParams.Count() <= 0)
+                throw new ArgumentException("Options can not be empty.");
 
-            StringBuilder group = new StringBuilder();
-            int depth = 0;
-            foreach(char c in format)
+            // Add global options at the beginning
+            if (globalStringParams != null)
+                splitParams = globalStringParams.Split("|").Concat(splitParams);
+
+            // For each _types, check if options contains it
+            // If yes, remove it from options and create the type
+            // If no, create the default type
+            foreach (var type in _types)
             {
-                if(c == '}')
-                    depth -= 1;
-
-                if(depth > 0)
-                    group.Append(c);
-                else if (c != '{' && c != '}')
-                    outputFormat.Append(c);
-
-                if (c == '{')
-                    depth += 1;
-
-                if(depth == 0 && group.Length > 0)
+                if(splitParams.Contains(type.Key))
                 {
-                    string newGroup = group.ToString();
-                    var groupParts = newGroup.Split(":", 2, StringSplitOptions.None);
-                    int index = Int32.Parse(groupParts[0]);
-                    groups.Add(index, groupParts[1]);
-                    outputFormat.Append("{" + index + "}");
-                    group.Clear();
+                    splitParams = splitParams.Where(x => x != type.Key);
+                    return type.Value.Invoke(splitParams);
                 }
             }
 
-            if(depth > 0)
-                throw new Exception("Invalid format");
+            return new BaseGroupParams(splitParams);
+        }
+    }
+
+    public class BaseGroupParams
+    {
+        public int? Length { get; set; }
+        [Display(Name = "format")]
+        public string? StringFormat { get; set; } = null;
+        public Regex? Regex { get; set; } = null;
+        [Display(Name = "nullable")]
+        public bool IsNullable { get; set; } = false;
+
+        public BaseGroupParams(IEnumerable<string> stringParams)
+        {
+            // Separate key and value
+            Dictionary<string, string?> paramKeyValue = new Dictionary<string, string?>();
+            foreach(var param in stringParams)
+            {
+                string[] splitParam = param.Split(":", 2);
+
+                string key = splitParam[0];
+
+                string? value = null;
+                if(splitParam.Length > 1)
+                    value = splitParam[1];
+
+                paramKeyValue.Add(key, value);
+            }
+
+            // For each property, check if options contains it
+            foreach(var property in this.GetType().GetProperties())
+            {
+                // Get display name attribute
+                var displayAttribute = property.GetCustomAttribute<DisplayAttribute>();
+                string displayName = displayAttribute?.Name ?? property.Name.FirstCharToLowerCase();
+
+                // Set properties
+                if(paramKeyValue.ContainsKey(displayName))
+                {
+                    Type type = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+
+                    string? value = paramKeyValue[displayName];
+                    if(type == typeof(int) && value != null)
+                        property.SetValue(this, int.Parse(value));
+                    else if(type == typeof(string) && value != null)
+                        property.SetValue(this, value);
+                    else if(type == typeof(Regex) && value != null)
+                        property.SetValue(this, new Regex(value));
+                    else if(type == typeof(bool))
+                        property.SetValue(this, true);
+                    else
+                        throw new ArgumentException("Invalid option type : " + property.PropertyType);
+                }
+            }
+
+            Build();
+        }
+
+        // Make the different properties work together
+        public virtual void Build()
+        {
+            // Create the regex
+            if (Regex != null)
+                return;
+
+            string inputLength = (Length > 0) ? "{1," + Length + "}" : "+";
+            if (IsNullable)
+                Regex = new Regex(@$"(\s{inputLength}|{BuildRegex(inputLength)})");
+            else
+                Regex = new Regex(@$"({BuildRegex(inputLength)})");
+        }
+
+        public virtual string BuildRegex(string inputLength)
+        {
+            return @"\w" + inputLength;
+        }
+    }
+
+    public class NumericOptions : BaseGroupParams
+    {
+        public int? Min { get; set; }
+
+        public int? Max { get; set; }
+
+        [Display(Name = "padded")]
+        public bool IsPadded { get; set; }
+
+        public NumericOptions(IEnumerable<string> options) : base(options)
+        {
+        }
+
+        public override void Build()
+        {
+            if (Max != null && Length == null)
+                Length = Max.ToString().Length; // Negative max number ?
+
+            if (IsPadded && StringFormat == null && Length != null)
+                StringFormat = $":D{Length}";
+
+            base.Build();
+        }
+
+        public override string BuildRegex(string inputLength)
+        {
+            return @"\d" + inputLength;
+        }
+    }
+
+    public class FormatedTextBox : TextBox
+    {
+        public string GlobalFormat { get; set; } = "numeric|min:0|padded";
+        public string CustomFormat { get; set; } = "{max:9999}/{max:12}/{max:31} {max:23}:{max:59}";
+
+        private string _outputFormat = "";
+        private List<BaseGroupParams> _groupParams = new List<BaseGroupParams>();
+
+        public FormatedTextBox()
+        {
+            ParseGroups(CustomFormat, GlobalFormat);
+        }
+        
+        public void ParseGroups(string format, string globalFormat)
+        {
+            GroupParamsFactory paramsFactory = new GroupParamsFactory();
+            StringBuilder outputFormatBuilder = new StringBuilder();
+
+            StringBuilder group = new StringBuilder();
+            int depth = 0;
+            char previousChar = '\0';
+            foreach (char c in format)
+            {
+                if (c == '}' && previousChar != '\\')
+                    depth -= 1;
+
+                if (depth > 0)
+                    group.Append(c);
+                else if (c != '{' && c != '}')
+                    outputFormatBuilder.Append(c);
+
+                if (c == '{' && previousChar != '\\')
+                    depth += 1;
+
+                if (depth == 0 && group.Length > 0)
+                {
+                    var param = paramsFactory.CreateParams(group.ToString(), globalFormat);
+                    outputFormatBuilder.Append("{" + _groupParams.Count + param.StringFormat + "}");
+
+                    _groupParams.Add(param);
+                    group.Clear();
+                }
+
+                previousChar = c;
+            }
+
+            if (depth > 0)
+                throw new Exception("Invalid format, was expecting }");
+
+            _outputFormat = outputFormatBuilder.ToString();
+        }
+
+        public string PartsToText(List<string> parts)
+        {
+
         }
     }
 
     // XXX : use classic string format, only have to find a way to link the string format to the actual DateTime. or maybe using regex and group ?
     public partial class TimePicker : UserControl, INotifyPropertyChanged
     {
-        #region Properties
-        const string TIME_FORMAT_CHARS = "yMdHhms";
-
-        public DateTime Time { get; set; } = DateTime.Now;
-
-        public string Format { get; set; } = "HH:mm:ss";
-
-        public string FormattedTime { get { return Time.ToString(Format); } }
-
-        private bool _isEditing = false;
-
-        public DateTime TestDateTime { get; set; } = DateTime.Now;
-        #endregion
-
-        // Select a part of the time
-        // Then pressing key change number on right, then left, then swap to next block on the right
-        // Check if next input is ok (31h for exemple)
-
         public TimePicker() { InitializeComponent(); }
-
-        #region UI Events
-        private void TextBox_SelectionChanged(object sender, RoutedEventArgs e)
-        {
-            if(_isEditing)
-                return;
-
-            // Get current textbox
-            TextBox textBox = (TextBox)sender;
-            // Get current caret position
-            int caretIndex = textBox.CaretIndex;
-
-            if(caretIndex < 0 || caretIndex >= Format.Length)
-            {
-                e.Handled = true;
-                return;
-            }
-
-            StringBuilder timeStringBuilder = new StringBuilder(Format);
-            char searchChar = timeStringBuilder[caretIndex];
-
-            if(TIME_FORMAT_CHARS.IndexOf(searchChar) == -1)
-            {
-                e.Handled = true;
-                return;
-            }
-
-            // Find the same char on the left and on the right
-            int leftIndex = caretIndex;
-            int rightIndex = caretIndex;
-            while(leftIndex > 0 && timeStringBuilder[leftIndex] == searchChar)
-                leftIndex--;
-            while(rightIndex < timeStringBuilder.Length && timeStringBuilder[rightIndex] == searchChar)
-                rightIndex++;
-
-            _isEditing = true;
-            // Set the textbox selection
-            textBox.Select(leftIndex + 1, rightIndex - leftIndex - 1);
-            _isEditing = false;
-        }
-
-        private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-        }
-        #endregion
-
-        private bool GetTimePart(string time, int index, out int? result)
-        {
-            if(index > time.Length)
-            {
-                result = null;
-                return false;
-            }
-
-            StringBuilder timeStringBuilder = new StringBuilder(time);
-            if(timeStringBuilder[index] == '1')
-                timeStringBuilder[index] = '2';
-            else
-                timeStringBuilder[index] = '1';
-
-            DateTime newTime;
-            try
-            {
-                newTime = DateTime.ParseExact(timeStringBuilder.ToString(), Format, CultureInfo.InvariantCulture);
-            } catch(Exception e)
-            {
-                result = null;
-                return true;
-            }
-
-            if(Time.Year != newTime.Year)
-            {
-                result = Time.Year;
-                return true;
-            } else if(Time.Month != newTime.Month)
-            {
-                result = Time.Month;
-                return true;
-            } else if(Time.Day != newTime.Day)
-            {
-                result = Time.Day;
-                return true;
-            } else if(Time.Hour != newTime.Hour)
-            {
-                result = Time.Hour;
-                return true;
-            } else if(Time.Minute != newTime.Minute)
-            {
-                result = Time.Minute;
-                return true;
-            } else if(Time.Second != newTime.Second)
-            {
-                result = Time.Second;
-                return true;
-            } else
-            {
-                result = null;
-                return false;
-            }
-        }
     }
 }

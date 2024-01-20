@@ -12,7 +12,7 @@
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
 
-        <local:FormatedTextBox Text="{Binding TestDateTime, StringFormat={}{0:HH:mm}}" />
+        <local:FormatedTextBox />
         <Button Grid.Column="1" />
     </Grid>
 </UserControl>
