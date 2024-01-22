@@ -14,7 +14,7 @@ namespace WpfComponents.Lib.Inputs.Formated
     {
         Dictionary<string, Func<IEnumerable<string>, BaseGroupParams>> _types = new Dictionary<string, Func<IEnumerable<string>, BaseGroupParams>>(
             )
-        { { "numeric", (options) => new NumericOptions(options) }, };
+        { { "numeric", (options) => new NumericParams(options) }, };
 
         public BaseGroupParams CreateParams(string stringParams, string? globalStringParams)
         {
@@ -117,7 +117,7 @@ namespace WpfComponents.Lib.Inputs.Formated
         }
     }
 
-    public class NumericOptions : BaseGroupParams
+    public class NumericParams : BaseGroupParams
     {
         public int? Min { get; set; }
 
@@ -126,7 +126,7 @@ namespace WpfComponents.Lib.Inputs.Formated
         [Display(Name = "padded")]
         public bool IsPadded { get; set; }
 
-        public NumericOptions(IEnumerable<string> options) : base(options)
+        public NumericParams(IEnumerable<string> options) : base(options)
         {
         }
 
