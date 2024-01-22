@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <formated:ToListConverter x:Key="ToListConverter" />
+        <local:DateTimeToListConverter x:Key="DateTimeToListConverter" />
     </UserControl.Resources>
     <Grid DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:TimePicker}}">
         <Grid.ColumnDefinitions>
@@ -16,18 +16,7 @@
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
 
-        <formated:FormatedTextBox>
-            <formated:FormatedTextBox.Parts>
-                <MultiBinding Converter="{StaticResource ToListConverter}">
-                    <Binding Path="TestDate.Year" />
-                    <Binding Path="TestDate.Month" />
-                    <Binding Path="TestDate.Day" />
-                    <Binding Path="TestDate.Hour" />
-                    <Binding Path="TestDate.Minute" />
-                    <Binding Path="TestDate.Second" />
-                </MultiBinding>
-            </formated:FormatedTextBox.Parts>
-        </formated:FormatedTextBox>
+        <formated:FormatedTextBox Parts="{Binding TestDate, Converter={StaticResource DateTimeToListConverter}}" />
         <Button Grid.Column="1" />
     </Grid>
 </UserControl>

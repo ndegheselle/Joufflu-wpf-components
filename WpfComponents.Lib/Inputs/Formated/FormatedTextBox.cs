@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows;
 using System.Diagnostics;
+using System.Transactions;
 
 namespace WpfComponents.Lib.Inputs.Formated
 {
@@ -19,21 +20,20 @@ namespace WpfComponents.Lib.Inputs.Formated
         public static readonly DependencyProperty PartsProperty =
             DependencyProperty.Register(
             "Parts",
-            typeof(List<dynamic>),
+            typeof(List<object>),
             typeof(FormatedTextBox),
-            new PropertyMetadata(null, (o, e) => ((FormatedTextBox)o).OnPartsChanged()));
+            new FrameworkPropertyMetadata(
+                null,
+                FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                (o, e) => ((FormatedTextBox)o).OnPartsChanged()));
 
-        public List<dynamic> Parts
+        public List<object> Parts
         {
-            get { return (List<dynamic>)GetValue(PartsProperty); }
+            get { return (List<object>)GetValue(PartsProperty); }
             set { SetValue(PartsProperty, value); }
         }
 
-        public void OnPartsChanged()
-        {
-            FormatText(Parts);
-            GetGroupsValues();
-        }
+        public void OnPartsChanged() { FormatText(Parts); }
         #endregion
 
         #region Properties
@@ -41,12 +41,17 @@ namespace WpfComponents.Lib.Inputs.Formated
         #region Options
         // Should call ParseGroups when changed
         public string GlobalFormat { get; set; } = "numeric|min:0|padded";
-        public string CustomFormat { get; set; } = "{max:9999}/{max:12}/{max:31} alotofinbetween{max:23}:{max:59}:{max:59}";
+
+        public string CustomFormat
+        {
+            get;
+            set;
+        } = "{max:9999}/{max:12}/{max:31} alotofinbetween{max:23}:{max:59}:{max:59}";
+
         public bool AllowSelectionOutsideGroups { get; set; } = false;
         #endregion
-
-
         private int _selectedGroupIndex = -1;
+
         public int SelectedGroupIndex
         {
             get { return _selectedGroupIndex; }
@@ -65,7 +70,9 @@ namespace WpfComponents.Lib.Inputs.Formated
                 }
             }
         }
+
         public BaseGroupParams? SelectedParam { get; set; }
+
         public Group? SelectedGroup { get; set; }
 
         private string _outputFormat = "";
@@ -75,7 +82,6 @@ namespace WpfComponents.Lib.Inputs.Formated
 
         private List<BaseGroupParams> _groupParams = new List<BaseGroupParams>();
         #endregion
-        
         public FormatedTextBox() { ParseGroups(CustomFormat, GlobalFormat); }
 
         #region UI Events
@@ -85,7 +91,34 @@ namespace WpfComponents.Lib.Inputs.Formated
 
             // Get the new text that would be created (including selection handling)
 
-            e.Handled = true;
+            // Can't edit outside groups
+            if (SelectedGroupIndex < 0)
+            {
+                e.Handled = true;
+                return;
+            }
+
+            if (SelectedParam is NumericParams numericParam)
+            {
+                string newString = Parts[SelectedGroupIndex].ToString() + e.Text;
+
+                // If the number is too big we loop back to only the new number
+                if (numericParam.Length != null && newString.Length > numericParam.Length)
+                    newString = e.Text;
+
+                int newValue = int.Parse(newString);
+                if (numericParam.Max != null && newValue > numericParam.Max)
+                    newValue = numericParam.Max.Value;
+                else if (numericParam.Min != null && newValue > numericParam.Min)
+                    newValue = numericParam.Min.Value;
+
+                Parts[SelectedGroupIndex] = newValue;
+                e.Handled = true;
+            }
+            else
+            {
+                // TODO : handle string
+            }
         }
 
         protected override void OnSelectionChanged(RoutedEventArgs e)
@@ -95,13 +128,13 @@ namespace WpfComponents.Lib.Inputs.Formated
 
             base.OnSelectionChanged(e);
 
-            if(_globalMatch == null)
+            if (_globalMatch == null)
                 return;
 
             int currentRegexGroupIndex = -1;
             for (int i = 1; i < _globalMatch.Groups.Count; i++)
             {
-                if(SelectionStart >= _globalMatch.Groups[i].Index &&
+                if (SelectionStart >= _globalMatch.Groups[i].Index &&
                     SelectionStart <= _globalMatch.Groups[i].Index + _globalMatch.Groups[i].Length)
                 {
                     currentRegexGroupIndex = i;
@@ -131,41 +164,52 @@ namespace WpfComponents.Lib.Inputs.Formated
         #endregion
 
         #region Input / Output
-        private void FormatText(List<dynamic> parts) { this.Text = string.Format(_outputFormat, parts.ToArray()); }
+        private void FormatText(IEnumerable<object> parts)
+        { this.Text = string.Format(_outputFormat, parts.ToArray()); }
 
-        private List<string> GetGroupsValues()
+        // XXX : not needed in theory since we diretly get the parts from PreviewTextInput
+        private IEnumerable<object> GetPartsValues()
         {
             _globalMatch = _globalRegex.Match(this.Text);
 
-            if(!_globalMatch.Success)
-                return new List<string>();
-            else
-                return _globalMatch.Groups.Cast<Group>().Skip(1).Select(x => x.Value).ToList();
+            List<object> values = new List<object>();
+            if (_globalMatch.Success)
+            {
+                for (int i = 1; i < _globalMatch.Groups.Count; i++)
+                {
+                    if (_groupParams[i - 1] is NumericParams)
+                        values.Add(int.Parse(_globalMatch.Groups[i].Value));
+                    else
+                        values.Add(_globalMatch.Groups[i].Value);
+                }
+            }
+            return values;
         }
         #endregion
 
         #region Parsing
         public void ParseGroups(string format, string globalFormat)
         {
-            List<dynamic> groups = ParseFormatString(format, globalFormat);
+            List<object> groups = ParseFormatString(format, globalFormat);
 
             // Create format for output
             // Create regex for input
             StringBuilder globalRegexBuilder = new StringBuilder();
             StringBuilder outputFormatBuilder = new StringBuilder();
             int paramIndex = 0;
-            for(int i = 0; i < groups.Count; i++)
+            for (int i = 0; i < groups.Count; i++)
             {
-                if(groups[i] is BaseGroupParams groupParam)
+                if (groups[i] is BaseGroupParams groupParam)
                 {
                     _groupParams.Add(groupParam);
                     outputFormatBuilder.Append("{" + paramIndex + groupParam.StringFormat + "}");
                     globalRegexBuilder.Append(groupParam.Regex);
                     paramIndex++;
-                } else if(groups[i] is string)
+                }
+                else if (groups[i] is string outputPart)
                 {
-                    outputFormatBuilder.Append(groups[i]);
-                    globalRegexBuilder.Append(Regex.Escape(groups[i]));
+                    outputFormatBuilder.Append(outputPart);
+                    globalRegexBuilder.Append(outputPart);
                 }
             }
 
@@ -173,35 +217,36 @@ namespace WpfComponents.Lib.Inputs.Formated
             _globalRegex = new Regex(globalRegexBuilder.ToString());
         }
 
-        private List<dynamic> ParseFormatString(string format, string globalFormat)
+        private List<object> ParseFormatString(string format, string globalFormat)
         {
             GroupParamsFactory paramsFactory = new GroupParamsFactory();
             StringBuilder outputFormatBuilder = new StringBuilder();
-            List<dynamic> groups = new List<dynamic>();
+            List<object> groups = new List<object>();
 
             StringBuilder groupBuilder = new StringBuilder();
             int depth = 0;
             char previousChar = '\0';
-            foreach(char c in format)
+            foreach (char c in format)
             {
-                if(c == '}' && previousChar != '\\')
+                if (c == '}' && previousChar != '\\')
                     depth -= 1;
 
-                if(depth > 0)
+                if (depth > 0)
                     groupBuilder.Append(c);
-                else if(c != '{' && c != '}')
+                else if (c != '{' && c != '}')
                     outputFormatBuilder.Append(c);
 
-                if(c == '{' && previousChar != '\\')
+                if (c == '{' && previousChar != '\\')
                     depth += 1;
 
                 // Group params & mask
-                if(depth == 0 && groupBuilder.Length > 0)
+                if (depth == 0 && groupBuilder.Length > 0)
                 {
                     var param = paramsFactory.CreateParams(groupBuilder.ToString(), globalFormat);
                     groups.Add(param);
                     groupBuilder.Clear();
-                } else if(depth > 0 && outputFormatBuilder.Length > 0)
+                }
+                else if (depth > 0 && outputFormatBuilder.Length > 0)
                 {
                     groups.Add(outputFormatBuilder.ToString());
                     outputFormatBuilder.Clear();
@@ -210,7 +255,7 @@ namespace WpfComponents.Lib.Inputs.Formated
                 previousChar = c;
             }
 
-            if(depth > 0)
+            if (depth > 0)
                 throw new Exception("Invalid format, was expecting '}'");
 
             return groups;
