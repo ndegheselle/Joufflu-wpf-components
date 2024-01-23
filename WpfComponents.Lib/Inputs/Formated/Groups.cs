@@ -12,11 +12,11 @@ namespace WpfComponents.Lib.Inputs.Formated
 {
     public class GroupParamsFactory
     {
-        Dictionary<string, Func<IEnumerable<string>, BaseGroupParams>> _types = 
-            new Dictionary<string, Func<IEnumerable<string>, BaseGroupParams>>()
-        { { "numeric", (options) => new NumericParams(options) } };
+        Dictionary<string, Func<IEnumerable<string>, BaseGroup>> _types = 
+            new Dictionary<string, Func<IEnumerable<string>, BaseGroup>>()
+        { { "numeric", (options) => new NumericGroup(options) } };
 
-        public BaseGroupParams CreateParams(string stringParams, string? globalStringParams)
+        public BaseGroup CreateParams(string stringParams, string? globalStringParams)
         {
             IEnumerable<string> splitParams = stringParams.Split("|");
             if (splitParams.Count() <= 0)
@@ -38,23 +38,25 @@ namespace WpfComponents.Lib.Inputs.Formated
                 }
             }
 
-            return new BaseGroupParams(splitParams);
+            // Default
+            return new StringGroup(splitParams);
         }
     }
 
-    public class BaseGroupParams
+    public class BaseGroup
     {
-        public int? Length { get; set; }
+        public int Index { get; set; } = -1;
+
+        public int Length { get; set; } = 0;
 
         [Display(Name = "format")]
         public string? StringFormat { get; set; } = null;
 
-        public Regex? Regex { get; set; } = null;
         [Display(Name = "nullable")]
         public bool IsNullable { get; set; } = false;
 
-        #region Init
-        public BaseGroupParams(IEnumerable<string> stringParams)
+
+        public BaseGroup(IEnumerable<string> stringParams)
         {
             // Separate key and value
             Dictionary<string, string?> paramKeyValue = new Dictionary<string, string?>();
@@ -96,26 +98,7 @@ namespace WpfComponents.Lib.Inputs.Formated
                         throw new ArgumentException("Invalid option type : " + property.PropertyType);
                 }
             }
-
-            Build();
         }
-
-        // Make the different properties work together
-        public virtual void Build()
-        {
-            // Create the regex
-            if (Regex != null)
-                return;
-
-            string inputLength = (Length > 0) ? "{1," + Length + "}" : "+";
-            if (IsNullable)
-                Regex = new Regex(@$"(\s{inputLength}|{BuildRegex(inputLength)})");
-            else
-                Regex = new Regex(@$"({BuildRegex(inputLength)})");
-        }
-
-        public virtual string BuildRegex(string inputLength) { return @"\w" + inputLength; }
-        #endregion
 
         // What 
         public virtual void HandleInput(string input)
@@ -133,8 +116,20 @@ namespace WpfComponents.Lib.Inputs.Formated
         }
     }
 
-    public class NumericParams : BaseGroupParams
+    public class StringGroup : BaseGroup
     {
+        public Regex? Regex { get; set; }
+        public string Value { get; set; } = "";
+
+        public StringGroup(IEnumerable<string> options) : base(options)
+        {
+        }
+    }
+
+    public class NumericGroup : BaseGroup
+    {
+        public int Value { get; set; } = 0;
+
         public int? Min { get; set; }
 
         public int? Max { get; set; }
@@ -142,23 +137,13 @@ namespace WpfComponents.Lib.Inputs.Formated
         [Display(Name = "padded")]
         public bool IsPadded { get; set; }
 
-        #region Init
-        public NumericParams(IEnumerable<string> options) : base(options)
+        public NumericGroup(IEnumerable<string> options) : base(options)
         {
-        }
-
-        public override void Build()
-        {
-            if (Max != null && Length == null)
+            if (Max != null && Length == 0)
                 Length = Max.ToString().Length; // Negative max number ?
 
-            if (IsPadded && StringFormat == null && Length != null)
+            if (IsPadded && StringFormat == null && Length != 0)
                 StringFormat = $":D{Length}";
-
-            base.Build();
         }
-
-        public override string BuildRegex(string inputLength) { return @"\d" + inputLength; }
-        #endregion
     }
 }

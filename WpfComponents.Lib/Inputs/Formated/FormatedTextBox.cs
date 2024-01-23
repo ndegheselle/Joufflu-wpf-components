@@ -74,13 +74,10 @@ namespace WpfComponents.Lib.Inputs.Formated
             }
         }
 
-        public BaseGroupParams? SelectedParam { get; set; }
-
-        public Group? SelectedGroup { get; set; }
+        public IBaseGroup? SelectedGroup { get; set; }
 
         private string _outputFormat = "";
         private Regex _globalRegex;
-        private Match _globalMatch;
         private bool _isSelectionChanging = false;
 
         private List<BaseGroupParams> _groupParams = new List<BaseGroupParams>();
