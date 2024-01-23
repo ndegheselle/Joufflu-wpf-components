@@ -12,9 +12,9 @@ namespace WpfComponents.Lib.Inputs.Formated
 {
     public class GroupParamsFactory
     {
-        Dictionary<string, Func<IEnumerable<string>, BaseGroupParams>> _types = new Dictionary<string, Func<IEnumerable<string>, BaseGroupParams>>(
-            )
-        { { "numeric", (options) => new NumericParams(options) }, };
+        Dictionary<string, Func<IEnumerable<string>, BaseGroupParams>> _types = 
+            new Dictionary<string, Func<IEnumerable<string>, BaseGroupParams>>()
+        { { "numeric", (options) => new NumericParams(options) } };
 
         public BaseGroupParams CreateParams(string stringParams, string? globalStringParams)
         {
@@ -45,12 +45,15 @@ namespace WpfComponents.Lib.Inputs.Formated
     public class BaseGroupParams
     {
         public int? Length { get; set; }
+
         [Display(Name = "format")]
         public string? StringFormat { get; set; } = null;
+
         public Regex? Regex { get; set; } = null;
         [Display(Name = "nullable")]
         public bool IsNullable { get; set; } = false;
 
+        #region Init
         public BaseGroupParams(IEnumerable<string> stringParams)
         {
             // Separate key and value
@@ -111,9 +114,22 @@ namespace WpfComponents.Lib.Inputs.Formated
                 Regex = new Regex(@$"({BuildRegex(inputLength)})");
         }
 
-        public virtual string BuildRegex(string inputLength)
+        public virtual string BuildRegex(string inputLength) { return @"\w" + inputLength; }
+        #endregion
+
+        // What 
+        public virtual void HandleInput(string input)
         {
-            return @"\w" + inputLength;
+        }
+
+        // What happen when the user click inside the group
+        public virtual void HandleSelection()
+        {
+        }
+
+        // After the regex apply logic on the value of the group
+        public virtual void HandleValidation()
+        {
         }
     }
 
@@ -126,6 +142,7 @@ namespace WpfComponents.Lib.Inputs.Formated
         [Display(Name = "padded")]
         public bool IsPadded { get; set; }
 
+        #region Init
         public NumericParams(IEnumerable<string> options) : base(options)
         {
         }
@@ -141,9 +158,7 @@ namespace WpfComponents.Lib.Inputs.Formated
             base.Build();
         }
 
-        public override string BuildRegex(string inputLength)
-        {
-            return @"\d" + inputLength;
-        }
+        public override string BuildRegex(string inputLength) { return @"\d" + inputLength; }
+        #endregion
     }
 }

@@ -23,13 +23,13 @@ namespace WpfComponents.Lib.Inputs
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             DateTime date = (DateTime)value;
-            return new List<int>() { date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second };
+            return new List<object>() { date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second };
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var list = value as List<int>;
-            return new DateTime(list[0], list[1], list[2], list[3], list[4], list[5]);
+            var list = value as List<object>;
+            return new DateTime((int)list[0], (int)list[1], (int)list[2], (int)list[3], (int)list[4], (int)list[5]);
         }
     }
 

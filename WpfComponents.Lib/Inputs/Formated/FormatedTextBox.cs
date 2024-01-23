@@ -33,7 +33,9 @@ namespace WpfComponents.Lib.Inputs.Formated
             set { SetValue(PartsProperty, value); }
         }
 
-        public void OnPartsChanged() { FormatText(Parts); }
+        public void OnPartsChanged() {
+            FormatText(Parts);
+        }
         #endregion
 
         #region Properties
@@ -49,6 +51,7 @@ namespace WpfComponents.Lib.Inputs.Formated
         } = "{max:9999}/{max:12}/{max:31} alotofinbetween{max:23}:{max:59}:{max:59}";
 
         public bool AllowSelectionOutsideGroups { get; set; } = false;
+        public bool GoToNextGroupOnMax { get; set; } = true;
         #endregion
         private int _selectedGroupIndex = -1;
 
@@ -82,7 +85,10 @@ namespace WpfComponents.Lib.Inputs.Formated
 
         private List<BaseGroupParams> _groupParams = new List<BaseGroupParams>();
         #endregion
-        public FormatedTextBox() { ParseGroups(CustomFormat, GlobalFormat); }
+        public FormatedTextBox() { 
+            ParseGroups(CustomFormat, GlobalFormat);
+            GetPartsValues();
+        }
 
         #region UI Events
         protected override void OnPreviewTextInput(TextCompositionEventArgs e)
@@ -108,7 +114,11 @@ namespace WpfComponents.Lib.Inputs.Formated
 
                 int newValue = int.Parse(newString);
                 if (numericParam.Max != null && newValue > numericParam.Max)
+                {
                     newValue = numericParam.Max.Value;
+                    if (GoToNextGroupOnMax && _globalMatch.Groups.Count > SelectedGroupIndex + 2)
+                        Select(_globalMatch.Groups[SelectedGroupIndex + 2].Index, 0);
+                }
                 else if (numericParam.Min != null && newValue > numericParam.Min)
                     newValue = numericParam.Min.Value;
 
