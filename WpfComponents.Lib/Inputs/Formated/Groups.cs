@@ -6,11 +6,13 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Input;
 using WpfComponents.Lib.Helpers;
 
 namespace WpfComponents.Lib.Inputs.Formated
 {
-    public class GroupParamsFactory
+    public class GroupsFactory
     {
         Dictionary<string, Func<IEnumerable<string>, BaseGroup>> _types = 
             new Dictionary<string, Func<IEnumerable<string>, BaseGroup>>()
@@ -43,8 +45,9 @@ namespace WpfComponents.Lib.Inputs.Formated
         }
     }
 
-    public class BaseGroup
+    public abstract class BaseGroup
     {
+
         public int Index { get; set; } = -1;
 
         public int Length { get; set; } = 0;
@@ -100,39 +103,55 @@ namespace WpfComponents.Lib.Inputs.Formated
             }
         }
 
-        // What 
-        public virtual void HandleInput(string input)
-        {
-        }
-
+        public abstract object? Value { get; set; }
+        /// <summary>
+        /// What to do with the string input of the user
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="input"></param>
+        /// <returns>Got a valid value</returns>
+        public abstract bool HandleInput(FormatedTextBox sender, string input);
         // What happen when the user click inside the group
-        public virtual void HandleSelection()
+        public abstract void HandleSelection(FormatedTextBox sender);
+    }
+
+    public abstract class GenericBaseGroup<T> : BaseGroup
+    {
+        protected T TypedValue { get; set; }
+        public override object Value
         {
+            get => TypedValue;
+            set => TypedValue = (T)value;
         }
 
-        // After the regex apply logic on the value of the group
-        public virtual void HandleValidation()
+        protected GenericBaseGroup(IEnumerable<string> stringParams) : base(stringParams)
         {
         }
     }
 
-    public class StringGroup : BaseGroup
+    public class StringGroup : GenericBaseGroup<string>
     {
         public Regex? Regex { get; set; }
-        public string Value { get; set; } = "";
-
         public StringGroup(IEnumerable<string> options) : base(options)
         {
         }
+
+        public override bool HandleInput(FormatedTextBox sender, string input)
+        {
+            return false;
+        }
+
+        public override void HandleSelection(FormatedTextBox sender)
+        {
+        }
     }
 
-    public class NumericGroup : BaseGroup
+    public class NumericGroup : GenericBaseGroup<int>
     {
-        public int Value { get; set; } = 0;
+        public int Min { get; set; } = int.MinValue;
+        public int Max { get; set; } = int.MaxValue;
 
-        public int? Min { get; set; }
-
-        public int? Max { get; set; }
+        public bool GotToNext { get; set; } = true;
 
         [Display(Name = "padded")]
         public bool IsPadded { get; set; }
@@ -144,6 +163,41 @@ namespace WpfComponents.Lib.Inputs.Formated
 
             if (IsPadded && StringFormat == null && Length != 0)
                 StringFormat = $":D{Length}";
+        }
+
+        public override bool HandleInput(FormatedTextBox sender, string input)
+        {
+            string newString = TypedValue + input;
+
+            // If the number is too big we loop back to only the new number
+            if (newString.Length > Length)
+            {
+                newString = input;
+                if (GotToNext)
+                    sender.SelectNextGroup();
+            }
+
+            bool isValid = int.TryParse(newString, out int newValue);
+            if (!isValid)
+                return false;
+
+            if (newValue > Max)
+            {
+                newValue = Max;
+                if (GotToNext)
+                    sender.SelectNextGroup();
+            }
+            else if (newValue < Min)
+                newValue = Min;
+
+            TypedValue = newValue;
+            return true;
+        }
+
+        public override void HandleSelection(FormatedTextBox sender)
+        {
+            // For numeric groups, we select the whole number
+            sender.Select(Index, Length);
         }
     }
 }
