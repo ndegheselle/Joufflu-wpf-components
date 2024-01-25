@@ -14,11 +14,11 @@ namespace WpfComponents.Lib.Inputs.Formated
 {
     public class GroupsFactory
     {
-        Dictionary<string, Func<IEnumerable<string>, BaseGroup>> _types = 
-            new Dictionary<string, Func<IEnumerable<string>, BaseGroup>>()
-        { { "numeric", (options) => new NumericGroup(options) } };
+        Dictionary<string, Func<FormatedTextBox, IEnumerable<string>, BaseGroup>> _types = 
+            new Dictionary<string, Func<FormatedTextBox, IEnumerable<string>, BaseGroup>>()
+        { { "numeric", (parent, options) => new NumericGroup(parent, options) } };
 
-        public BaseGroup CreateParams(string stringParams, string? globalStringParams)
+        public BaseGroup CreateParams(FormatedTextBox parent, string stringParams, string? globalStringParams)
         {
             IEnumerable<string> splitParams = stringParams.Split("|");
             if (splitParams.Count() <= 0)
@@ -36,17 +36,18 @@ namespace WpfComponents.Lib.Inputs.Formated
                 if (splitParams.Contains(type.Key))
                 {
                     splitParams = splitParams.Where(x => x != type.Key);
-                    return type.Value.Invoke(splitParams);
+                    return type.Value.Invoke(parent, splitParams);
                 }
             }
 
             // Default
-            return new StringGroup(splitParams);
+            return new StringGroup(parent, splitParams);
         }
     }
 
     public abstract class BaseGroup
     {
+        protected readonly FormatedTextBox _parent;
 
         public int Index { get; set; } = -1;
 
@@ -59,8 +60,9 @@ namespace WpfComponents.Lib.Inputs.Formated
         public bool IsNullable { get; set; } = false;
 
 
-        public BaseGroup(IEnumerable<string> stringParams)
+        public BaseGroup(FormatedTextBox parent, IEnumerable<string> stringParams)
         {
+            _parent = parent;
             // Separate key and value
             Dictionary<string, string?> paramKeyValue = new Dictionary<string, string?>();
             foreach (var param in stringParams)
@@ -104,27 +106,30 @@ namespace WpfComponents.Lib.Inputs.Formated
         }
 
         public abstract object? Value { get; set; }
+
         /// <summary>
         /// What to do with the string input of the user
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="input"></param>
         /// <returns>Got a valid value</returns>
-        public abstract bool HandleInput(FormatedTextBox sender, string input);
+        public abstract bool HandleInput(string input);
+
         // What happen when the user click inside the group
-        public abstract void HandleSelection(FormatedTextBox sender);
+        public abstract void HandleSelection();
+
+        public abstract void HandleDelete();
     }
 
     public abstract class GenericBaseGroup<T> : BaseGroup
     {
         protected T TypedValue { get; set; }
-        public override object Value
-        {
-            get => TypedValue;
-            set => TypedValue = (T)value;
-        }
 
-        protected GenericBaseGroup(IEnumerable<string> stringParams) : base(stringParams)
+        public override object Value { get => TypedValue; set => TypedValue = (T)value; }
+
+        protected GenericBaseGroup(FormatedTextBox parent, IEnumerable<string> stringParams) : base(
+            parent,
+            stringParams)
         {
         }
     }
@@ -132,16 +137,19 @@ namespace WpfComponents.Lib.Inputs.Formated
     public class StringGroup : GenericBaseGroup<string>
     {
         public Regex? Regex { get; set; }
-        public StringGroup(IEnumerable<string> options) : base(options)
+
+        public StringGroup(FormatedTextBox parent, IEnumerable<string> options) : base(parent, options)
         {
         }
 
-        public override bool HandleInput(FormatedTextBox sender, string input)
+        public override bool HandleInput(string input) { return false; }
+
+        public override void HandleSelection()
         {
-            return false;
         }
 
-        public override void HandleSelection(FormatedTextBox sender)
+
+        public override void HandleDelete()
         {
         }
     }
@@ -149,14 +157,13 @@ namespace WpfComponents.Lib.Inputs.Formated
     public class NumericGroup : GenericBaseGroup<int>
     {
         public int Min { get; set; } = int.MinValue;
-        public int Max { get; set; } = int.MaxValue;
 
-        public bool GotToNext { get; set; } = true;
+        public int Max { get; set; } = int.MaxValue;
 
         [Display(Name = "padded")]
         public bool IsPadded { get; set; }
 
-        public NumericGroup(IEnumerable<string> options) : base(options)
+        public NumericGroup(FormatedTextBox parent, IEnumerable<string> options) : base(parent, options)
         {
             if (Max != null && Length == 0)
                 Length = Max.ToString().Length; // Negative max number ?
@@ -165,7 +172,7 @@ namespace WpfComponents.Lib.Inputs.Formated
                 StringFormat = $":D{Length}";
         }
 
-        public override bool HandleInput(FormatedTextBox sender, string input)
+        public override bool HandleInput(string input)
         {
             string newString = TypedValue + input;
 
@@ -173,8 +180,6 @@ namespace WpfComponents.Lib.Inputs.Formated
             if (newString.Length > Length)
             {
                 newString = input;
-                if (GotToNext)
-                    sender.SelectNextGroup();
             }
 
             bool isValid = int.TryParse(newString, out int newValue);
@@ -182,11 +187,7 @@ namespace WpfComponents.Lib.Inputs.Formated
                 return false;
 
             if (newValue > Max)
-            {
                 newValue = Max;
-                if (GotToNext)
-                    sender.SelectNextGroup();
-            }
             else if (newValue < Min)
                 newValue = Min;
 
@@ -194,10 +195,12 @@ namespace WpfComponents.Lib.Inputs.Formated
             return true;
         }
 
-        public override void HandleSelection(FormatedTextBox sender)
+        public override void HandleSelection()
         {
             // For numeric groups, we select the whole number
-            sender.Select(Index, Length);
+            _parent.Select(Index, Length);
         }
+
+        public override void HandleDelete() { Value = 0; }
     }
 }

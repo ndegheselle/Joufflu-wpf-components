@@ -34,21 +34,19 @@ namespace WpfComponents.Lib.Inputs.Formated
         }
 
         public void OnPartsChanged() {
+            if (Groups.Count == 0)
+                ParseGroups(Format, GlobalFormat);
             FormatText(Parts);
-            for (int i = 0; i < Groups.Count; i++)
-            {
-                Groups[i].Value = Parts[i];
-            }
         }
         #endregion
 
         #region Properties
 
         #region Options
+
         // Should call ParseGroups when changed
         public string GlobalFormat { get; set; } = "numeric|min:0|padded";
-
-        public string CustomFormat
+        public string Format
         {
             get;
             set;
@@ -56,7 +54,9 @@ namespace WpfComponents.Lib.Inputs.Formated
 
         public bool AllowSelectionOutsideGroups { get; set; } = false;
         public bool GoToNextGroupOnMax { get; set; } = true;
+
         #endregion
+
         private int _selectedGroupIndex = -1;
         public int SelectedGroupIndex
         {
@@ -83,21 +83,16 @@ namespace WpfComponents.Lib.Inputs.Formated
 
         #endregion
 
-        public FormatedTextBox() { 
-            ParseGroups(CustomFormat, GlobalFormat);
-        }
-
         #region UI Events
         protected override void OnPreviewTextInput(TextCompositionEventArgs e)
         {
             base.OnPreviewTextInput(e);
 
-            bool validInput = SelectedGroup?.HandleInput(this, e.Text) ?? false;
+            bool validInput = SelectedGroup?.HandleInput(e.Text) ?? false;
 
             if (validInput)
             {
-                Parts = Groups.Select(g => g.Value).ToList();
-                FormatText(Parts);
+                UpdateParts();
                 // TODO : raise event value changed
             }
 
@@ -131,12 +126,19 @@ namespace WpfComponents.Lib.Inputs.Formated
             }
 
             _isSelectionChanging = true;
-            SelectedGroup?.HandleSelection(this);
+            SelectedGroup?.HandleSelection();
             _isSelectionChanging = false;
         }
         #endregion
 
         #region Input / Output
+
+        private void UpdateParts()
+        {
+            Parts = Groups.Select(g => g.Value).ToList();
+            FormatText(Parts);
+        }
+
         private void FormatText(IEnumerable<object?> parts)
         {
             // Change text and prevent selection from changing
@@ -148,11 +150,60 @@ namespace WpfComponents.Lib.Inputs.Formated
             _isSelectionChanging = false;
         }
 
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            // If escape unfocus the textbox
+            if (e.Key == Key.Escape)
+            {
+                Keyboard.ClearFocus();
+                e.Handled = true;
+            }
+            // If tab select next group
+            else if (e.Key == Key.Tab)
+            {
+                ChangeSelectedGroup(Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) ? -1 : 1);
+                e.Handled = true;
+            }
+            // If arrow keys change group
+            else if (e.Key == Key.Left)
+            {
+                ChangeSelectedGroup(-1);
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Right)
+            {
+                ChangeSelectedGroup(1);
+                e.Handled = true;
+            }
+            // If suppr
+            else if (e.Key == Key.Delete)
+            {
+                if (SelectedGroup != null)
+                {
+                    SelectedGroup.HandleDelete();
+                    UpdateParts();
+                }
+                e.Handled = true;
+            }
+            // Backspace
+            else if (e.Key == Key.Back)
+            {
+                if (SelectedGroup != null)
+                {
+                    SelectedGroup.HandleDelete();
+                    UpdateParts();
+                }
+                e.Handled = true;
+            }
+
+        }
+
         #endregion
 
         #region Parsing
         public void ParseGroups(string format, string globalFormat)
         {
+            Groups.Clear();
             List<object> groups = ParseFormatString(format, globalFormat);
 
             // Create format for output
@@ -173,6 +224,11 @@ namespace WpfComponents.Lib.Inputs.Formated
             }
 
             _outputFormat = outputFormatBuilder.ToString();
+            // Update group values from parts
+            for (int i = 0; i < Groups.Count; i++)
+            {
+                Groups[i].Value = Parts[i];
+            }
         }
 
         private List<object> ParseFormatString(string format, string globalFormat)
@@ -201,7 +257,7 @@ namespace WpfComponents.Lib.Inputs.Formated
                 // Group params & mask
                 if (depth == 0 && groupBuilder.Length > 0)
                 {
-                    var group = groupsFactory.CreateParams(groupBuilder.ToString(), globalFormat);
+                    var group = groupsFactory.CreateParams(this, groupBuilder.ToString(), globalFormat);
                     group.Index = index;
                     groups.Add(group);
                     groupBuilder.Clear();
@@ -225,12 +281,12 @@ namespace WpfComponents.Lib.Inputs.Formated
         }
         #endregion
 
-
-        public void SelectNextGroup()
+        public void ChangeSelectedGroup(int delta)
         {
-            if (SelectedGroupIndex + 1 >= Groups.Count)
+            int newindex = SelectedGroupIndex + delta;
+            if (newindex < 0 || newindex >= Groups.Count)
                 return;
-            Select(Groups[SelectedGroupIndex + 1].Index, 0);
+            Select(Groups[newindex].Index, 0);
         }
     }
 }
