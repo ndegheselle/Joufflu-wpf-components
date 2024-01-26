@@ -11,8 +11,4 @@
     <ProjectReference Include="..\WpfComponents.Lib\WpfComponents.Lib.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Ressources\" />
-  </ItemGroup>
-
 </Project>

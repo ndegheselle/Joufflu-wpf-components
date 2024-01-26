@@ -28,7 +28,10 @@ namespace WpfComponents.Lib.Inputs
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var list = value as List<object>;
+            var list = (List<object?>)value;
+            if (list.Any(x => x == null))
+                return null;
+
             return new DateTime((int)list[0], (int)list[1], (int)list[2], (int)list[3], (int)list[4], (int)list[5]);
         }
     }

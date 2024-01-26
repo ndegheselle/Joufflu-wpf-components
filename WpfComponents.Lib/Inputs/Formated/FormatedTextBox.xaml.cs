@@ -36,7 +36,7 @@ namespace WpfComponents.Lib.Inputs.Formated
         public void OnPartsChanged() {
             if (Groups.Count == 0)
                 ParseGroups(Format, GlobalFormat);
-            FormatText(Parts);
+            FormatText(Groups);
         }
         #endregion
 
@@ -45,12 +45,12 @@ namespace WpfComponents.Lib.Inputs.Formated
         #region Options
 
         // Should call ParseGroups when changed
-        public string GlobalFormat { get; set; } = "numeric|min:0|padded";
+        public string GlobalFormat { get; set; } = "numeric|min:0|padded|nullable";
         public string Format
         {
             get;
             set;
-        } = "{max:9999}/{max:12}/{max:31} alotofinbetween{max:23}:{max:59}:{max:59}";
+        } = "{max:9999}/{max:12}/{max:31} {max:23}:{max:59}:{max:59}";
 
         public bool AllowSelectionOutsideGroups { get; set; } = false;
         public bool GoToNextGroupOnMax { get; set; } = true;
@@ -80,6 +80,41 @@ namespace WpfComponents.Lib.Inputs.Formated
 
         private string _outputFormat = "";
         private bool _isSelectionChanging = false;
+
+        // Parts
+        private Button _upButton;
+        private Button _downButton;
+        private Button _clearButton;
+
+        #endregion
+
+        #region Init
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            _upButton = (Button)this.Template.FindName("PART_UpButton", this);
+            _downButton = (Button)this.Template.FindName("PART_DownButton", this);
+            _clearButton = (Button)this.Template.FindName("PART_ClearButton", this);
+
+            _upButton.Click += UpButton_Click;
+            _downButton.Click += DownButton_Click;
+            _clearButton.Click += ClearButton_Click;
+        }
+
+        private void UpButton_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        private void DownButton_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
 
@@ -127,26 +162,6 @@ namespace WpfComponents.Lib.Inputs.Formated
 
             _isSelectionChanging = true;
             SelectedGroup?.HandleSelection();
-            _isSelectionChanging = false;
-        }
-        #endregion
-
-        #region Input / Output
-
-        private void UpdateParts()
-        {
-            Parts = Groups.Select(g => g.Value).ToList();
-            FormatText(Parts);
-        }
-
-        private void FormatText(IEnumerable<object?> parts)
-        {
-            // Change text and prevent selection from changing
-            _isSelectionChanging = true;
-            int selectionStart = SelectionStart;
-            int selectionLength = SelectionLength;
-            this.Text = string.Format(_outputFormat, parts.ToArray());
-            Select(selectionStart, selectionLength);
             _isSelectionChanging = false;
         }
 
@@ -197,7 +212,38 @@ namespace WpfComponents.Lib.Inputs.Formated
             }
 
         }
+        #endregion
 
+        #region Input / Output
+
+        #endregion
+
+
+        #region Methods
+        public void ChangeSelectedGroup(int delta)
+        {
+            int newindex = SelectedGroupIndex + delta;
+            if (newindex < 0 || newindex >= Groups.Count)
+                return;
+            Select(Groups[newindex].Index, 0);
+        }
+
+        private void UpdateParts()
+        {
+            Parts = Groups.Select(g => g.Value).ToList();
+            FormatText(Groups);
+        }
+
+        private void FormatText(IEnumerable<BaseGroup> groups)
+        {
+            // Change text and prevent selection from changing
+            _isSelectionChanging = true;
+            int selectionStart = SelectionStart;
+            int selectionLength = SelectionLength;
+            this.Text = string.Format(_outputFormat, groups.ToArray());
+            Select(selectionStart, selectionLength);
+            _isSelectionChanging = false;
+        }
         #endregion
 
         #region Parsing
@@ -214,7 +260,7 @@ namespace WpfComponents.Lib.Inputs.Formated
                 if (groups[i] is BaseGroup groupParam)
                 {
                     Groups.Add(groupParam);
-                    outputFormatBuilder.Append("{" + paramIndex + groupParam.StringFormat + "}");
+                    outputFormatBuilder.Append("{" + paramIndex + "}");
                     paramIndex++;
                 }
                 else if (groups[i] is string outputPart)
@@ -281,12 +327,5 @@ namespace WpfComponents.Lib.Inputs.Formated
         }
         #endregion
 
-        public void ChangeSelectedGroup(int delta)
-        {
-            int newindex = SelectedGroupIndex + delta;
-            if (newindex < 0 || newindex >= Groups.Count)
-                return;
-            Select(Groups[newindex].Index, 0);
-        }
     }
 }

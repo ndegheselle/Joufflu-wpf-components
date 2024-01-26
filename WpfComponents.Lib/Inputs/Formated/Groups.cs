@@ -40,8 +40,9 @@ namespace WpfComponents.Lib.Inputs.Formated
                 }
             }
 
-            // Default
-            return new StringGroup(parent, splitParams);
+            return null;
+            // May use a StringGroup
+            // return new StringGroup(parent, splitParams);
         }
     }
 
@@ -58,6 +59,7 @@ namespace WpfComponents.Lib.Inputs.Formated
 
         [Display(Name = "nullable")]
         public bool IsNullable { get; set; } = false;
+        public char NullableChar { get; set; } = ' ';
 
 
         public BaseGroup(FormatedTextBox parent, IEnumerable<string> stringParams)
@@ -105,7 +107,7 @@ namespace WpfComponents.Lib.Inputs.Formated
             }
         }
 
-        public abstract object? Value { get; set; }
+        public object? Value { get; set; }
 
         /// <summary>
         /// What to do with the string input of the user
@@ -121,40 +123,7 @@ namespace WpfComponents.Lib.Inputs.Formated
         public abstract void HandleDelete();
     }
 
-    public abstract class GenericBaseGroup<T> : BaseGroup
-    {
-        protected T TypedValue { get; set; }
-
-        public override object Value { get => TypedValue; set => TypedValue = (T)value; }
-
-        protected GenericBaseGroup(FormatedTextBox parent, IEnumerable<string> stringParams) : base(
-            parent,
-            stringParams)
-        {
-        }
-    }
-
-    public class StringGroup : GenericBaseGroup<string>
-    {
-        public Regex? Regex { get; set; }
-
-        public StringGroup(FormatedTextBox parent, IEnumerable<string> options) : base(parent, options)
-        {
-        }
-
-        public override bool HandleInput(string input) { return false; }
-
-        public override void HandleSelection()
-        {
-        }
-
-
-        public override void HandleDelete()
-        {
-        }
-    }
-
-    public class NumericGroup : GenericBaseGroup<int>
+    public class NumericGroup : BaseGroup
     {
         public int Min { get; set; } = int.MinValue;
 
@@ -165,7 +134,9 @@ namespace WpfComponents.Lib.Inputs.Formated
 
         public NumericGroup(FormatedTextBox parent, IEnumerable<string> options) : base(parent, options)
         {
-            if (Max != null && Length == 0)
+            NullableChar = '-';
+
+            if (Max != int.MaxValue && Length == 0)
                 Length = Max.ToString().Length; // Negative max number ?
 
             if (IsPadded && StringFormat == null && Length != 0)
@@ -174,7 +145,7 @@ namespace WpfComponents.Lib.Inputs.Formated
 
         public override bool HandleInput(string input)
         {
-            string newString = TypedValue + input;
+            string newString = Value + input;
 
             // If the number is too big we loop back to only the new number
             if (newString.Length > Length)
@@ -191,7 +162,13 @@ namespace WpfComponents.Lib.Inputs.Formated
             else if (newValue < Min)
                 newValue = Min;
 
-            TypedValue = newValue;
+            Value = newValue;
+
+            // If the next input will make the number too big, we change group
+            int futureValue = newValue * 10;
+            if (futureValue > Max || futureValue.ToString().Length > Length)
+                _parent.ChangeSelectedGroup(1);
+
             return true;
         }
 
@@ -201,6 +178,19 @@ namespace WpfComponents.Lib.Inputs.Formated
             _parent.Select(Index, Length);
         }
 
-        public override void HandleDelete() { Value = 0; }
+        public override void HandleDelete() {
+        
+            if (IsNullable)
+                Value = null;
+            else
+                Value = 0;
+        }
+
+        public override string ToString()
+        {
+            if (Value == null)
+                return new string(NullableChar, Length);
+            return string.Format("{0" + StringFormat + "}", Value);
+        }
     }
 }
