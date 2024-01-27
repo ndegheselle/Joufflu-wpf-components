@@ -17,6 +17,5 @@
         </Grid.ColumnDefinitions>
 
         <formated:FormatedTextBox Parts="{Binding TestDate, Converter={StaticResource DateTimeToListConverter}}" />
-        <Button Grid.Column="1" />
     </Grid>
 </UserControl>

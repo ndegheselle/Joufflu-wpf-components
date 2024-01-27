@@ -17,12 +17,8 @@
 
   <ItemGroup>
     <Resource Include="Resources\Fonts\FontAwesomeSolid.otf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Resources\Styles\" />
   </ItemGroup>
 
 </Project>

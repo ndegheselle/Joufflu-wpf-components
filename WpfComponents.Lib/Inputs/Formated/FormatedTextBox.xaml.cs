@@ -9,11 +9,13 @@ using System.Windows.Input;
 using System.Windows;
 using System.Diagnostics;
 using System.Transactions;
+using System.ComponentModel;
 
 namespace WpfComponents.Lib.Inputs.Formated
 {
-    public class FormatedTextBox : TextBox
+    public class FormatedTextBox : TextBox, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
         #region Dependency Properties
 
         // Should update text when changed
@@ -33,7 +35,8 @@ namespace WpfComponents.Lib.Inputs.Formated
             set { SetValue(PartsProperty, value); }
         }
 
-        public void OnPartsChanged() {
+        public void OnPartsChanged()
+        {
             if (Groups.Count == 0)
                 ParseGroups(Format, GlobalFormat);
             FormatText(Groups);
@@ -43,21 +46,17 @@ namespace WpfComponents.Lib.Inputs.Formated
         #region Properties
 
         #region Options
-
         // Should call ParseGroups when changed
         public string GlobalFormat { get; set; } = "numeric|min:0|padded|nullable";
-        public string Format
-        {
-            get;
-            set;
-        } = "{max:9999}/{max:12}/{max:31} {max:23}:{max:59}:{max:59}";
+
+        public string Format { get; set; } = "{max:9999}/{max:12}/{max:31} {max:23}:{max:59}:{max:59}";
 
         public bool AllowSelectionOutsideGroups { get; set; } = false;
-        public bool GoToNextGroupOnMax { get; set; } = true;
 
+        public bool ShowActions { get; set; } = true;
         #endregion
-
         private int _selectedGroupIndex = -1;
+
         public int SelectedGroupIndex
         {
             get { return _selectedGroupIndex; }
@@ -76,46 +75,62 @@ namespace WpfComponents.Lib.Inputs.Formated
         }
 
         public BaseGroup? SelectedGroup { get; set; }
+
         public List<BaseGroup> Groups = new List<BaseGroup>();
 
         private string _outputFormat = "";
         private bool _isSelectionChanging = false;
 
         // Parts
+        private Button _clearButton;
         private Button _upButton;
         private Button _downButton;
-        private Button _clearButton;
-
         #endregion
 
         #region Init
-
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
 
+            _clearButton = (Button)this.Template.FindName("PART_ClearButton", this);
             _upButton = (Button)this.Template.FindName("PART_UpButton", this);
             _downButton = (Button)this.Template.FindName("PART_DownButton", this);
-            _clearButton = (Button)this.Template.FindName("PART_ClearButton", this);
 
+            _clearButton.Click += ClearButton_Click;
             _upButton.Click += UpButton_Click;
             _downButton.Click += DownButton_Click;
-            _clearButton.Click += ClearButton_Click;
         }
 
         private void UpButton_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
-        }
-        private void DownButton_Click(object sender, RoutedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-        private void ClearButton_Click(object sender, RoutedEventArgs e)
-        {
-            throw new NotImplementedException();
+            if (SelectedGroup == null)
+                ChangeSelectedGroup(1);
+
+            if (SelectedGroup is NumericGroup numericGroup)
+            {
+                numericGroup.Value++;
+                FormatText(Groups);
+            }
         }
 
+        private void DownButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedGroup == null)
+                ChangeSelectedGroup(1);
+
+            if (SelectedGroup is NumericGroup numericGroup)
+            {
+                numericGroup.Value--;
+                FormatText(Groups);
+            }
+        }
+
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var group in Groups)
+                group.HandleDelete();
+            FormatText(Groups);
+        }
         #endregion
 
         #region UI Events
@@ -142,10 +157,9 @@ namespace WpfComponents.Lib.Inputs.Formated
             base.OnSelectionChanged(e);
 
             int currentRegexGroupIndex = -1;
-            for(int i = 0; i < Groups.Count; i++)
+            for (int i = 0; i < Groups.Count; i++)
             {
-                if (SelectionStart >= Groups[i].Index &&
-                    SelectionStart <= Groups[i].Index + Groups[i].Length)
+                if (SelectionStart >= Groups[i].Index && SelectionStart <= Groups[i].Index + Groups[i].Length)
                 {
                     currentRegexGroupIndex = i;
                     break;
@@ -210,7 +224,6 @@ namespace WpfComponents.Lib.Inputs.Formated
                 }
                 e.Handled = true;
             }
-
         }
         #endregion
 
@@ -218,13 +231,16 @@ namespace WpfComponents.Lib.Inputs.Formated
 
         #endregion
 
-
         #region Methods
         public void ChangeSelectedGroup(int delta)
         {
             int newindex = SelectedGroupIndex + delta;
             if (newindex < 0 || newindex >= Groups.Count)
                 return;
+
+            if (IsFocused == false)
+                Focus();
+
             Select(Groups[newindex].Index, 0);
         }
 
@@ -326,6 +342,5 @@ namespace WpfComponents.Lib.Inputs.Formated
             return groups;
         }
         #endregion
-
     }
 }

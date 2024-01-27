@@ -1,33 +1,83 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
     xmlns:local="clr-namespace:WpfComponents.Lib.Inputs.Formated">
 
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Resources/NamedStyles/IconButton.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
     <Style TargetType="{x:Type local:FormatedTextBox}">
+        <!--  XXX: Should use adonis layout system  -->
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
+        <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource {x:Static adonisUi:Dimensions.BorderThickness}}" />
+        <Setter Property="Padding" Value="2,1" />
+
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TextBoxBase}">
                     <Border
                         Name="Border"
-                        Padding="{TemplateBinding Padding}"
-                        BorderThickness="1">
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
                                 <ColumnDefinition Width="auto" />
                             </Grid.ColumnDefinitions>
 
-                            <ScrollViewer x:Name="PART_ContentHost" />
+                            <ScrollViewer x:Name="PART_ContentHost" Padding="{TemplateBinding Padding}" />
                             <!--  Actions butons  -->
-                            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                <StackPanel>
-                                    <Button x:Name="PART_UpButton">UpDOwn</Button>
-                                    <Button x:Name="PART_DownButton">UpDOwn</Button>
-                                </StackPanel>
-                                <Button x:Name="PART_ClearButton">Clear</Button>
+                            <StackPanel
+                                x:Name="ActionsContainer"
+                                Grid.Column="1"
+                                Orientation="Horizontal">
+                                <Button x:Name="PART_ClearButton" Style="{StaticResource IconButton}">
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontFamily="{DynamicResource FontAwesomeSolid}"
+                                        FontSize="10"
+                                        Text="&#xf00d;" />
+                                </Button>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Button
+                                        x:Name="PART_UpButton"
+                                        Height="auto"
+                                        Focusable="False"
+                                        Style="{StaticResource IconButton}">
+                                        <TextBlock
+                                            FontFamily="{DynamicResource FontAwesomeSolid}"
+                                            FontSize="8"
+                                            Text="&#xf077;" />
+                                    </Button>
+                                    <Button
+                                        x:Name="PART_DownButton"
+                                        Grid.Row="1"
+                                        Height="auto"
+                                        Focusable="False"
+                                        Style="{StaticResource IconButton}">
+                                        <TextBlock
+                                            FontFamily="{DynamicResource FontAwesomeSolid}"
+                                            FontSize="8"
+                                            Text="&#xf078;" />
+                                    </Button>
+                                </Grid>
                             </StackPanel>
                         </Grid>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding ShowActions, RelativeSource={RelativeSource Self}}" Value="False">
+                            <Setter TargetName="ActionsContainer" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

@@ -8,7 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Fonts\FontAwesomeSolid.otf" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\WpfComponents.Lib\WpfComponents.Lib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\Styles\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Fonts\FontAwesomeSolid.otf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

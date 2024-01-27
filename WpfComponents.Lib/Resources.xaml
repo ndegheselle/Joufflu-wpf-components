@@ -1,14 +1,13 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary>
-            <FontFamily x:Key="FontAwesomeSolid">/Resources/Fonts/FontAwesomeSolid.otf#Font Awesome 6 Free Solid</FontFamily>
-            <!--  Converters  -->
-        </ResourceDictionary>
 
+    <FontFamily x:Key="FontAwesomeSolid">/Resources/Fonts/FontAwesomeSolid.otf#Font Awesome 6 Free Solid</FontFamily>
+
+    <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/AdonisUI.ClassicTheme;component/Resources.xaml" />
+
+        <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Resources/NamedStyles/IconButton.xaml" />
 
         <!--  Inputs  -->
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Inputs/Formated/FormatedTextBox.xaml" />
-
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

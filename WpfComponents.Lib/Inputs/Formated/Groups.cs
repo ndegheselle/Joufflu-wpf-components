@@ -125,6 +125,27 @@ namespace WpfComponents.Lib.Inputs.Formated
 
     public class NumericGroup : BaseGroup
     {
+        public new int? Value
+        { get
+            {
+                return (int?)base.Value;
+            }
+            set
+            {
+                if (value > Max)
+                {
+                    base.Value = Max;
+                    return;
+                }
+                else if (value < Min)
+                {
+                    base.Value = Min;
+                    return;
+                }
+                base.Value = value;
+            }
+        }
+
         public int Min { get; set; } = int.MinValue;
 
         public int Max { get; set; } = int.MaxValue;
@@ -156,11 +177,6 @@ namespace WpfComponents.Lib.Inputs.Formated
             bool isValid = int.TryParse(newString, out int newValue);
             if (!isValid)
                 return false;
-
-            if (newValue > Max)
-                newValue = Max;
-            else if (newValue < Min)
-                newValue = Min;
 
             Value = newValue;
 
