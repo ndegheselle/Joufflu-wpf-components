@@ -6,7 +6,18 @@
     xmlns:inputs="clr-namespace:WpfComponents.Lib.Inputs;assembly=WpfComponents.Lib">
 
     <StackPanel>
-        <inputs:TimePicker />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <inputs:TimePicker x:Name="TimePickerInput" ValueChanged="TimePickerInput_ValueChanged" />
+            <TextBlock
+                VerticalAlignment="Center"
+                Margin="4,0,0,0"
+                Grid.Column="1"
+                Text="{Binding Value, StringFormat=dd\\:hh\\:mm\\:ss, ElementName=TimePickerInput}" />
+        </Grid>
     </StackPanel>
 
 </adonisControls:AdonisWindow>

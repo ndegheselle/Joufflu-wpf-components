@@ -8,14 +8,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <local:DateTimeToListConverter x:Key="DateTimeToListConverter" />
+        <local:TimeSpanToListConverter x:Key="TimeSpanToListConverter" />
     </UserControl.Resources>
-    <Grid DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:TimePicker}}">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition Width="auto" />
-        </Grid.ColumnDefinitions>
 
-        <formated:FormatedTextBox Parts="{Binding TestDate, Converter={StaticResource DateTimeToListConverter}}" />
-    </Grid>
+    <formated:FormatedTextBox
+        GlobalFormat="numeric|min:0|padded|nullable"
+        Format="{}{max:365}d {max:23}h {max:59}m {max:59}s"
+        Values="{Binding Value, Converter={StaticResource TimeSpanToListConverter}, RelativeSource={RelativeSource AncestorType=local:TimePicker}}"
+        ValuesChanged="FormatedTextBox_ValuesChanged" />
 </UserControl>

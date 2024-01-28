@@ -10,35 +10,44 @@ using System.Windows;
 using System.Diagnostics;
 using System.Transactions;
 using System.ComponentModel;
+using System.Runtime.Serialization;
+using System.Runtime.CompilerServices;
 
 namespace WpfComponents.Lib.Inputs.Formated
 {
     public class FormatedTextBox : TextBox, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName]string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public event EventHandler<List<object?>>? ValuesChanged;
         #region Dependency Properties
 
         // Should update text when changed
-        public static readonly DependencyProperty PartsProperty =
+        public static readonly DependencyProperty ValuesProperty =
             DependencyProperty.Register(
-            "Parts",
+            "Values",
             typeof(List<object?>),
             typeof(FormatedTextBox),
             new FrameworkPropertyMetadata(
                 null,
                 FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
-                (o, e) => ((FormatedTextBox)o).OnPartsChanged()));
+                (o, e) => ((FormatedTextBox)o).OnValuesChanged()));
 
-        public List<object?> Parts
+        public List<object?> Values
         {
-            get { return (List<object?>)GetValue(PartsProperty); }
-            set { SetValue(PartsProperty, value); }
+            get { return (List<object?>)GetValue(ValuesProperty); }
+            set { SetValue(ValuesProperty, value); }
         }
 
-        public void OnPartsChanged()
+        private void OnValuesChanged()
         {
             if (Groups.Count == 0)
                 ParseGroups(Format, GlobalFormat);
+            ValuesChanged?.Invoke(this, Values);
             FormatText(Groups);
         }
         #endregion
@@ -47,13 +56,15 @@ namespace WpfComponents.Lib.Inputs.Formated
 
         #region Options
         // Should call ParseGroups when changed
-        public string GlobalFormat { get; set; } = "numeric|min:0|padded|nullable";
+        public string GlobalFormat { get; set; }
 
-        public string Format { get; set; } = "{max:9999}/{max:12}/{max:31} {max:23}:{max:59}:{max:59}";
+        public string Format { get; set; } = "";
 
         public bool AllowSelectionOutsideGroups { get; set; } = false;
 
-        public bool ShowActions { get; set; } = true;
+        public bool ShowDeleteButton { get; set; } = true;
+
+        public bool ShowIncrementsButtons { get; set; } = true;
         #endregion
         private int _selectedGroupIndex = -1;
 
@@ -81,7 +92,7 @@ namespace WpfComponents.Lib.Inputs.Formated
         private string _outputFormat = "";
         private bool _isSelectionChanging = false;
 
-        // Parts
+        // UI Parts
         private Button _clearButton;
         private Button _upButton;
         private Button _downButton;
@@ -100,37 +111,6 @@ namespace WpfComponents.Lib.Inputs.Formated
             _upButton.Click += UpButton_Click;
             _downButton.Click += DownButton_Click;
         }
-
-        private void UpButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (SelectedGroup == null)
-                ChangeSelectedGroup(1);
-
-            if (SelectedGroup is NumericGroup numericGroup)
-            {
-                numericGroup.Value++;
-                FormatText(Groups);
-            }
-        }
-
-        private void DownButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (SelectedGroup == null)
-                ChangeSelectedGroup(1);
-
-            if (SelectedGroup is NumericGroup numericGroup)
-            {
-                numericGroup.Value--;
-                FormatText(Groups);
-            }
-        }
-
-        private void ClearButton_Click(object sender, RoutedEventArgs e)
-        {
-            foreach (var group in Groups)
-                group.HandleDelete();
-            FormatText(Groups);
-        }
         #endregion
 
         #region UI Events
@@ -138,12 +118,11 @@ namespace WpfComponents.Lib.Inputs.Formated
         {
             base.OnPreviewTextInput(e);
 
-            bool validInput = SelectedGroup?.HandleInput(e.Text) ?? false;
-
+            bool validInput = SelectedGroup?.OnInput(e.Text) ?? false;
             if (validInput)
             {
-                UpdateParts();
-                // TODO : raise event value changed
+                UpdateCurrentValue();
+                SelectedGroup?.OnAfterInput();
             }
 
             e.Handled = true;
@@ -175,7 +154,7 @@ namespace WpfComponents.Lib.Inputs.Formated
             }
 
             _isSelectionChanging = true;
-            SelectedGroup?.HandleSelection();
+            SelectedGroup?.OnSelection();
             _isSelectionChanging = false;
         }
 
@@ -209,8 +188,8 @@ namespace WpfComponents.Lib.Inputs.Formated
             {
                 if (SelectedGroup != null)
                 {
-                    SelectedGroup.HandleDelete();
-                    UpdateParts();
+                    SelectedGroup.OnDelete();
+                    UpdateCurrentValue();
                 }
                 e.Handled = true;
             }
@@ -219,11 +198,42 @@ namespace WpfComponents.Lib.Inputs.Formated
             {
                 if (SelectedGroup != null)
                 {
-                    SelectedGroup.HandleDelete();
-                    UpdateParts();
+                    SelectedGroup.OnDelete();
+                    UpdateCurrentValue();
                 }
                 e.Handled = true;
             }
+        }
+
+        private void UpButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedGroup == null)
+                ChangeSelectedGroup(1);
+
+            if (SelectedGroup is NumericGroup numericGroup)
+            {
+                numericGroup.Value++;
+                OnPropertyChanged(nameof(Values));
+            }
+        }
+
+        private void DownButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedGroup == null)
+                ChangeSelectedGroup(1);
+
+            if (SelectedGroup is NumericGroup numericGroup)
+            {
+                numericGroup.Value--;
+                OnPropertyChanged(nameof(Values));
+            }
+        }
+
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var group in Groups)
+                group.OnDelete();
+            OnPropertyChanged(nameof(Values));
         }
         #endregion
 
@@ -244,12 +254,6 @@ namespace WpfComponents.Lib.Inputs.Formated
             Select(Groups[newindex].Index, 0);
         }
 
-        private void UpdateParts()
-        {
-            Parts = Groups.Select(g => g.Value).ToList();
-            FormatText(Groups);
-        }
-
         private void FormatText(IEnumerable<BaseGroup> groups)
         {
             // Change text and prevent selection from changing
@@ -260,6 +264,19 @@ namespace WpfComponents.Lib.Inputs.Formated
             Select(selectionStart, selectionLength);
             _isSelectionChanging = false;
         }
+
+        private void UpdateCurrentValue()
+        {
+            if (SelectedGroup == null)
+                return;
+
+            object? oldValue = Values[SelectedGroupIndex];
+            Values[SelectedGroupIndex] = SelectedGroup.Value;
+            // Trigger change
+            if (oldValue != SelectedGroup.Value)
+                Values =  Groups.Select(x => x.Value).ToList();
+        }
+
         #endregion
 
         #region Parsing
@@ -289,7 +306,7 @@ namespace WpfComponents.Lib.Inputs.Formated
             // Update group values from parts
             for (int i = 0; i < Groups.Count; i++)
             {
-                Groups[i].Value = Parts[i];
+                Groups[i].Value = Values[i];
             }
         }
 
@@ -338,6 +355,9 @@ namespace WpfComponents.Lib.Inputs.Formated
 
             if (depth > 0)
                 throw new Exception("Invalid format, was expecting '}'");
+
+            if (outputFormatBuilder.Length > 0)
+                groups.Add(outputFormatBuilder.ToString());
 
             return groups;
         }

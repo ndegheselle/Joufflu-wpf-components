@@ -48,10 +48,7 @@ namespace WpfComponents.Lib.Inputs.Formated
 
     public abstract class BaseGroup
     {
-        protected readonly FormatedTextBox _parent;
-
-        public int Index { get; set; } = -1;
-
+        #region Options
         public int Length { get; set; } = 0;
 
         [Display(Name = "format")]
@@ -59,8 +56,15 @@ namespace WpfComponents.Lib.Inputs.Formated
 
         [Display(Name = "nullable")]
         public bool IsNullable { get; set; } = false;
-        public char NullableChar { get; set; } = ' ';
 
+        public char NullableChar { get; set; } = ' ';
+        #endregion
+
+        public int Index { get; set; } = -1;
+
+        public object? Value { get; set; }
+
+        protected readonly FormatedTextBox _parent;
 
         public BaseGroup(FormatedTextBox parent, IEnumerable<string> stringParams)
         {
@@ -81,6 +85,7 @@ namespace WpfComponents.Lib.Inputs.Formated
             }
 
             // For each property, check if options contains it
+            // XXX : may want to create a separate class options and only look in it
             foreach (var property in this.GetType().GetProperties())
             {
                 // Get display name attribute
@@ -107,29 +112,36 @@ namespace WpfComponents.Lib.Inputs.Formated
             }
         }
 
-        public object? Value { get; set; }
-
         /// <summary>
         /// What to do with the string input of the user
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="input"></param>
         /// <returns>Got a valid value</returns>
-        public abstract bool HandleInput(string input);
+        public abstract bool OnInput(string input);
+
+        public abstract void OnAfterInput();
 
         // What happen when the user click inside the group
-        public abstract void HandleSelection();
+        public abstract void OnSelection();
 
-        public abstract void HandleDelete();
+        public abstract void OnDelete();
     }
 
     public class NumericGroup : BaseGroup
     {
+        #region Options
+        public int Min { get; set; } = int.MinValue;
+
+        public int Max { get; set; } = int.MaxValue;
+
+        [Display(Name = "padded")]
+        public bool IsPadded { get; set; }
+        #endregion
+
         public new int? Value
-        { get
-            {
-                return (int?)base.Value;
-            }
+        {
+            get { return (int?)base.Value; }
             set
             {
                 if (value > Max)
@@ -146,13 +158,6 @@ namespace WpfComponents.Lib.Inputs.Formated
             }
         }
 
-        public int Min { get; set; } = int.MinValue;
-
-        public int Max { get; set; } = int.MaxValue;
-
-        [Display(Name = "padded")]
-        public bool IsPadded { get; set; }
-
         public NumericGroup(FormatedTextBox parent, IEnumerable<string> options) : base(parent, options)
         {
             NullableChar = '-';
@@ -164,7 +169,7 @@ namespace WpfComponents.Lib.Inputs.Formated
                 StringFormat = $":D{Length}";
         }
 
-        public override bool HandleInput(string input)
+        public override bool OnInput(string input)
         {
             string newString = Value + input;
 
@@ -179,27 +184,34 @@ namespace WpfComponents.Lib.Inputs.Formated
                 return false;
 
             Value = newValue;
-
-            // If the next input will make the number too big, we change group
-            int futureValue = newValue * 10;
-            if (futureValue > Max || futureValue.ToString().Length > Length)
-                _parent.ChangeSelectedGroup(1);
-
             return true;
         }
 
-        public override void HandleSelection()
+        public override void OnAfterInput()
+        {
+            if (Value == null)
+                return;
+
+            // If the next input will make the number too big, we change group
+            int futureValue = Value.Value * 10;
+            if (futureValue > Max || futureValue.ToString().Length > Length)
+                _parent.ChangeSelectedGroup(1);
+        }
+
+        public override void OnSelection()
         {
             // For numeric groups, we select the whole number
             _parent.Select(Index, Length);
         }
 
-        public override void HandleDelete() {
-        
+        public override void OnDelete()
+        {
             if (IsNullable)
                 Value = null;
             else
                 Value = 0;
+
+
         }
 
         public override string ToString()

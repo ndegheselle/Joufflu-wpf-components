@@ -17,13 +17,15 @@ using WpfComponents.Lib.Helpers;
 
 namespace WpfComponents.Lib.Inputs
 {
-    // IValueConverter from DateTime to List<int> and back
-    public class DateTimeToListConverter : IValueConverter
+    // IValueConverter from TimeSpan to List<int> and back
+    public class TimeSpanToListConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            DateTime date = (DateTime)value;
-            return new List<object>() { date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second };
+            if (value is TimeSpan date)
+                return new List<object?>() { date.Days, date.Hours, date.Minutes, date.Seconds };
+            else
+                return new List<object?>() { null, null, null, null };
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -32,15 +34,26 @@ namespace WpfComponents.Lib.Inputs
             if (list.Any(x => x == null))
                 return null;
 
-            return new DateTime((int)list[0], (int)list[1], (int)list[2], (int)list[3], (int)list[4], (int)list[5]);
+            return new TimeSpan((int)list[0], (int)list[1], (int)list[2], (int)list[3]);
         }
     }
 
-    // XXX : use classic string format, only have to find a way to link the string format to the actual DateTime. or maybe using regex and group ?
     public partial class TimePicker : UserControl, INotifyPropertyChanged
     {
-        public DateTime TestDate { get; set; } = DateTime.Now;
+        public event EventHandler<TimeSpan?>? ValueChanged;
 
+        // TODO : should be a DP
+        private TimeSpan? _previousValue;
+        public TimeSpan? Value { get; set; }
         public TimePicker() { InitializeComponent(); }
+
+        private void FormatedTextBox_ValuesChanged(object sender, List<object> e)
+        {
+            if (Value == _previousValue)
+                return;
+
+            ValueChanged?.Invoke(this, Value);
+            _previousValue = Value;
+        }
     }
 }

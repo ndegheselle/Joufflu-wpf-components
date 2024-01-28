@@ -1,4 +1,5 @@
 ﻿using AdonisUI.Controls;
+using System.Diagnostics;
 
 namespace WpfComponents.App
 {
@@ -10,6 +11,11 @@ namespace WpfComponents.App
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void TimePickerInput_ValueChanged(object sender, System.TimeSpan? e)
+        {
+            Debug.WriteLine($"TimePicker.ValueChanged: {e}");
         }
     }
 }
