@@ -19,9 +19,7 @@ namespace WpfComponents.Lib.Inputs.Formated
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName]string name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
+        { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)); }
 
         public event EventHandler<List<object?>>? ValuesChanged;
         #region Dependency Properties
@@ -55,10 +53,31 @@ namespace WpfComponents.Lib.Inputs.Formated
         #region Properties
 
         #region Options
-        // Should call ParseGroups when changed
-        public string GlobalFormat { get; set; }
+        private string _globalFormat = "";
 
-        public string Format { get; set; } = "";
+        public string GlobalFormat
+        {
+            get { return _globalFormat; }
+            set
+            {
+                _globalFormat = value;
+                ParseGroups(Format, GlobalFormat);
+                FormatText(Groups);
+            }
+        }
+
+        private string _format = "";
+
+        public string Format
+        {
+            get { return _format; }
+            set
+            {
+                _format = value;
+                ParseGroups(Format, GlobalFormat);
+                FormatText(Groups);
+            }
+        }
 
         public bool AllowSelectionOutsideGroups { get; set; } = false;
 
@@ -213,7 +232,7 @@ namespace WpfComponents.Lib.Inputs.Formated
             if (SelectedGroup is NumericGroup numericGroup)
             {
                 numericGroup.Value++;
-                OnPropertyChanged(nameof(Values));
+                UpdateCurrentValue();
             }
         }
 
@@ -225,7 +244,7 @@ namespace WpfComponents.Lib.Inputs.Formated
             if (SelectedGroup is NumericGroup numericGroup)
             {
                 numericGroup.Value--;
-                OnPropertyChanged(nameof(Values));
+                UpdateCurrentValue();
             }
         }
 
@@ -233,7 +252,7 @@ namespace WpfComponents.Lib.Inputs.Formated
         {
             foreach (var group in Groups)
                 group.OnDelete();
-            OnPropertyChanged(nameof(Values));
+            UpdateValues();
         }
         #endregion
 
@@ -270,13 +289,23 @@ namespace WpfComponents.Lib.Inputs.Formated
             if (SelectedGroup == null)
                 return;
 
-            object? oldValue = Values[SelectedGroupIndex];
-            Values[SelectedGroupIndex] = SelectedGroup.Value;
-            // Trigger change
-            if (oldValue != SelectedGroup.Value)
-                Values =  Groups.Select(x => x.Value).ToList();
+            if (Values == null)
+            {
+                UpdateValues();
+            }
+            else
+            {
+                object? oldValue = Values[SelectedGroupIndex];
+                if (oldValue != SelectedGroup.Value)
+                    UpdateValues();
+            }
         }
 
+        private void UpdateValues()
+        {
+            // Trigger DP change
+            Values = Groups.Select(x => x.Value).ToList();
+        }
         #endregion
 
         #region Parsing
@@ -303,6 +332,10 @@ namespace WpfComponents.Lib.Inputs.Formated
             }
 
             _outputFormat = outputFormatBuilder.ToString();
+
+            if (Values == null || Values.Count != Groups.Count)
+                return;
+
             // Update group values from parts
             for (int i = 0; i < Groups.Count; i++)
             {
@@ -334,7 +367,7 @@ namespace WpfComponents.Lib.Inputs.Formated
                     depth += 1;
 
                 // Group params & mask
-                if (depth == 0 && groupBuilder.Length > 0)
+                if (depth == 0 && c == '}')
                 {
                     var group = groupsFactory.CreateParams(this, groupBuilder.ToString(), globalFormat);
                     group.Index = index;

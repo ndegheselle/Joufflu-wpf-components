@@ -3,7 +3,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
-    xmlns:inputs="clr-namespace:WpfComponents.Lib.Inputs;assembly=WpfComponents.Lib">
+    xmlns:inputs="clr-namespace:WpfComponents.Lib.Inputs;assembly=WpfComponents.Lib"
+    xmlns:formated="clr-namespace:WpfComponents.Lib.Inputs.Formated;assembly=WpfComponents.Lib">
 
     <StackPanel>
         <Grid>
@@ -11,12 +12,29 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <inputs:TimePicker x:Name="TimePickerInput" ValueChanged="TimePickerInput_ValueChanged" />
+            <inputs:TimeSpanPicker x:Name="TimePickerInput" ValueChanged="TimePickerInput_ValueChanged" />
             <TextBlock
                 VerticalAlignment="Center"
                 Margin="4,0,0,0"
                 Grid.Column="1"
                 Text="{Binding Value, StringFormat=dd\\:hh\\:mm\\:ss, ElementName=TimePickerInput}" />
+        </Grid>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <formated:FormatedTextBox
+                x:Name="PhoneNumberInput"
+                ValuesChanged="PhoneNumberInput_ValueChanged"
+                GlobalFormat="numeric|min:0|nullable|padded"
+                ShowIncrementsButtons="False"
+                Format="+{max:99} {max:99} {max:9999} {max:9999}" />
+            <TextBlock
+                VerticalAlignment="Center"
+                Margin="4,0,0,0"
+                Grid.Column="1"
+                Text="{Binding Values, ElementName=PhoneNumberInput}" />
         </Grid>
     </StackPanel>
 

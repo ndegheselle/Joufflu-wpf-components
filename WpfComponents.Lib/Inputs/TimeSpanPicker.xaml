@@ -1,5 +1,5 @@
 ﻿<UserControl
-    x:Class="WpfComponents.Lib.Inputs.TimePicker"
+    x:Class="WpfComponents.Lib.Inputs.TimeSpanPicker"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -14,6 +14,6 @@
     <formated:FormatedTextBox
         GlobalFormat="numeric|min:0|padded|nullable"
         Format="{}{max:365}d {max:23}h {max:59}m {max:59}s"
-        Values="{Binding Value, Converter={StaticResource TimeSpanToListConverter}, RelativeSource={RelativeSource AncestorType=local:TimePicker}}"
+        Values="{Binding Value, Converter={StaticResource TimeSpanToListConverter}, RelativeSource={RelativeSource AncestorType=local:TimeSpanPicker}}"
         ValuesChanged="FormatedTextBox_ValuesChanged" />
 </UserControl>

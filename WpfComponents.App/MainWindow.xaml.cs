@@ -1,5 +1,7 @@
 ﻿using AdonisUI.Controls;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows.Documents;
 
 namespace WpfComponents.App
 {
@@ -17,5 +19,11 @@ namespace WpfComponents.App
         {
             Debug.WriteLine($"TimePicker.ValueChanged: {e}");
         }
+
+        private void PhoneNumberInput_ValueChanged(object sender, List<object?> values)
+        {
+            Debug.WriteLine($"CardInput.ValueChanged: {string.Join(',', values)}");
+        }
+        
     }
 }

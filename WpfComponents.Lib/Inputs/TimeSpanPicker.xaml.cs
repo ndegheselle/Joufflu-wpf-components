@@ -38,14 +38,14 @@ namespace WpfComponents.Lib.Inputs
         }
     }
 
-    public partial class TimePicker : UserControl, INotifyPropertyChanged
+    public partial class TimeSpanPicker : UserControl, INotifyPropertyChanged
     {
         public event EventHandler<TimeSpan?>? ValueChanged;
 
         // TODO : should be a DP
         private TimeSpan? _previousValue;
         public TimeSpan? Value { get; set; }
-        public TimePicker() { InitializeComponent(); }
+        public TimeSpanPicker() { InitializeComponent(); }
 
         private void FormatedTextBox_ValuesChanged(object sender, List<object> e)
         {

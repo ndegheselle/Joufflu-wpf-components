@@ -57,7 +57,7 @@ namespace WpfComponents.Lib.Inputs.Formated
         [Display(Name = "nullable")]
         public bool IsNullable { get; set; } = false;
 
-        public char NullableChar { get; set; } = ' ';
+        public char NullableChar { get; set; }
         #endregion
 
         public int Index { get; set; } = -1;
@@ -106,6 +106,8 @@ namespace WpfComponents.Lib.Inputs.Formated
                         property.SetValue(this, new Regex(value));
                     else if (type == typeof(bool))
                         property.SetValue(this, true);
+                    else if (type == typeof(char))
+                        property.SetValue(this, value[0]);
                     else
                         throw new ArgumentException("Invalid option type : " + property.PropertyType);
                 }
@@ -160,7 +162,8 @@ namespace WpfComponents.Lib.Inputs.Formated
 
         public NumericGroup(FormatedTextBox parent, IEnumerable<string> options) : base(parent, options)
         {
-            NullableChar = '-';
+            if (NullableChar == '\0')
+                NullableChar = '-';
 
             if (Max != int.MaxValue && Length == 0)
                 Length = Max.ToString().Length; // Negative max number ?
@@ -210,8 +213,6 @@ namespace WpfComponents.Lib.Inputs.Formated
                 Value = null;
             else
                 Value = 0;
-
-
         }
 
         public override string ToString()
