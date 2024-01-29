@@ -8,6 +8,6 @@
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Resources/NamedStyles/IconButton.xaml" />
 
         <!--  Inputs  -->
-        <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Inputs/Formated/FormatedTextBox.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Inputs/Format/FormatTextBox.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

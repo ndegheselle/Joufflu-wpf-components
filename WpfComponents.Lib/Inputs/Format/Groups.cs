@@ -10,15 +10,15 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using WpfComponents.Lib.Helpers;
 
-namespace WpfComponents.Lib.Inputs.Formated
+namespace WpfComponents.Lib.Inputs.Format
 {
     public class GroupsFactory
     {
-        Dictionary<string, Func<FormatedTextBox, IEnumerable<string>, BaseGroup>> _types = 
-            new Dictionary<string, Func<FormatedTextBox, IEnumerable<string>, BaseGroup>>()
+        Dictionary<string, Func<FormatTextBox, IEnumerable<string>, BaseGroup>> _types = 
+            new Dictionary<string, Func<FormatTextBox, IEnumerable<string>, BaseGroup>>()
         { { "numeric", (parent, options) => new NumericGroup(parent, options) } };
 
-        public BaseGroup CreateParams(FormatedTextBox parent, string stringParams, string? globalStringParams)
+        public BaseGroup CreateParams(FormatTextBox parent, string stringParams, string? globalStringParams)
         {
             IEnumerable<string> splitParams = stringParams.Split("|");
             if (splitParams.Count() <= 0)
@@ -64,9 +64,9 @@ namespace WpfComponents.Lib.Inputs.Formated
 
         public object? Value { get; set; }
 
-        protected readonly FormatedTextBox _parent;
+        protected readonly FormatTextBox _parent;
 
-        public BaseGroup(FormatedTextBox parent, IEnumerable<string> stringParams)
+        public BaseGroup(FormatTextBox parent, IEnumerable<string> stringParams)
         {
             _parent = parent;
             // Separate key and value
@@ -160,7 +160,7 @@ namespace WpfComponents.Lib.Inputs.Formated
             }
         }
 
-        public NumericGroup(FormatedTextBox parent, IEnumerable<string> options) : base(parent, options)
+        public NumericGroup(FormatTextBox parent, IEnumerable<string> options) : base(parent, options)
         {
             if (NullableChar == '\0')
                 NullableChar = '-';

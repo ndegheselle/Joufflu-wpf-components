@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace WpfComponents.Lib.Inputs.Formated
+namespace WpfComponents.Lib.Inputs.Format
 {
     // Should be possible to bind directly a MultiBinding to a object[] property ...
     public class ToListConverter: IMultiValueConverter

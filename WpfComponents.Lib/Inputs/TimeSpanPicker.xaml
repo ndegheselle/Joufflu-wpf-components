@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:formated="clr-namespace:WpfComponents.Lib.Inputs.Formated"
+    xmlns:format="clr-namespace:WpfComponents.Lib.Inputs.Format"
     xmlns:local="clr-namespace:WpfComponents.Lib.Inputs"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -11,7 +11,7 @@
         <local:TimeSpanToListConverter x:Key="TimeSpanToListConverter" />
     </UserControl.Resources>
 
-    <formated:FormatedTextBox
+    <format:FormatTextBox
         GlobalFormat="numeric|min:0|padded|nullable"
         Format="{}{max:365}d {max:23}h {max:59}m {max:59}s"
         Values="{Binding Value, Converter={StaticResource TimeSpanToListConverter}, RelativeSource={RelativeSource AncestorType=local:TimeSpanPicker}}"

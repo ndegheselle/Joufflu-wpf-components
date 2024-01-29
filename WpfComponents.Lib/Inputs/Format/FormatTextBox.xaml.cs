@@ -13,9 +13,9 @@ using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Runtime.CompilerServices;
 
-namespace WpfComponents.Lib.Inputs.Formated
+namespace WpfComponents.Lib.Inputs.Format
 {
-    public class FormatedTextBox : TextBox, INotifyPropertyChanged
+    public class FormatTextBox : TextBox, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName]string name = null)
@@ -29,11 +29,11 @@ namespace WpfComponents.Lib.Inputs.Formated
             DependencyProperty.Register(
             "Values",
             typeof(List<object?>),
-            typeof(FormatedTextBox),
+            typeof(FormatTextBox),
             new FrameworkPropertyMetadata(
                 null,
                 FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
-                (o, e) => ((FormatedTextBox)o).OnValuesChanged()));
+                (o, e) => ((FormatTextBox)o).OnValuesChanged()));
 
         public List<object?> Values
         {

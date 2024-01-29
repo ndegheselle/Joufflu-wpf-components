@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
     xmlns:inputs="clr-namespace:WpfComponents.Lib.Inputs;assembly=WpfComponents.Lib"
-    xmlns:formated="clr-namespace:WpfComponents.Lib.Inputs.Formated;assembly=WpfComponents.Lib">
+    xmlns:format="clr-namespace:WpfComponents.Lib.Inputs.Format;assembly=WpfComponents.Lib">
 
     <StackPanel>
         <Grid>
@@ -24,7 +24,7 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <formated:FormatedTextBox
+            <format:FormatTextBox
                 x:Name="PhoneNumberInput"
                 ValuesChanged="PhoneNumberInput_ValueChanged"
                 GlobalFormat="numeric|min:0|nullable|padded"
