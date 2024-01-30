@@ -2,7 +2,6 @@
     x:Class="WpfComponents.App.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:converters="clr-namespace:WpfComponents.App.Base.Converters"
     xmlns:local="clr-namespace:WpfComponents.App"
     StartupUri="MainWindow.xaml">
     <Application.Resources>

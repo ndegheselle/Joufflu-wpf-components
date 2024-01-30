@@ -12,6 +12,7 @@ using System.Transactions;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Runtime.CompilerServices;
+using WpfComponents.Lib.Components.Inputs.Format;
 
 namespace WpfComponents.Lib.Inputs.Format
 {

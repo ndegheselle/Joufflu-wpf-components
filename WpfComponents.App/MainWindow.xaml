@@ -4,8 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
     xmlns:inputs="clr-namespace:WpfComponents.Lib.Inputs;assembly=WpfComponents.Lib"
-    xmlns:format="clr-namespace:WpfComponents.Lib.Inputs.Format;assembly=WpfComponents.Lib">
-
+    xmlns:format="clr-namespace:WpfComponents.Lib.Inputs.Format;assembly=WpfComponents.Lib"
+    xmlns:converters="clr-namespace:WpfComponents.Lib.Converters;assembly=WpfComponents.Lib">
+    <adonisControls:AdonisWindow.Resources>
+        <converters:ListToStringConverter x:Key="ListToStringConverter"/>
+    </adonisControls:AdonisWindow.Resources>
     <StackPanel>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -27,14 +30,14 @@
             <format:FormatTextBox
                 x:Name="PhoneNumberInput"
                 ValuesChanged="PhoneNumberInput_ValueChanged"
-                GlobalFormat="numeric|min:0|nullable|padded"
+                GlobalFormat="numeric|min:0|padded"
                 ShowIncrementsButtons="False"
                 Format="+{max:99} {max:99} {max:9999} {max:9999}" />
             <TextBlock
                 VerticalAlignment="Center"
                 Margin="4,0,0,0"
                 Grid.Column="1"
-                Text="{Binding Values, ElementName=PhoneNumberInput}" />
+                Text="{Binding Values, ElementName=PhoneNumberInput, Converter={StaticResource ListToStringConverter}}" />
         </Grid>
     </StackPanel>
 

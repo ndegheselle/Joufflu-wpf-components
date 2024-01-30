@@ -9,12 +9,13 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using WpfComponents.Lib.Helpers;
+using WpfComponents.Lib.Inputs.Format;
 
-namespace WpfComponents.Lib.Inputs.Format
+namespace WpfComponents.Lib.Components.Inputs.Format
 {
     public class GroupsFactory
     {
-        Dictionary<string, Func<FormatTextBox, IEnumerable<string>, BaseGroup>> _types = 
+        Dictionary<string, Func<FormatTextBox, IEnumerable<string>, BaseGroup>> _types =
             new Dictionary<string, Func<FormatTextBox, IEnumerable<string>, BaseGroup>>()
         { { "numeric", (parent, options) => new NumericGroup(parent, options) } };
 
@@ -86,7 +87,7 @@ namespace WpfComponents.Lib.Inputs.Format
 
             // For each property, check if options contains it
             // XXX : may want to create a separate class options and only look in it
-            foreach (var property in this.GetType().GetProperties())
+            foreach (var property in GetType().GetProperties())
             {
                 // Get display name attribute
                 var displayAttribute = property.GetCustomAttribute<DisplayAttribute>();
@@ -170,6 +171,9 @@ namespace WpfComponents.Lib.Inputs.Format
 
             if (IsPadded && StringFormat == null && Length != 0)
                 StringFormat = $":D{Length}";
+
+            if (!IsNullable)
+                Value = default(int);
         }
 
         public override bool OnInput(string input)
