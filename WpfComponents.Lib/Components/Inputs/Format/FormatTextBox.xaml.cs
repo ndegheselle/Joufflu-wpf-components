@@ -23,9 +23,8 @@ namespace WpfComponents.Lib.Inputs.Format
         { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)); }
 
         public event EventHandler<List<object?>>? ValuesChanged;
-        #region Dependency Properties
 
-        // Should update text when changed
+        #region Dependency Properties
         public static readonly DependencyProperty ValuesProperty =
             DependencyProperty.Register(
             "Values",
