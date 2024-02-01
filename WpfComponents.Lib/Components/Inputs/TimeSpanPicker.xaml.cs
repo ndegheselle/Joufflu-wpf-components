@@ -15,7 +15,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using WpfComponents.Lib.Helpers;
 
-namespace WpfComponents.Lib.Inputs
+namespace WpfComponents.Lib.Components.Inputs
 {
     // IValueConverter from TimeSpan to List<int> and back
     public class TimeSpanToListConverter : IValueConverter

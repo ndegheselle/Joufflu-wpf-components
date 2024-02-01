@@ -14,7 +14,7 @@ namespace WpfComponents.Lib.Converters
         {
             var list = (IEnumerable<object>)value;
             if (list == null)
-                return null;
+                return string.Empty;
             return string.Join(", ", list.Where(x => x != null).Select(x => x?.ToString()));
         }
 

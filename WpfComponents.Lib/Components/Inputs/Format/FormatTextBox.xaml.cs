@@ -14,7 +14,7 @@ using System.Runtime.Serialization;
 using System.Runtime.CompilerServices;
 using WpfComponents.Lib.Components.Inputs.Format;
 
-namespace WpfComponents.Lib.Inputs.Format
+namespace WpfComponents.Lib.Components.Inputs.Format
 {
     public class FormatTextBox : TextBox, INotifyPropertyChanged
     {

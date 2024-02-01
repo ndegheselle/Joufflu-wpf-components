@@ -3,13 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Input;
 using WpfComponents.Lib.Helpers;
-using WpfComponents.Lib.Inputs.Format;
 
 namespace WpfComponents.Lib.Components.Inputs.Format
 {
