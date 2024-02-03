@@ -2,10 +2,12 @@
 using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
+using System.Transactions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
 
 namespace WpfComponents.Lib.Components.Inputs
@@ -18,7 +20,6 @@ namespace WpfComponents.Lib.Components.Inputs
     /// </summary>
     public class ComboBoxSearch : ComboBox
     {
-        private bool _preventTextUpdate;
         private TextBox _editableTextBox;
 
         public bool HideFilteredItems { get; set; } = true;
@@ -37,10 +38,9 @@ namespace WpfComponents.Lib.Components.Inputs
 
         public override void OnApplyTemplate()
         {
+            AddHandler(TextBoxBase.TextChangedEvent, new TextChangedEventHandler(OnTextChanged));
             _editableTextBox = (TextBox)GetTemplateChild("PART_EditableTextBox");
-            _editableTextBox.FontStyle = FontStyles.Normal;
-            if (SelectedItem != null)
-                this.Text = ItemGetTextFrom(SelectedItem, DisplayMemberPath);
+            _editableTextBox.FontStyle = FontStyles.Italic;
 
             base.OnApplyTemplate();
         }
@@ -78,24 +78,31 @@ namespace WpfComponents.Lib.Components.Inputs
                         SelectedIndex = 0;
                     break;
                 case Key.Tab:
-                    case Key.Enter:
+                case Key.Enter:
                     IsDropDownOpen = false;
                     break;
                 case Key.Escape:
                     IsDropDownOpen = false;
                     SelectedItem = null;
                     break;
-                default:
-                    IsDropDownOpen = true;
-                    break;
             }
             base.OnPreviewKeyDown(e);
         }
 
-        protected override void OnPreviewKeyUp(KeyEventArgs e)
+
+        void OnTextChanged(object sender, TextChangedEventArgs e)
         {
+            if (SelectedItem != null && Text == ItemGetTextFrom(SelectedItem, DisplayMemberPath))
+                return;
+
+            SelectedIndex = -1;
+            if (!IsDropDownOpen)
+            {
+                IsDropDownOpen = true;
+                // HACK : prevent the default behavior of the combobox to select all the text when the dropdown is opened
+                _editableTextBox.SelectionStart = _editableTextBox.Text.Length;
+            }
             RefreshFilter();
-            base.OnPreviewKeyUp(e);
         }
 
         protected override void OnPreviewLostKeyboardFocus(KeyboardFocusChangedEventArgs e)
@@ -121,19 +128,23 @@ namespace WpfComponents.Lib.Components.Inputs
             base.OnDropDownClosed(e);
         }
 
+
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
             if (_editableTextBox == null)
                 return;
 
             // Show italic text if no item is selected
-            if (e.AddedItems.Count == 0)
-                _editableTextBox.FontStyle = FontStyles.Italic;
-            else
+            if (SelectedItem != null)
+            {
                 _editableTextBox.FontStyle = FontStyles.Normal;
-
-            if (string.IsNullOrEmpty(Text) && SelectedItem != null)
                 Text = ItemGetTextFrom(SelectedItem, DisplayMemberPath);
+                _editableTextBox.SelectAll();
+            }
+            else
+            {
+                _editableTextBox.FontStyle = FontStyles.Italic;
+            }
 
             e.Handled = true;
         }
@@ -145,18 +156,11 @@ namespace WpfComponents.Lib.Components.Inputs
 
             var view = CollectionViewSource.GetDefaultView(ItemsSource);
             view.Refresh();
-
             SelectFromFilter();
         }
 
         private void SelectFromFilter()
         {
-            if (string.IsNullOrEmpty(Text))
-            {
-                SelectedIndex = -1;
-                return;
-            }
-
             if (HideFilteredItems == false)
             {
                 // Select closest to user input
@@ -181,12 +185,12 @@ namespace WpfComponents.Lib.Components.Inputs
                     }
                 }
             }
-            SelectedIndex = -1;
         }
 
         private void ClearFilter()
         {
             Text = string.Empty;
+            RefreshFilter();
         }
 
         private bool DoesItemPassFilter(object value)
