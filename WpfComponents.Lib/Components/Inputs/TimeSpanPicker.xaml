@@ -1,19 +1,18 @@
-﻿<UserControl
-    x:Class="WpfComponents.Lib.Components.Inputs.TimeSpanPicker"
+﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:format="clr-namespace:WpfComponents.Lib.Components.Inputs.Format"
     xmlns:local="clr-namespace:WpfComponents.Lib.Components.Inputs"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
-    <UserControl.Resources>
-        <local:TimeSpanToListConverter x:Key="TimeSpanToListConverter" />
-    </UserControl.Resources>
+    xmlns:format="clr-namespace:WpfComponents.Lib.Components.Inputs.Format">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/Format/FormatTextBox.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
-    <format:FormatTextBox
-        GlobalFormat="numeric|min:0|padded|nullable"
-        Format="{}{max:365}d {max:23}h {max:59}m {max:59}s"
-        Values="{Binding Value, Converter={StaticResource TimeSpanToListConverter}, RelativeSource={RelativeSource AncestorType=local:TimeSpanPicker}}"
-        ValuesChanged="FormatedTextBox_ValuesChanged" />
-</UserControl>
+    <Style TargetType="{x:Type local:TimeSpanPicker}" BasedOn="{StaticResource {x:Type format:FormatTextBox}}">
+        <Style.Resources>
+            <local:TimeSpanToListConverter x:Key="TimeSpanToListConverter" />
+        </Style.Resources>
+        <Setter Property="GlobalFormat" Value="numeric|min:0|padded|nullable" />
+        <Setter Property="Format" Value="{}{max:365}d {max:23}h {max:59}m {max:59}s" />
+        <Setter Property="Value" Value="{Binding Values, Converter={StaticResource TimeSpanToListConverter}, Mode=TwoWay}" />
+    </Style>
+</ResourceDictionary>

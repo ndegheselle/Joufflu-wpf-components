@@ -30,7 +30,7 @@
             </Grid.ColumnDefinitions>
             <format:FormatTextBox
                 x:Name="PhoneNumberInput"
-                ValuesChanged="PhoneNumberInput_ValueChanged"
+                ValueChanged="PhoneNumberInput_ValueChanged"
                 GlobalFormat="numeric|min:0|padded"
                 ShowIncrementsButtons="False"
                 Format="+{max:99} {max:99} {max:9999} {max:9999}" />
@@ -52,6 +52,14 @@
                 Grid.Column="1"
                 Text="{Binding SelectedItem, ElementName=ComboBoxSearchInput}" />
         </Grid>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <inputs:ComboBoxTags ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+        </Grid>
+        <ComboBox />
     </StackPanel>
 
 </adonisControls:AdonisWindow>

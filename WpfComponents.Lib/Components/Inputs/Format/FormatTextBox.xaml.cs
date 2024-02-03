@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows;
-using System.Diagnostics;
-using System.Transactions;
-using System.ComponentModel;
-using System.Runtime.Serialization;
-using System.Runtime.CompilerServices;
-using WpfComponents.Lib.Components.Inputs.Format;
 
 namespace WpfComponents.Lib.Components.Inputs.Format
 {
@@ -22,7 +16,7 @@ namespace WpfComponents.Lib.Components.Inputs.Format
         protected void OnPropertyChanged([CallerMemberName]string name = null)
         { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)); }
 
-        public event EventHandler<List<object?>>? ValuesChanged;
+        public event EventHandler<List<object?>>? ValueChanged;
 
         #region Dependency Properties
         public static readonly DependencyProperty ValuesProperty =
@@ -33,7 +27,7 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             new FrameworkPropertyMetadata(
                 null,
                 FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
-                (o, e) => ((FormatTextBox)o).OnValuesChanged()));
+                (o, e) => ((FormatTextBox)o).OnValueChanged()));
 
         public List<object?> Values
         {
@@ -41,44 +35,63 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             set { SetValue(ValuesProperty, value); }
         }
 
-        private void OnValuesChanged()
+        protected virtual void OnValueChanged()
         {
             if (Groups.Count == 0)
                 ParseGroups(Format, GlobalFormat);
-            ValuesChanged?.Invoke(this, Values);
+            ValueChanged?.Invoke(this, Values);
             FormatText(Groups);
         }
+
+        public static readonly DependencyProperty GlobalFormatProperty =
+    DependencyProperty.Register(
+    "GlobalFormat",
+    typeof(string),
+    typeof(FormatTextBox),
+    new FrameworkPropertyMetadata(
+        "",
+        FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+        (o, e) => ((FormatTextBox)o).OnGlobalFormatChanged()));
+
+        public string GlobalFormat
+        {
+            get { return (string)GetValue(GlobalFormatProperty); }
+            set { SetValue(GlobalFormatProperty, value); }
+        }
+
+        protected void OnGlobalFormatChanged()
+        {
+            ParseGroups(Format, GlobalFormat);
+            FormatText(Groups);
+        }
+
+        public static readonly DependencyProperty FormatProperty =
+            DependencyProperty.Register(
+            "Format",
+            typeof(string),
+            typeof(FormatTextBox),
+            new FrameworkPropertyMetadata(
+                "",
+                FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                (o, e) => ((FormatTextBox)o).OnFormatChanged()));
+
+        public string Format
+        {
+            get { return (string)GetValue(FormatProperty); }
+            set { SetValue(FormatProperty, value); }
+        }
+
+        protected void OnFormatChanged()
+        {
+            ParseGroups(Format, GlobalFormat);
+            FormatText(Groups);
+        }
+
         #endregion
 
         #region Properties
 
         #region Options
-        private string _globalFormat = "";
-
-        public string GlobalFormat
-        {
-            get { return _globalFormat; }
-            set
-            {
-                _globalFormat = value;
-                ParseGroups(Format, GlobalFormat);
-                FormatText(Groups);
-            }
-        }
-
-        private string _format = "";
-
-        public string Format
-        {
-            get { return _format; }
-            set
-            {
-                _format = value;
-                ParseGroups(Format, GlobalFormat);
-                FormatText(Groups);
-            }
-        }
-
         public bool AllowSelectionOutsideGroups { get; set; } = false;
 
         public bool ShowDeleteButton { get; set; } = true;
@@ -256,10 +269,6 @@ namespace WpfComponents.Lib.Components.Inputs.Format
         }
         #endregion
 
-        #region Input / Output
-
-        #endregion
-
         #region Methods
         public void ChangeSelectedGroup(int delta)
         {
@@ -306,6 +315,7 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             // Trigger DP change
             Values = Groups.Select(x => x.Value).ToList();
         }
+
         #endregion
 
         #region Parsing

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Transactions;
@@ -21,6 +22,7 @@ namespace WpfComponents.Lib.Components.Inputs
     public class ComboBoxSearch : ComboBox
     {
         private TextBox _editableTextBox;
+        private ICollectionView _collectionView;
 
         public bool HideFilteredItems { get; set; } = true;
 
@@ -47,19 +49,8 @@ namespace WpfComponents.Lib.Components.Inputs
 
         protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
         {
-            if (newValue != null)
-            {
-                var view = CollectionViewSource.GetDefaultView(newValue);
-                view.Filter += DoesItemPassFilter;
-            }
-
-            if (oldValue != null)
-            {
-                var view = CollectionViewSource.GetDefaultView(oldValue);
-                if (view != null)
-                    view.Filter -= DoesItemPassFilter;
-            }
-
+            _collectionView = new CollectionViewSource() { Source = newValue }.View;
+            _collectionView.Filter += DoesItemPassFilter;
             base.OnItemsSourceChanged(oldValue, newValue);
         }
 
@@ -154,8 +145,7 @@ namespace WpfComponents.Lib.Components.Inputs
             if (ItemsSource == null)
                 return;
 
-            var view = CollectionViewSource.GetDefaultView(ItemsSource);
-            view.Refresh();
+            _collectionView.Refresh();
             SelectFromFilter();
         }
 

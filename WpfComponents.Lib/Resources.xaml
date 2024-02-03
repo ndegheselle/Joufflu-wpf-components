@@ -4,6 +4,10 @@
 
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Resources/NamedStyles/IconButton.xaml" />
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/Format/FormatTextBox.xaml" />
+
+        <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/TimeSpanPicker.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/ComboBoxSearch.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/ComboBoxTags.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <FontFamily x:Key="FontAwesomeSolid">/Resources/Fonts/FontAwesomeSolid.otf#Font Awesome 6 Free Solid</FontFamily>

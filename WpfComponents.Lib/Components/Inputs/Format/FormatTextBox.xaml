@@ -8,7 +8,7 @@
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Resources/NamedStyles/IconButton.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <Style TargetType="{x:Type local:FormatTextBox}">
+    <Style x:Key="{x:Type local:FormatTextBox}" TargetType="{x:Type local:FormatTextBox}">
         <!--  XXX: Should use adonis layout system  -->
         <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
         <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}" />

@@ -6,29 +6,11 @@ using System.Windows.Controls;
 
 namespace WpfComponents.Lib.Components.Inputs
 {
-    class ComboBoxTags : Control
+    public class ComboBoxTags : ComboBoxSearch
     {
         public event EventHandler<EventArgs>? SelectionChanged;
 
         #region Dependency Properties
-        public static readonly DependencyProperty ItemsSourceProperty =
-            DependencyProperty.Register(
-            "ItemsSource",
-            typeof(IEnumerable),
-            typeof(ComboBoxTags),
-            new FrameworkPropertyMetadata(null, (o, e) => ((ComboBoxTags)o).OnItemsSourceChanged()));
-
-        public IEnumerable ItemsSource
-        {
-            get => (IEnumerable)GetValue(ItemsSourceProperty);
-            set => SetValue(ItemsSourceProperty, value);
-        }
-
-        private void OnItemsSourceChanged()
-        {
-            throw new NotImplementedException();
-        }
-
         public static readonly DependencyProperty SelectedItemsProperty =
             DependencyProperty.Register(
             "SelectedItems",
@@ -47,7 +29,7 @@ namespace WpfComponents.Lib.Components.Inputs
             if (SelectedItems == null)
                 return;
 
-            // Check if 
+            // Check if observable collection
         }
         #endregion
 

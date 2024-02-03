@@ -1,19 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Drawing;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
-using WpfComponents.Lib.Helpers;
+using WpfComponents.Lib.Components.Inputs.Format;
 
 namespace WpfComponents.Lib.Components.Inputs
 {
@@ -38,16 +30,24 @@ namespace WpfComponents.Lib.Components.Inputs
         }
     }
 
-    public partial class TimeSpanPicker : UserControl, INotifyPropertyChanged
+    public partial class TimeSpanPicker : FormatTextBox, INotifyPropertyChanged
     {
-        public event EventHandler<TimeSpan?>? ValueChanged;
+        public new event EventHandler<TimeSpan?>? ValueChanged;
 
-        // TODO : should be a DP
         private TimeSpan? _previousValue;
-        public TimeSpan? Value { get; set; }
-        public TimeSpanPicker() { InitializeComponent(); }
 
-        private void FormatedTextBox_ValuesChanged(object sender, List<object> e)
+        public static readonly DependencyProperty ValueProperty =
+        DependencyProperty.Register("Value", typeof(TimeSpan?), typeof(TimeSpanPicker), new PropertyMetadata(null));
+
+        public TimeSpan? Value
+        {
+            get { return (TimeSpan?)GetValue(ValueProperty); }
+            set { SetValue(ValueProperty, value); }
+        }
+
+        public TimeSpanPicker() {}
+
+        protected override void OnValueChanged()
         {
             if (Value == _previousValue)
                 return;
