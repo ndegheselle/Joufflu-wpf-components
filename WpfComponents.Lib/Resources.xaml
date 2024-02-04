@@ -1,8 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/AdonisUI.ClassicTheme;component/Resources.xaml" />
-
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Resources/NamedStyles/IconButton.xaml" />
+        
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/Format/FormatTextBox.xaml" />
 
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/TimeSpanPicker.xaml" />
@@ -11,8 +10,11 @@
     </ResourceDictionary.MergedDictionaries>
 
     <FontFamily x:Key="FontAwesomeSolid">/Resources/Fonts/FontAwesomeSolid.otf#Font Awesome 6 Free Solid</FontFamily>
+
+    <!--  HACK : fix a binding error  -->
     <Style TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
     </Style>
+
 </ResourceDictionary>

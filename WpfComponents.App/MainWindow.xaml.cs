@@ -54,7 +54,7 @@ namespace WpfComponents.App
 
         private void PhoneNumberInput_ValueChanged(object sender, List<object?> values)
         {
-            Debug.WriteLine($"CardInput.ValueChanged: {string.Join(',', values)}");
+            Debug.WriteLine($"PhoneNumberInput.ValueChanged: {string.Join(',', values)}");
         }
         
     }

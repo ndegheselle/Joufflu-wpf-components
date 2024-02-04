@@ -6,10 +6,14 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
 namespace WpfComponents.Lib.Components.Inputs.Format
 {
+    [TemplatePart(Name = nameof(ClearButton), Type = typeof(Button))]
+    [TemplatePart(Name = nameof(UpButton), Type = typeof(Button))]
+    [TemplatePart(Name = nameof(DownButton), Type = typeof(Button))]
     public class FormatTextBox : TextBox, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -126,23 +130,37 @@ namespace WpfComponents.Lib.Components.Inputs.Format
 
         // UI Parts
         private Button _clearButton;
-        private Button _upButton;
-        private Button _downButton;
-        #endregion
-
-        #region Init
-        public override void OnApplyTemplate()
+        private Button ClearButton
         {
-            base.OnApplyTemplate();
-
-            _clearButton = (Button)this.Template.FindName("PART_ClearButton", this);
-            _upButton = (Button)this.Template.FindName("PART_UpButton", this);
-            _downButton = (Button)this.Template.FindName("PART_DownButton", this);
-
-            _clearButton.Click += ClearButton_Click;
-            _upButton.Click += UpButton_Click;
-            _downButton.Click += DownButton_Click;
+            get { return _clearButton; }
+            set
+            {
+                _clearButton = value;
+                _clearButton.Click += ClearButton_Click;
+            }
         }
+
+        private Button _upButton;
+        private Button UpButton
+        {
+            get { return _upButton; }
+            set
+            {
+                _upButton = value;
+                _upButton.Click += UpButton_Click;
+            }
+        }
+
+        private Button _downButton;
+        private Button DownButton
+        {
+            get { return _downButton; }
+            set {
+                _downButton = value;
+                _downButton.Click += DownButton_Click;
+            }
+        }
+
         #endregion
 
         #region UI Events

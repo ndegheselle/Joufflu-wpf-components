@@ -49,6 +49,7 @@ namespace WpfComponents.Lib.Components.Inputs
 
         protected override void OnValueChanged()
         {
+            base.OnValueChanged();
             if (Value == _previousValue)
                 return;
 
