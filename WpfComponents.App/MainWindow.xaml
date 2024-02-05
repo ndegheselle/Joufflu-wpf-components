@@ -48,21 +48,19 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <inputs:ComboBoxSearch x:Name="ComboBoxSearchInput" ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+            <inputs:ComboBoxSearch x:Name="ComboBoxSearchInput"  />
             <TextBlock
                 VerticalAlignment="Center"
                 Margin="4,0,0,0"
-                Grid.Column="1"
-                Text="{Binding SelectedItem, ElementName=ComboBoxSearchInput}" />
+                Grid.Column="1" />
         </Grid>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <inputs:ComboBoxTags ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+            <inputs:ComboBoxTags />
         </Grid>
-        <ComboBox />
     </StackPanel>
 
 </adonisControls:AdonisWindow>

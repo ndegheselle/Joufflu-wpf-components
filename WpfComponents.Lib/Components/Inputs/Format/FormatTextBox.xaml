@@ -4,7 +4,7 @@
     xmlns:local="clr-namespace:WpfComponents.Lib.Components.Inputs.Format">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Resources/NamedStyles/IconButton.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Styles/NamedStyles/IconButton.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <Style
