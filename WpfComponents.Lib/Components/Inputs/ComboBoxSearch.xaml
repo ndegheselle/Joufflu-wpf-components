@@ -5,7 +5,5 @@
     <Style
         x:Key="{x:Type local:ComboBoxSearch}"
         TargetType="{x:Type local:ComboBoxSearch}"
-        BasedOn="{StaticResource {x:Type ComboBox}}">
-        <Setter Property="Background" Value="White" />
-    </Style>
+        BasedOn="{StaticResource {x:Type ComboBox}}" />
 </ResourceDictionary>

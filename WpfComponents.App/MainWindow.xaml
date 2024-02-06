@@ -9,9 +9,6 @@
     xmlns:converters="clr-namespace:WpfComponents.Lib.Converters;assembly=WpfComponents.Lib">
     <adonisControls:AdonisWindow.Resources>
         <converters:ListToStringConverter x:Key="ListToStringConverter" />
-        <Style TargetType="{x:Type inputs:ComboBoxSearch}" BasedOn="{StaticResource {x:Type inputs:ComboBoxSearch}}">
-            <Setter Property="Background" Value="red" />
-        </Style>
     </adonisControls:AdonisWindow.Resources>
     <StackPanel>
         <Grid>
@@ -48,7 +45,7 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <inputs:ComboBoxSearch x:Name="ComboBoxSearchInput"  />
+            <inputs:ComboBoxSearch x:Name="ComboBoxSearchInput" />
             <TextBlock
                 VerticalAlignment="Center"
                 Margin="4,0,0,0"

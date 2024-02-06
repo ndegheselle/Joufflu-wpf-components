@@ -30,8 +30,6 @@ namespace WpfComponents.Lib.Components.Inputs
 
         public ComboBoxSearch()
         {
-            Style = (Style)Application.Current.FindResource(typeof(ComboBox));
-
             // Set default options
             IsEditable = true;
             StaysOpenOnEdit = true;
