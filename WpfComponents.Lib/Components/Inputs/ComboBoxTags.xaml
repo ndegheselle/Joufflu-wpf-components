@@ -4,6 +4,7 @@
     xmlns:local="clr-namespace:WpfComponents.Lib.Components.Inputs">
 
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Styles/NamedStyles/IconButton.xaml" />
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/ComboBoxSearch.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
@@ -11,6 +12,9 @@
         x:Key="{x:Type local:ComboBoxTags}"
         TargetType="{x:Type local:ComboBoxTags}"
         BasedOn="{StaticResource {x:Type local:ComboBoxSearch}}">
+        <Style.Resources>
+            <local:DisplayMemberPathConverter x:Key="DisplayMemberPathConverter" />
+        </Style.Resources>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ComboBoxTags}">
@@ -31,16 +35,46 @@
 
                         <Border Margin="0,0,11,0">
 
-                            <DockPanel Margin="{TemplateBinding Padding}">
-                                <TextBlock>TAFA</TextBlock>
-                                <ContentPresenter
-                                    x:Name="ContentSite"
-                                    IsHitTestVisible="False"
-                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    Content="{TemplateBinding ComboBox.SelectionBoxItem}"
-                                    ContentTemplate="{TemplateBinding ComboBox.SelectionBoxItemTemplate}"
-                                    ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" />
+                            <WrapPanel Margin="{TemplateBinding Padding}">
+                                <WrapPanel>
+                                    <ItemsControl
+                                        ItemsSource="{Binding InternalSelectedItems, RelativeSource={RelativeSource TemplatedParent}}"
+                                        BorderThickness="0"
+                                        ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Margin="1">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Margin="2,0">
+                                                            <TextBlock.Text>
+                                                                <MultiBinding Converter="{StaticResource DisplayMemberPathConverter}">
+                                                                    <Binding />
+                                                                    <Binding Path="DisplayMemberPath" RelativeSource="{RelativeSource AncestorType=local:ComboBoxTags}" />
+                                                                </MultiBinding>
+                                                            </TextBlock.Text>
+                                                        </TextBlock>
+                                                        <Button
+                                                            Style="{StaticResource IconButton}"
+                                                            Command="{Binding RemoveSelectedCmd, RelativeSource={RelativeSource AncestorType=local:ComboBoxTags}}"
+                                                            CommandParameter="{Binding}">
+                                                            <TextBlock
+                                                                VerticalAlignment="Center"
+                                                                FontFamily="{DynamicResource FontAwesomeSolid}"
+                                                                FontSize="10"
+                                                                Text="&#xf00d;" />
+                                                        </Button>
+
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </WrapPanel>
 
                                 <TextBox
                                     x:Name="PART_EditableTextBox"
@@ -66,7 +100,7 @@
                                         </ControlTemplate>
                                     </TextBox.Template>
                                 </TextBox>
-                            </DockPanel>
+                            </WrapPanel>
                         </Border>
 
                         <!--  Popup showing items  -->
@@ -109,7 +143,6 @@
                         <Trigger Property="IsEditable" Value="True">
                             <Setter Property="KeyboardNavigation.IsTabStop" Value="False" />
                             <Setter Property="UIElement.Visibility" TargetName="PART_EditableTextBox" Value="Visible" />
-                            <Setter Property="UIElement.Visibility" TargetName="ContentSite" Value="Collapsed" />
                             <Setter Property="HorizontalAlignment" TargetName="ToggleButton" Value="Right" />
                             <Setter Property="HorizontalAlignment" TargetName="ToggleButton" Value="Right" />
                         </Trigger>

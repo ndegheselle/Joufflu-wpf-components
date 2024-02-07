@@ -56,7 +56,7 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <inputs:ComboBoxTags />
+            <inputs:ComboBoxTags ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
         </Grid>
     </StackPanel>
 

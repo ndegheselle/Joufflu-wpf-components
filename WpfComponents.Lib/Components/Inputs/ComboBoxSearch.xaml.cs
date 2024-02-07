@@ -47,35 +47,58 @@ namespace WpfComponents.Lib.Components.Inputs
 
         protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
         {
-            _collectionView = new CollectionViewSource() { Source = newValue }.View;
+            _collectionView = CollectionViewSource.GetDefaultView(newValue);
             _collectionView.Filter += DoesItemPassFilter;
             base.OnItemsSourceChanged(oldValue, newValue);
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
-            switch (e.Key)
+            if (e.Key >= Key.Left && e.Key <= Key.Down)
             {
-                case Key.Up:
-                    IsDropDownOpen = true;
-                    if (SelectedItem == null)
-                        SelectedIndex = Items.Count - 1;
-                    break;
-                case Key.Down:
-                    IsDropDownOpen = true;
-                    if (SelectedItem == null)
-                        SelectedIndex = 0;
-                    break;
-                case Key.Tab:
-                case Key.Enter:
-                    IsDropDownOpen = false;
-                    break;
-                case Key.Escape:
-                    IsDropDownOpen = false;
-                    SelectedItem = null;
-                    break;
+                // Change the focus direction without committing the selection
+                var direction = FocusNavigationDirection.Previous;
+                switch (e.Key)
+                {
+                    case Key.Up:
+                        direction = FocusNavigationDirection.Up;
+                        break;
+                    case Key.Right:
+                        direction = FocusNavigationDirection.Right;
+                        break;
+                    case Key.Down:
+                        direction = FocusNavigationDirection.Down;
+                        break;
+                    case Key.Left:
+                        direction = FocusNavigationDirection.Left;
+                        break;
+                }
+                MoveFocus(new TraversalRequest(direction));
+                e.Handled = true; // Mark the event as handled so it won't bubble up
             }
-            base.OnPreviewKeyDown(e);
+            else
+            {
+                switch (e.Key)
+                {
+                    case Key.Up:
+                        e.Handled = true;
+                        break;
+                    case Key.Down:
+                        e.Handled = true;
+                        break;
+                    case Key.Tab:
+                    case Key.Enter:
+                        IsDropDownOpen = false;
+                        break;
+                    case Key.Escape:
+                        IsDropDownOpen = false;
+                        SelectedItem = null;
+                        break;
+                }
+                base.OnPreviewKeyDown(e);
+            }
+
+
         }
 
 
@@ -85,7 +108,7 @@ namespace WpfComponents.Lib.Components.Inputs
                 return;
 
             SelectedIndex = -1;
-            if (!IsDropDownOpen)
+            if (IsDropDownOpen == false && !string.IsNullOrEmpty(Text))
             {
                 IsDropDownOpen = true;
                 // HACK : prevent the default behavior of the combobox to select all the text when the dropdown is opened
@@ -94,7 +117,7 @@ namespace WpfComponents.Lib.Components.Inputs
             RefreshFilter();
         }
 
-        protected override void OnPreviewLostKeyboardFocus(KeyboardFocusChangedEventArgs e)
+        protected override void OnLostKeyboardFocus(KeyboardFocusChangedEventArgs e)
         {
             // Prevent having a value that doesn't match any item (could be misleading)
             if (SelectedItem == null)
@@ -181,7 +204,7 @@ namespace WpfComponents.Lib.Components.Inputs
             RefreshFilter();
         }
 
-        private bool DoesItemPassFilter(object value)
+        protected virtual bool DoesItemPassFilter(object value)
         {
             // If the filter is disabled, we don't filter the items
             if (HideFilteredItems == false)
