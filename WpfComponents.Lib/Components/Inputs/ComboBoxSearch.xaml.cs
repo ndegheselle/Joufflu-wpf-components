@@ -21,6 +21,9 @@ namespace WpfComponents.Lib.Components.Inputs
     /// </summary>
     public class ComboBoxSearch : ComboBox
     {
+        // Selection changed
+        public event SelectionChangedEventHandler? ChangesCommited;
+
         private TextBox _editableTextBox;
         private ICollectionView _collectionView;
 
@@ -54,53 +57,27 @@ namespace WpfComponents.Lib.Components.Inputs
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
-            if (e.Key >= Key.Left && e.Key <= Key.Down)
+            switch (e.Key)
             {
-                // Change the focus direction without committing the selection
-                var direction = FocusNavigationDirection.Previous;
-                switch (e.Key)
-                {
-                    case Key.Up:
-                        direction = FocusNavigationDirection.Up;
-                        break;
-                    case Key.Right:
-                        direction = FocusNavigationDirection.Right;
-                        break;
-                    case Key.Down:
-                        direction = FocusNavigationDirection.Down;
-                        break;
-                    case Key.Left:
-                        direction = FocusNavigationDirection.Left;
-                        break;
-                }
-                MoveFocus(new TraversalRequest(direction));
-                e.Handled = true; // Mark the event as handled so it won't bubble up
+                case Key.Up:
+                    if (IsDropDownOpen == false)
+                        IsDropDownOpen = true;
+                    break;
+                case Key.Down:
+                    if (IsDropDownOpen == false)
+                        IsDropDownOpen = true;
+                    break;
+                case Key.Tab:
+                case Key.Enter:
+                    IsDropDownOpen = false;
+                    break;
+                case Key.Escape:
+                    IsDropDownOpen = false;
+                    SelectedItem = null;
+                    break;
             }
-            else
-            {
-                switch (e.Key)
-                {
-                    case Key.Up:
-                        e.Handled = true;
-                        break;
-                    case Key.Down:
-                        e.Handled = true;
-                        break;
-                    case Key.Tab:
-                    case Key.Enter:
-                        IsDropDownOpen = false;
-                        break;
-                    case Key.Escape:
-                        IsDropDownOpen = false;
-                        SelectedItem = null;
-                        break;
-                }
-                base.OnPreviewKeyDown(e);
-            }
-
-
+            base.OnPreviewKeyDown(e);
         }
-
 
         void OnTextChanged(object sender, TextChangedEventArgs e)
         {
@@ -122,6 +99,8 @@ namespace WpfComponents.Lib.Components.Inputs
             // Prevent having a value that doesn't match any item (could be misleading)
             if (SelectedItem == null)
                 ClearFilter();
+            else
+                _editableTextBox.FontStyle = FontStyles.Normal;
 
             base.OnPreviewLostKeyboardFocus(e);
         }
@@ -149,8 +128,8 @@ namespace WpfComponents.Lib.Components.Inputs
             // Show italic text if no item is selected
             if (SelectedItem != null)
             {
-                _editableTextBox.FontStyle = FontStyles.Normal;
                 Text = ItemGetTextFrom(SelectedItem, DisplayMemberPath);
+                _editableTextBox.FontStyle = FontStyles.Normal;
                 _editableTextBox.SelectAll();
             }
             else

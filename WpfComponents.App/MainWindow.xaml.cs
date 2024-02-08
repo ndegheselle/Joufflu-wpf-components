@@ -1,5 +1,7 @@
 ﻿using AdonisUI.Controls;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Documents;
@@ -21,12 +23,23 @@ namespace WpfComponents.App
         {
             return $"{Name} : {Value}";
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is TestValue value &&
+                   Name == value.Name;
+        }
+
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode();
+        }
     }
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : AdonisWindow
+    public partial class MainWindow : AdonisWindow, INotifyPropertyChanged
     {
         public List<TestValue> TestValues { get; set; } = new List<TestValue>
         {
@@ -40,6 +53,13 @@ namespace WpfComponents.App
             new TestValue("Eight", "8"),
             new TestValue("Nine", "9"),
             new TestValue("Ten", "10"),
+        };
+
+        public ObservableCollection<TestValue> SelectedTestValues { get; set; } = new ObservableCollection<TestValue>
+        {
+            new TestValue("One", "1"),
+            new TestValue("Two", "2"),
+            new TestValue("Three", "3"),
         };
 
         public MainWindow()

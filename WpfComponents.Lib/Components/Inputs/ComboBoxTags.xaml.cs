@@ -4,10 +4,12 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -45,10 +47,7 @@ namespace WpfComponents.Lib.Components.Inputs
 
             private readonly ComboBoxTags _comboBoxTags;
 
-            public RemoveSelectedCommand(ComboBoxTags comboBoxTags)
-            {
-                _comboBoxTags = comboBoxTags;
-            }
+            public RemoveSelectedCommand(ComboBoxTags comboBoxTags) { _comboBoxTags = comboBoxTags; }
 
             public bool CanExecute(object? parameter) { return true; }
 
@@ -61,53 +60,33 @@ namespace WpfComponents.Lib.Components.Inputs
             }
         }
 
-        public class SelectItemCommand : ICommand
-        {
-            public event EventHandler? CanExecuteChanged;
-
-            private readonly ComboBoxTags _comboBoxTags;
-
-            public SelectItemCommand(ComboBoxTags comboBoxTags)
-            {
-                _comboBoxTags = comboBoxTags;
-            }
-
-            public bool CanExecute(object? parameter) { return true; }
-
-            public void Execute(object? parameter)
-            {
-                if (parameter == null)
-                    return;
-                _comboBoxTags.AddSelectedItem();
-            }
-        }
-
         public event PropertyChangedEventHandler? PropertyChanged;
         #region Dependency Properties
         public static readonly DependencyProperty SelectedItemsProperty =
             DependencyProperty.Register(
             "SelectedItems",
-            typeof(IEnumerable),
+            typeof(ObservableCollection<object>),
             typeof(ComboBoxTags),
             new FrameworkPropertyMetadata(null, (o, e) => ((ComboBoxTags)o).OnSelectedItemsChanged()));
 
-        public IEnumerable SelectedItems
+        public ObservableCollection<object> SelectedItems
         {
-            get => (IEnumerable)GetValue(SelectedItemsProperty);
+            get => (ObservableCollection<object>)GetValue(SelectedItemsProperty);
             set => SetValue(SelectedItemsProperty, value);
         }
 
         void OnSelectedItemsChanged()
         {
-            if (SelectedItems == null)
+            if (SelectedItems == null || InternalSelectedItems == SelectedItems)
                 return;
 
-            InternalSelectedItems.Clear();
+            InternalSelectedItems = new ObservableCollection<object>();
             foreach (var item in SelectedItems)
             {
                 if (Items.Contains(item))
                     InternalSelectedItems.Add(item);
             }
+            InternalSelectedItems.CollectionChanged += InternalSelectedItems_CollectionChanged;
         }
         #endregion
 
@@ -115,19 +94,52 @@ namespace WpfComponents.Lib.Components.Inputs
         public ObservableCollection<object> InternalSelectedItems { get; set; } = new ObservableCollection<object>();
 
         public bool AllowAdd { get; set; } = false;
+
         public RemoveSelectedCommand RemoveSelectedCmd { get; }
-        public SelectItemCommand SelectItemCmd { get; }
+
+        // Only add to selection then clicking or pressing enter (like combobox with IsEditable = false)
+        // Sad that the combobox doesn't allow to set this behavior
+        private bool _ignoreNextSelection = false;
+
         #endregion
 
         public ComboBoxTags()
         {
             RemoveSelectedCmd = new RemoveSelectedCommand(this);
-            SelectItemCmd = new SelectItemCommand(this);
-            // TODO : update the selected items when the internal collection changes
-            // InternalSelectedItems.CollectionChanged += InternalSelectedItems_CollectionChanged;
+            InternalSelectedItems.CollectionChanged += InternalSelectedItems_CollectionChanged;
         }
 
-        protected override void OnSelectionChanged(SelectionChangedEventArgs e) { base.OnSelectionChanged(e); }
+        private void InternalSelectedItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (SelectedItems == null)
+                SelectedItems = InternalSelectedItems;
+            if (SelectedItems == InternalSelectedItems)
+                return;
+
+            SelectedItems.Clear();
+            foreach (var item in InternalSelectedItems)
+                SelectedItems.Add(item);
+        }
+
+        protected override void OnSelectionChanged(SelectionChangedEventArgs e)
+        {
+            base.OnSelectionChanged(e);
+            if (_ignoreNextSelection)
+            {
+                _ignoreNextSelection = false;
+                return;
+            }
+
+            AddSelectedItem();
+        }
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            if (e.Key == Key.Up || e.Key == Key.Down)
+                _ignoreNextSelection = true;
+
+            base.OnPreviewKeyDown(e);
+        }
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
@@ -135,27 +147,20 @@ namespace WpfComponents.Lib.Components.Inputs
             {
                 InternalSelectedItems.RemoveAt(InternalSelectedItems.Count - 1);
             }
-            // If the user press enter, add the item to the list
             else if (e.Key == Key.Enter && SelectedItem != null)
             {
-                SelectItemCmd.Execute(SelectedItem);
+                AddSelectedItem();
             }
 
             base.OnKeyDown(e);
         }
 
-        protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
-        {
-            if (SelectedItem == null)
-                return;
-
-            base.OnPreviewMouseLeftButtonDown(e);
-        }
+        protected override void OnKeyUp(KeyEventArgs e) { base.OnKeyUp(e); }
 
         protected override bool DoesItemPassFilter(object value)
         {
             // If the item is already selected, don't show it in the list
-            if (InternalSelectedItems.Contains(value))
+            if (InternalSelectedItems.Contains(value) == true)
                 return false;
 
             return base.DoesItemPassFilter(value);
@@ -165,10 +170,8 @@ namespace WpfComponents.Lib.Components.Inputs
         {
             if (SelectedItem == null)
                 return;
-
             InternalSelectedItems.Add(SelectedItem);
-
-            SelectedItem = null;
+            Text = string.Empty;
         }
     }
 }

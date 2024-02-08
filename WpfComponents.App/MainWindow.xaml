@@ -56,8 +56,12 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <inputs:ComboBoxTags ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+            <inputs:ComboBoxTags x:Name="ComboBoxTagsInput" ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+            <TextBlock
+                VerticalAlignment="Center"
+                Margin="4,0,0,0"
+                Grid.Column="1"
+                Text="{Binding SelectedItems, UpdateSourceTrigger=PropertyChanged, ElementName=ComboBoxTagsInput, Converter={StaticResource ListToStringConverter}}" />
         </Grid>
     </StackPanel>
-
 </adonisControls:AdonisWindow>
