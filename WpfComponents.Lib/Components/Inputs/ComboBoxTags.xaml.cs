@@ -65,13 +65,13 @@ namespace WpfComponents.Lib.Components.Inputs
         public static readonly DependencyProperty SelectedItemsProperty =
             DependencyProperty.Register(
             "SelectedItems",
-            typeof(ObservableCollection<object>),
+            typeof(IList),
             typeof(ComboBoxTags),
             new FrameworkPropertyMetadata(null, (o, e) => ((ComboBoxTags)o).OnSelectedItemsChanged()));
 
-        public ObservableCollection<object> SelectedItems
+        public IList SelectedItems
         {
-            get => (ObservableCollection<object>)GetValue(SelectedItemsProperty);
+            get => (IList)GetValue(SelectedItemsProperty);
             set => SetValue(SelectedItemsProperty, value);
         }
 
@@ -86,6 +86,7 @@ namespace WpfComponents.Lib.Components.Inputs
                 if (Items.Contains(item))
                     InternalSelectedItems.Add(item);
             }
+
             InternalSelectedItems.CollectionChanged += InternalSelectedItems_CollectionChanged;
         }
         #endregion
@@ -100,7 +101,6 @@ namespace WpfComponents.Lib.Components.Inputs
         // Only add to selection then clicking or pressing enter (like combobox with IsEditable = false)
         // Sad that the combobox doesn't allow to set this behavior
         private bool _ignoreNextSelection = false;
-
         #endregion
 
         public ComboBoxTags()
@@ -109,16 +109,27 @@ namespace WpfComponents.Lib.Components.Inputs
             InternalSelectedItems.CollectionChanged += InternalSelectedItems_CollectionChanged;
         }
 
+        /// <summary>
+        /// Handle update the SelectedItems property when the internal list is modified
+        /// </summary>
         private void InternalSelectedItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (SelectedItems == null)
+            var bindingExpression = GetBindingExpression(SelectedItemsProperty);
+            // TwoWay or OneWayToSource : update the source directly to avoid losing the reference
+            if (bindingExpression?.ParentBinding.Mode == BindingMode.TwoWay ||
+                bindingExpression?.ParentBinding.Mode == BindingMode.OneWayToSource)
+            {
+                SelectedItems.Clear();
+                foreach (var item in InternalSelectedItems)
+                    SelectedItems.Add(item);
+                // For non ObservableCollection
+                bindingExpression.UpdateSource();
+            }
+            // Else copy the internal list so that other controls can bind to it
+            else
+            {
                 SelectedItems = InternalSelectedItems;
-            if (SelectedItems == InternalSelectedItems)
-                return;
-
-            SelectedItems.Clear();
-            foreach (var item in InternalSelectedItems)
-                SelectedItems.Add(item);
+            }
         }
 
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)

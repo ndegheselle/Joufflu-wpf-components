@@ -5,11 +5,7 @@
     xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
     xmlns:local="clr-namespace:WpfComponents.App"
     xmlns:inputs="clr-namespace:WpfComponents.Lib.Components.Inputs;assembly=WpfComponents.Lib"
-    xmlns:format="clr-namespace:WpfComponents.Lib.Components.Inputs.Format;assembly=WpfComponents.Lib"
-    xmlns:converters="clr-namespace:WpfComponents.Lib.Converters;assembly=WpfComponents.Lib">
-    <adonisControls:AdonisWindow.Resources>
-        <converters:ListToStringConverter x:Key="ListToStringConverter" />
-    </adonisControls:AdonisWindow.Resources>
+    xmlns:format="clr-namespace:WpfComponents.Lib.Components.Inputs.Format;assembly=WpfComponents.Lib">
     <StackPanel>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -34,11 +30,13 @@
                 GlobalFormat="numeric|min:0|padded"
                 ShowIncrementsButtons="False"
                 Format="+{max:99} {max:99} {max:9999} {max:9999}" />
-            <TextBlock
-                VerticalAlignment="Center"
-                Margin="4,0,0,0"
-                Grid.Column="1"
-                Text="{Binding Values, ElementName=PhoneNumberInput, Converter={StaticResource ListToStringConverter}}" />
+            <ListBox Grid.Column="1" ItemsSource="{Binding Values, ElementName=PhoneNumberInput}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel IsItemsHost="True" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
         </Grid>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -56,12 +54,17 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <inputs:ComboBoxTags x:Name="ComboBoxTagsInput" ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
-            <TextBlock
-                VerticalAlignment="Center"
-                Margin="4,0,0,0"
-                Grid.Column="1"
-                Text="{Binding SelectedItems, UpdateSourceTrigger=PropertyChanged, ElementName=ComboBoxTagsInput, Converter={StaticResource ListToStringConverter}}" />
+            <inputs:ComboBoxTags
+                x:Name="ComboBoxTagsInput"
+                ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}"
+                SelectedItems="{Binding SelectedTestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+            <ListBox Grid.Column="1" ItemsSource="{Binding SelectedItems, ElementName=ComboBoxTagsInput}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel IsItemsHost="True" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
         </Grid>
     </StackPanel>
 </adonisControls:AdonisWindow>
