@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WpfComponents.Lib.Helpers
+namespace WpfComponents.Lib.Logic.Helpers
 {
     internal static class StringHelper
     {

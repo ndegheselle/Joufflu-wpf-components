@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using WpfComponents.Lib.Helpers;
+using WpfComponents.Lib.Logic.Helpers;
 
 namespace WpfComponents.Lib.Components.Inputs.Format
 {
