@@ -10,7 +10,7 @@ using System.Windows.Input;
 namespace WpfComponents.Lib.Logic
 {
     /// <summary>
-    /// Gestion du Drag and Drop
+    /// Drag and Drop handling
     /// </summary>
     public abstract class BaseDnDHandler : INotifyPropertyChanged
     {
@@ -56,7 +56,7 @@ namespace WpfComponents.Lib.Logic
         #region D&D source handling
         /// <summary>
         /// On MouseDown
-        /// Insure that the drag and drop start with a click and get the click position
+        /// Ensure that the drag and drop starts with a click and get the click position
         /// </summary>
         public void HandleDragMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -76,10 +76,10 @@ namespace WpfComponents.Lib.Logic
 
             if (UseMinimalDistance)
             {
-                Point lPositionActuel = e.GetPosition(_parentUI);
-                // Distance minimal pour déclencher un D&D
-                if (Math.Abs(lPositionActuel.X - _clickPosition.X) < SystemParameters.MinimumHorizontalDragDistance ||
-                    Math.Abs(lPositionActuel.Y - _clickPosition.Y) < SystemParameters.MinimumVerticalDragDistance)
+                Point currentPosition = e.GetPosition(_parentUI);
+                // Minimum distance to trigger a D&D
+                if (Math.Abs(currentPosition.X - _clickPosition.X) < SystemParameters.MinimumHorizontalDragDistance ||
+                    Math.Abs(currentPosition.Y - _clickPosition.Y) < SystemParameters.MinimumVerticalDragDistance)
                     return;
             }
 
@@ -89,15 +89,15 @@ namespace WpfComponents.Lib.Logic
 
             if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
             {
-                object lDonnees = GetSourceData(e.OriginalSource as FrameworkElement);
-                UpdatePopup(lDonnees);
+                object data = GetSourceData(e.OriginalSource as FrameworkElement);
+                UpdatePopup(data);
 
-                if (lDonnees == null)
+                if (data == null)
                     return;
 
                 try
                 {
-                    DragDrop.DoDragDrop((DependencyObject)sender, lDonnees, DragDropEffects.Copy);
+                    DragDrop.DoDragDrop((DependencyObject)sender, data, DragDropEffects.Copy);
                 }
                 catch (ExternalException)
                 {
@@ -132,8 +132,8 @@ namespace WpfComponents.Lib.Logic
 
             // D&D is valid
 
-            var lPositionSouris = e.GetPosition(_parentUI);
-            DisplayPopup(lPositionSouris);
+            var mousePosition = e.GetPosition(_parentUI);
+            DisplayPopup(mousePosition);
 
             // HACK : DragDropEffects.Move display the same icon as None, could change it with event GiveFeedback
             e.Effects = DragDropEffects.Copy;
@@ -179,7 +179,7 @@ namespace WpfComponents.Lib.Logic
 
         #region Methods
 
-        private void DisplayPopup(Point pPosition)
+        private void DisplayPopup(Point position)
         {
             if (_popup == null)
                 return;
@@ -187,8 +187,8 @@ namespace WpfComponents.Lib.Logic
             _popup.IsOpen = true;
             // Need to offset the popup since the drop will try to go in the popup even with IsHitTestVisible = false
             // DnD cursor is 20px
-            _popup.HorizontalOffset = pPosition.X + 20;
-            _popup.VerticalOffset = pPosition.Y;
+            _popup.HorizontalOffset = position.X + 20;
+            _popup.VerticalOffset = position.Y;
         }
 
         private void HidePopup()
@@ -201,25 +201,25 @@ namespace WpfComponents.Lib.Logic
         /// <summary>
         /// Handle special cases where the D&D is not allowed, for example the component is in a state that doesn't allow it
         /// </summary>
-        protected virtual bool CanDrag(object sender, MouseEventArgs pArgs) { return true; }
+        protected virtual bool CanDrag(object sender, MouseEventArgs args) { return true; }
 
         /// <summary>
         /// Get data from the source of the D&D event
         /// </summary>
-        protected virtual object GetSourceData(FrameworkElement lSource)
-        { return GetDataContext<object>(lSource); }
+        protected virtual object GetSourceData(FrameworkElement source)
+        { return GetDataContext<object>(source); }
 
-        protected virtual void UpdatePopup(object lDonnees)
+        protected virtual void UpdatePopup(object data)
         {
             if (_popup == null)
                 return;
-            _popup.DataContext = lDonnees;
+            _popup.DataContext = data;
         }
 
         /// <summary>
         /// Check if the destination is the source, if the source data is valid for the drop, ...
         /// </summary>
-        protected abstract bool CanDrop(object sender, DragEventArgs pArgs);
+        protected abstract bool CanDrop(object sender, DragEventArgs args);
 
         /// <summary>
         /// Handle the consequences of the drop (copy files, delete, ...)
@@ -229,17 +229,17 @@ namespace WpfComponents.Lib.Logic
         /// <summary>
         /// Get destination DataContext
         /// </summary>
-        protected TDonnees GetDataContext<TDonnees>(FrameworkElement lDestination) where TDonnees : class
-        { return lDestination?.DataContext as TDonnees; }
+        protected TData GetDataContext<TData>(FrameworkElement destination) where TData : class
+        { return destination?.DataContext as TData; }
 
         /// <summary>
         /// Get data from the dropped object
         /// </summary>
-        protected TDonnees GetDroppedData<TDonnees>(IDataObject pData) where TDonnees : class
+        protected TData GetDroppedData<TData>(IDataObject dataObject) where TData : class
         {
-            if (!pData.GetDataPresent(typeof(TDonnees)))
+            if (!dataObject.GetDataPresent(typeof(TData)))
                 return null;
-            return pData.GetData(typeof(TDonnees)) as TDonnees;
+            return dataObject.GetData(typeof(TData)) as TData;
         }
         #endregion
     }
@@ -247,42 +247,42 @@ namespace WpfComponents.Lib.Logic
     /// <summary>
     /// Simple D&D handler for a list of data, only in the same list
     /// </summary>
-    public class SimpleDnDHandler<TDonnees> : BaseDnDHandler where TDonnees : class
+    public class SimpleDnDHandler<TData> : BaseDnDHandler where TData : class
     {
-        public delegate void DelacementHandler(int pAncienIndex, int pNouveauIndex);
-        public event DelacementHandler OnMove;
+        public delegate void MoveHandler(int oldIndex, int newIndex);
+        public event MoveHandler? OnMove;
 
-        private readonly IList<TDonnees> _Liste;
+        private readonly IList<TData> _list;
 
-        public SimpleDnDHandler(FrameworkElement pParent, Popup pPopup, IList<TDonnees> pListe) : base(pParent, pPopup)
-        { _Liste = pListe; }
+        public SimpleDnDHandler(FrameworkElement parent, Popup popup, IList<TData> list) : base(parent, popup)
+        { _list = list; }
 
         protected override void ApplyDrop(object sender, DragEventArgs e)
         {
-            var lDonnees = GetDroppedData<TDonnees>(e.Data);
-            var lDestination = GetDataContext<TDonnees>(e.OriginalSource as FrameworkElement);
+            var data = GetDroppedData<TData>(e.Data);
+            var destination = GetDataContext<TData>(e.OriginalSource as FrameworkElement);
 
-            int lAncienIndex = _Liste.IndexOf(lDonnees);
-            _Liste.RemoveAt(lAncienIndex);
-            int lNouveauIndex = _Liste.IndexOf(lDestination);
+            int oldIndex = _list.IndexOf(data);
+            _list.RemoveAt(oldIndex);
+            int newIndex = _list.IndexOf(destination);
 
-            if (lDestination == null)
-                _Liste.Add(lDonnees);
+            if (destination == null)
+                _list.Add(data);
             else
-                _Liste.Insert(lNouveauIndex, lDonnees);
+                _list.Insert(newIndex, data);
 
-            OnMove?.Invoke(lAncienIndex, lNouveauIndex);
+            OnMove?.Invoke(oldIndex, newIndex);
         }
 
-        protected override bool CanDrop(object sender, DragEventArgs pArgs)
+        protected override bool CanDrop(object sender, DragEventArgs args)
         {
-            object lDonneesSource = GetDroppedData<TDonnees>(pArgs.Data);
-            object lDonneesDestination = GetDataContext<TDonnees>(pArgs.OriginalSource as FrameworkElement);
+            object sourceData = GetDroppedData<TData>(args.Data);
+            object destinationData = GetDataContext<TData>(args.OriginalSource as FrameworkElement);
 
-            if (lDonneesSource == null || lDonneesDestination == null)
+            if (sourceData == null || destinationData == null)
                 return false;
 
-            if (lDonneesSource == lDonneesDestination)
+            if (sourceData == destinationData)
                 return false;
 
             return true;

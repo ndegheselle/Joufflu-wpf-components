@@ -12,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using WpfComponents.Lib.Logic;
 
 namespace WpfComponents.Lib.Components.Inputs
 {
@@ -41,25 +42,6 @@ namespace WpfComponents.Lib.Components.Inputs
 
     public class ComboBoxTags : ComboBoxSearch, INotifyPropertyChanged
     {
-        public class RemoveSelectedCommand : ICommand
-        {
-            public event EventHandler? CanExecuteChanged;
-
-            private readonly ComboBoxTags _comboBoxTags;
-
-            public RemoveSelectedCommand(ComboBoxTags comboBoxTags) { _comboBoxTags = comboBoxTags; }
-
-            public bool CanExecute(object? parameter) { return true; }
-
-            public void Execute(object? parameter)
-            {
-                if (parameter == null)
-                    return;
-
-                _comboBoxTags.InternalSelectedItems.Remove(parameter);
-            }
-        }
-
         public event PropertyChangedEventHandler? PropertyChanged;
         #region Dependency Properties
         public static readonly DependencyProperty SelectedItemsProperty =
@@ -96,7 +78,7 @@ namespace WpfComponents.Lib.Components.Inputs
 
         public bool AllowAdd { get; set; } = false;
 
-        public RemoveSelectedCommand RemoveSelectedCmd { get; }
+        public SimpleCommand<object> RemoveSelectedCmd { get; }
 
         // Only add to selection then clicking or pressing enter (like combobox with IsEditable = false)
         // Sad that the combobox doesn't allow to set this behavior
@@ -105,7 +87,7 @@ namespace WpfComponents.Lib.Components.Inputs
 
         public ComboBoxTags()
         {
-            RemoveSelectedCmd = new RemoveSelectedCommand(this);
+            RemoveSelectedCmd = new SimpleCommand<object>((parameter) => this.InternalSelectedItems.Remove(parameter));
             InternalSelectedItems.CollectionChanged += InternalSelectedItems_CollectionChanged;
         }
 
