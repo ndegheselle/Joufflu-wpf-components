@@ -20,7 +20,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.DnD
 
         public FileExplorerDnD(FileExplorerBase explorer) : base(
             explorer,
-            explorer.PopupDnD)
+            explorer.DnDPopup)
         { _explorer = explorer; }
 
         #region Event handling
@@ -81,9 +81,9 @@ namespace WpfComponents.Lib.Components.FileExplorer.DnD
 
             // Update popup content
             if (lFichier.IsCopy())
-                _explorer.PopupDnD.ChangeEffect(DragDropEffects.Copy);
+                _explorer.DnDPopup.ChangeEffect(DragDropEffects.Copy);
             else
-                _explorer.PopupDnD.ChangeEffect(DragDropEffects.Move);
+                _explorer.DnDPopup.ChangeEffect(DragDropEffects.Move);
 
             return true;
         }

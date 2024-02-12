@@ -15,6 +15,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Converters;
 using System.Windows.Threading;
+using WpfComponents.Lib.Components.FileExplorer.Data;
+using WpfComponents.Lib.Components.FileExplorer.DnD;
+using WpfComponents.Lib.Logic.Helpers;
 
 namespace WpfComponents.Lib.Components.FileExplorer.Controls
 {
@@ -24,61 +27,68 @@ namespace WpfComponents.Lib.Components.FileExplorer.Controls
     public abstract class FileExplorerBase : UserControl, INotifyPropertyChanged
     {
         [Flags]
-        public enum EnumAutorisation 
+        public enum EnumPermission
         {
-            Rien = 0,
-            AutoriseDrop = 1,
-            AutoriseDrag = 2,
-            AutoriseDragDrop = AutoriseDrag | AutoriseDrop,
-            AutoriseRaccourcis = 4,
-            AutoriseContextMenuOuvrir = 8,
-            AutoriseContextMenuActions = 16,
-            AutoriseContextMenu = AutoriseContextMenuOuvrir | AutoriseContextMenuActions,
+            None = 0,
+            AllowDrop = 1,
+            AllowDrag = 2,
+            AllowDragDrop = AllowDrag | AllowDrop,
+            AllowShortcuts = 4,
+            AllowContextMenuOpen = 8,
+            AllowContextMenuActions = 16,
+            AllowContextMenu = AllowContextMenuOpen | AllowContextMenuActions,
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)); }
 
-        private string _TexteStatut = "";
+        private string _StatusText = "";
 
-        public string TexteStatut
+        public string StatusText
         {
-            get { return _TexteStatut; }
+            get { return _StatusText; }
             set
             {
-                _TexteStatut = value;
+                _StatusText = value;
                 OnPropertyChanged();
             }
         }
 
-        public GestionDnD GestionDnD { get; private set; }
+        public EnumPermission Permissions
+        {
+            get;
+            set;
+        } =
+                EnumPermission.AllowDragDrop | EnumPermission.AllowShortcuts | EnumPermission.AllowContextMenu;
 
-        public TextBox TextBoxEnCoursEdition { get; set; } = null;
+        public abstract PopupActionDnD DnDPopup { get; }
 
-        private bool _EstEnCoursDeNavigation = false;
-        private int _IndexeHistoriqueActuel = -1;
-        private List<NodeExplorateurDossier> _HistoriqueNavigation = new List<NodeExplorateurDossier>();
-        private readonly DispatcherTimer _TimerRenommage;
+        public FileExplorerDnD DnDHandler { get; private set; }
 
-        // Permet d'éviter qu'un click sur une node trigger le renommage imédiatement
-        protected bool _EmpecherRenommage { get; set; } = false;
+        public TextBox? CurrentRenamingTextBox { get; set; } = null;
+
+        private bool _isNavigating = false;
+        private int _currentHistoryIndex = -1;
+        private List<ExplorerNodeFolder> _navigationHistory = new List<ExplorerNodeFolder>();
+        private readonly DispatcherTimer _renamingTimer;
+
+        // Prevent a click on a node to trigger renaming immediately
+        protected bool _preventRenaming { get; set; } = false;
 
         private ScrollViewer _ScrollParent;
 
-        public abstract IEnumerable<NodeExplorateur> NodeSelectionnees { get; }
+        public abstract IEnumerable<ExplorerNode> SelectedNodes { get; }
 
-        public abstract PopupActionDnD PopupDnD { get; }
-
-        public IEnumerable<string> CheminsSelectionnees { get { return NodeSelectionnees.Select(x => x.Chemin); } }
+        public IEnumerable<string> SelectedPaths { get { return SelectedNodes.Select(x => x.FullPath); } }
 
         public FileExplorerBase()
         {
-            GestionDnD = new GestionDnD(this);
-            _TimerRenommage = new DispatcherTimer(
+            DnDHandler = new FileExplorerDnD(this);
+            _renamingTimer = new DispatcherTimer(
                 new TimeSpan(0, 0, 0, 0, GetDoubleClickTime()),
                 DispatcherPriority.Normal,
-                GererClickRenommage,
+                HandleRenamingClick,
                 Dispatcher.CurrentDispatcher)
             {
                 IsEnabled = false
@@ -86,136 +96,121 @@ namespace WpfComponents.Lib.Components.FileExplorer.Controls
         }
 
         #region Dependency Properties
-        public static readonly DependencyProperty NodeRacineProperty = DependencyProperty.Register(
-            "NodeRacine",
-            typeof(NodeExplorateurDossier),
+        public static readonly DependencyProperty RootNodeProperty = DependencyProperty.Register(
+            "RootNode",
+            typeof(ExplorerNodeFolder),
             typeof(FileExplorerBase),
-            new UIPropertyMetadata(null, (o, value) => ((FileExplorerBase)o).OnNodeRacineChange(value)));
+            new UIPropertyMetadata(null, (o, value) => ((FileExplorerBase)o).OnRootNodeChange(value)));
 
-        public NodeExplorateurDossier NodeRacine
+        public ExplorerNodeFolder RootNode
         {
-            get { return (NodeExplorateurDossier)GetValue(NodeRacineProperty); }
-            set { SetValue(NodeRacineProperty, value); }
+            get { return (ExplorerNodeFolder)GetValue(RootNodeProperty); }
+            set { SetValue(RootNodeProperty, value); }
         }
 
-        public static readonly DependencyProperty AutorisationsProperty = DependencyProperty.Register(
-            "Autorisations",
-            typeof(EnumAutorisation),
+        public static readonly DependencyProperty MediatorProperty = DependencyProperty.Register(
+            "Mediator",
+            typeof(IMediatorNodeSelected),
             typeof(FileExplorerBase),
-            new UIPropertyMetadata(
-                EnumAutorisation.AutoriseDragDrop |
-                    EnumAutorisation.AutoriseRaccourcis |
-                    EnumAutorisation.AutoriseContextMenu));
+            new UIPropertyMetadata(null, (o, value) => ((FileExplorerBase)o).OnMediatorChange()));
 
-        public EnumAutorisation Autorisations
+        private void OnMediatorChange()
         {
-            get { return (EnumAutorisation)GetValue(AutorisationsProperty); }
-            set { SetValue(AutorisationsProperty, value); }
-        }
-
-        public static readonly DependencyProperty MediateurProperty = DependencyProperty.Register(
-            "Mediateur",
-            typeof(IMediateurSelectionFichier),
-            typeof(FileExplorerBase),
-            new UIPropertyMetadata(null, (o, value) => ((FileExplorerBase)o).OnMediateurChange()));
-
-        private void OnMediateurChange()
-        {
-            if (Mediateur == null)
+            if (Mediator == null)
                 return;
-            // Si un autre controlleur sélectionne un élément on clear notre sélection
-            Mediateur.OnSelectionNode += (sender, value) =>
+            // If another controller selects an item, we clear our selection
+            Mediator.OnNodeSelected += (sender, value) =>
             {
                 if (sender != this)
                 {
-                    ClearSelection();
+                    ClearSelected();
                 }
             };
         }
 
-        public IMediateurSelectionFichier Mediateur
+        public IMediatorNodeSelected Mediator
         {
-            get { return (IMediateurSelectionFichier)GetValue(MediateurProperty); }
-            set { SetValue(MediateurProperty, value); }
+            get { return (IMediatorNodeSelected)GetValue(MediatorProperty); }
+            set { SetValue(MediatorProperty, value); }
         }
         #endregion
 
         #region Methodes
-        public abstract void ClearSelection();
+        public abstract void ClearSelected();
 
-        public void CreerNouveauDossier(NodeExplorateurDossier pNodeCibleDossier)
+        public void CreateNewFolder(ExplorerNodeFolder targetNode)
         {
-            string lNom = SystemFichier.NomNouveauDossierValide(pNodeCibleDossier.Chemin);
+            string lNom = FileSystemHelper.GetValidNewFolderName(targetNode.FullPath);
 
-            Directory.CreateDirectory(Path.Combine(pNodeCibleDossier.Chemin, lNom));
-            var lNouveauDossier = new NodeExplorateurDossier(Path.Combine(pNodeCibleDossier.Chemin, lNom));
-            pNodeCibleDossier.Ajouter(lNouveauDossier);
-            lNouveauDossier.EstSelectionnee = true;
-            RenommerNode(lNouveauDossier);
+            Directory.CreateDirectory(Path.Combine(targetNode.FullPath, lNom));
+            var newFolder = new ExplorerNodeFolder(Path.Combine(targetNode.FullPath, lNom));
+            targetNode.Add(newFolder);
+            newFolder.IsSelected = true;
+            RenameNode(newFolder);
         }
         #endregion
 
         #region Events
-        protected virtual void OnNodeRacineChange(DependencyPropertyChangedEventArgs eventArgs)
+        protected virtual void OnRootNodeChange(DependencyPropertyChangedEventArgs eventArgs)
         {
-            if (!_EstEnCoursDeNavigation)
-                AjouterHistorique(NodeRacine);
+            if (!_isNavigating)
+                AddToHistory(RootNode);
         }
 
         protected void HandleNodeDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (TextBoxEnCoursEdition != null)
+            if (CurrentRenamingTextBox != null)
                 return;
 
-            NodeExplorateur lDataContext = (e.OriginalSource as FrameworkElement).DataContext as NodeExplorateur;
-            if (lDataContext == null)
+            ExplorerNode? targetNode = ((FrameworkElement)e.OriginalSource).DataContext as ExplorerNode;
+            if (targetNode == null)
                 return;
 
-            _EmpecherRenommage = true;
-            NaviguerNodes(e, new List<NodeExplorateur>() { lDataContext });
-            _TimerRenommage.Stop();
+            _preventRenaming = true;
+            NavigateToNodes(e, new List<ExplorerNode>() { targetNode });
+            _renamingTimer.Stop();
             e.Handled = true;
         }
 
         // Si le click est effectuer sur un élément déjà sélectionné et qu'on a pas fait un double click on renomme
         protected void HandleNodeMouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (_EmpecherRenommage)
+            if (_preventRenaming)
             {
-                _EmpecherRenommage = false;
+                _preventRenaming = false;
                 return;
             }
             if (e.ChangedButton != MouseButton.Left)
                 return;
-            _TimerRenommage.Start();
+            _renamingTimer.Start();
         }
 
         protected virtual void HandlePreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            // Avant AutoriseRaccourcis étant donné que c'est pas uen option qui devrais être bloquée
-            GererRaccourcisRenommage(sender, e);
+            // Not considered as a shortcut you can disallow
+            HandleRenamingShortcuts(sender, e);
 
-            if (Autorisations.HasFlag(EnumAutorisation.AutoriseRaccourcis) == false ||
-                TextBoxEnCoursEdition != null ||
+            if (Permissions.HasFlag(EnumPermission.AllowShortcuts) == false ||
+                CurrentRenamingTextBox != null ||
                 e.Handled)
                 return;
 
-            // Go back (si aucun go back la racine)
+            // Go back 
             if (e.Key == Key.Back)
             {
-                NaviguerParent();
+                NavigateToParent();
                 e.Handled = true;
             }
-            // Coller
+            // Past
             else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.V)
             {
-                NodeExplorateurDossier lDestination = NodeSelectionnees.FirstOrDefault() as NodeExplorateurDossier;
-                if (lDestination == null)
-                    lDestination = NodeRacine;
+                ExplorerNodeFolder? target = SelectedNodes.FirstOrDefault() as ExplorerNodeFolder;
+                if (target == null)
+                    target = RootNode;
 
-                if (ExplorateurFichierCmds.CollerPressePapier.CanExecute(lDestination.Chemin))
+                if (FileExplorerCmds.PasteFromClipboard.CanExecute(target.FullPath))
                 {
-                    ExplorateurFichierCmds.CollerPressePapier.Execute(lDestination.Chemin);
+                    FileExplorerCmds.PasteFromClipboard.Execute(target.FullPath);
                     e.Handled = true;
                 }
             }
@@ -223,56 +218,56 @@ namespace WpfComponents.Lib.Components.FileExplorer.Controls
                 Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) &&
                 e.Key == Key.N)
             {
-                CreerNouveauDossier(NodeRacine);
+                CreateNewFolder(RootNode);
                 e.Handled = true;
             }
 
-            if (!NodeSelectionnees.Any())
+            if (!SelectedNodes.Any())
                 return;
 
-            // Couper
+            // Shortcuts that require a selected node
+
+            // Cut
             else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.X)
             {
-                IEnumerable<string> lFichierSelectionnes = CheminsSelectionnees;
-                ExplorateurFichierCmds.CouperPressePapier.Execute(lFichierSelectionnes);
+                FileExplorerCmds.CutToClipboard.Execute(SelectedPaths);
                 e.Handled = true;
             }
-            // Copier
+            // Copy
             else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.C)
             {
-                IEnumerable<string> lFichierSelectionnes = CheminsSelectionnees;
-                ExplorateurFichierCmds.CopierPressePapier.Execute(lFichierSelectionnes);
+                FileExplorerCmds.CopyToClipboard.Execute(SelectedPaths);
                 e.Handled = true;
             }
-            // Ouvrir
+            // Open
             else if (e.Key == Key.Enter)
             {
-                NaviguerNodes(e, NodeSelectionnees);
+                NavigateToNodes(e, SelectedNodes);
             }
-            // Supprimer
+            // Remove
             else if (e.Key == Key.Delete)
             {
-                if (ExplorateurFichierCmds.Supprimer.CanExecute(CheminsSelectionnees))
+                if (FileExplorerCmds.Delete.CanExecute(SelectedPaths))
                 {
-                    ExplorateurFichierCmds.Supprimer.Execute(CheminsSelectionnees);
+                    FileExplorerCmds.Delete.Execute(SelectedPaths);
                     e.Handled = true;
                 }
             }
-            // Renomer
+            // Rename
             else if (e.Key == Key.F2)
             {
-                RenommerNode(NodeSelectionnees.First());
+                RenameNode(SelectedNodes.First());
                 e.Handled = true;
             }
         }
 
-        // 2 cas de figures :
-        // - On a plusieurs TreeView l'une après l'autre, on veut un scrollviewer parent pour les gérer tous
-        // - On a un TreeView et on veut le laisser gérer sont propre scroll sans a avoir a ajouter un scrollviewer
-        protected void PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        // Either :
+        // - We have multiple TreeViews one after the other, we want a parent scrollviewer to handle them all
+        // - We have a single TreeView and we want to let it handle its own scroll without having to add a scrollviewer
+        protected void OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (_ScrollParent == null)
-                _ScrollParent = VisualTreeHelperExt.GetParent<ScrollViewer>(this);
+                _ScrollParent = MoreVisualTreeHelper.FindParent<ScrollViewer>(this);
 
             if (e.Handled == true || _ScrollParent == null)
                 return;
@@ -286,209 +281,208 @@ namespace WpfComponents.Lib.Components.FileExplorer.Controls
         #endregion
 
         #region Renommage
-        public void RenommerNode(NodeExplorateur pNode)
+        public void RenameNode(ExplorerNode target)
         {
-            TextBoxEnCoursEdition = RecupererTextBoxEdition(pNode);
-            if (TextBoxEnCoursEdition == null)
+            CurrentRenamingTextBox = GetEditingTextBox(target);
+            if (CurrentRenamingTextBox == null)
                 return;
 
-            if (pNode is NodeExplorateurDossier)
+            if (target is ExplorerNodeFolder)
             {
-                TextBoxEnCoursEdition.SelectAll();
+                CurrentRenamingTextBox.SelectAll();
             }
             else
             {
-                // Selectionner seulement le nom du fichier et pas l'extension
-                int lTailleNomFichier = pNode.Nom.LastIndexOf(".");
+                // Set selection on the name without the extension
+                int lTailleNomFichier = target.Name.LastIndexOf(".");
                 if (lTailleNomFichier > 0)
-                    TextBoxEnCoursEdition.Select(0, lTailleNomFichier);
+                    CurrentRenamingTextBox.Select(0, lTailleNomFichier);
                 else
-                    TextBoxEnCoursEdition.SelectAll();
+                    CurrentRenamingTextBox.SelectAll();
             }
 
-            pNode.EstEnEdition = true;
+            target.IsEditing = true;
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
         protected static extern int GetDoubleClickTime();
 
-        protected void ClearRenommage()
+        protected void ClearRenaming()
         {
-            if (TextBoxEnCoursEdition == null)
+            if (CurrentRenamingTextBox == null)
                 return;
-            var lNode = TextBoxEnCoursEdition.DataContext as NodeExplorateur;
-            lNode.EstEnEdition = false;
-            TextBoxEnCoursEdition.Select(0, 0);
-            TextBoxEnCoursEdition = null;
-            // Permet de fix des comportement bizarre de la selection après un renommage (élément sélectionné pour toujours ?)
-            ClearSelection();
+            var currentNode = (ExplorerNode)CurrentRenamingTextBox.DataContext;
+            currentNode.IsEditing = false;
+            CurrentRenamingTextBox.Select(0, 0);
+            CurrentRenamingTextBox = null;
+            // Fix weird selection behavior after renaming (element selected forever ?)
+            ClearSelected();
         }
 
-        protected void AnnulerRenommage()
+        protected void CancelRenaming()
         {
-            if (TextBoxEnCoursEdition == null)
+            if (CurrentRenamingTextBox == null)
                 return;
-            var lNode = TextBoxEnCoursEdition.DataContext as NodeExplorateur;
-            TextBoxEnCoursEdition.Text = lNode.Nom;
-            ClearRenommage();
+            var target = (ExplorerNode)CurrentRenamingTextBox.DataContext;
+            CurrentRenamingTextBox.Text = target.Name;
+            ClearRenaming();
         }
 
-        protected abstract TextBox RecupererTextBoxEdition(NodeExplorateur pNode);
+        protected abstract TextBox GetEditingTextBox(ExplorerNode target);
 
         protected void TextBoxNode_LostFocus(object sender, RoutedEventArgs e)
         {
             var lTextBox = (TextBox)sender;
-            var lNode = lTextBox.DataContext as NodeExplorateur;
+            var lNode = (ExplorerNode) lTextBox.DataContext;
 
-            if (lNode.EstEnEdition == false)
+            if (lNode.IsEditing == false)
                 return;
 
-            lNode.EstEnEdition = false;
+            lNode.IsEditing = false;
 
-            // Si changement du nom
-            if (lTextBox.Text != lNode.Nom)
+            // If the name is the same, we don't do anything
+            if (lTextBox.Text != lNode.Name)
             {
-                var lParams = new FichierCmdParams(
-                    lNode.Chemin,
-                    Path.Combine(Path.GetDirectoryName(lNode.Chemin), lTextBox.Text));
-                if (ExplorateurFichierCmds.Renommer.CanExecute(lParams) == false)
+                var lParams = new FileParams(
+                    lNode.FullPath,
+                    Path.Combine(Path.GetDirectoryName(lNode.FullPath), lTextBox.Text));
+                if (FileExplorerCmds.Rename.CanExecute(lParams) == false)
                 {
-                    AnnulerRenommage();
+                    CancelRenaming();
                     MessageBox.Show(
-                        "Un fichier du même nom existe déjà à cet emplacement.",
-                        "Erreur",
+                        "A file with the same name already exist at this location.",
+                        "Error",
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
                     return;
                 }
                 try
                 {
-                    ExplorateurFichierCmds.Renommer.Execute(lParams);
-                }
-                catch (OperationCanceledException)
+                    FileExplorerCmds.Rename.Execute(lParams);
+                } catch (OperationCanceledException)
                 {
-                    AnnulerRenommage();
+                    CancelRenaming();
                     return;
                 }
             }
 
-            ClearRenommage();
+            ClearRenaming();
             e.Handled = true;
         }
 
         protected void NomNode_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            // N'accepter que les charactères autorisés
-            Regex lRegex = new Regex(@"^[\w\-. ]+$");
-            if (!lRegex.IsMatch(e.Text))
+            // Only allow valid characters
+            Regex regex = new Regex(@"^[\w\-. ]+$");
+            if (!regex.IsMatch(e.Text))
                 e.Handled = true;
             base.OnPreviewTextInput(e);
         }
 
 
-        private void GererRaccourcisRenommage(object sender, KeyEventArgs e)
+        private void HandleRenamingShortcuts(object sender, KeyEventArgs e)
         {
-            if (TextBoxEnCoursEdition == null)
+            if (CurrentRenamingTextBox == null)
                 return;
 
             if (e.Key == Key.Escape)
             {
-                AnnulerRenommage();
+                CancelRenaming();
                 e.Handled = true;
             }
             else if (e.Key == Key.Return)
             {
-                // On force le focus sur le control pour que le LostFocus soit appelé sur le TextBox
+                // Force focus on the control so that the LostFocus event is called on the TextBox
                 this.Focus();
                 e.Handled = true;
             }
         }
 
-        private void GererClickRenommage(object sender, EventArgs e)
+        private void HandleRenamingClick(object sender, EventArgs e)
         {
-            // Garde fou
-            if (NodeSelectionnees.Any() == false)
+            // Safeguard
+            if (SelectedNodes.Any() == false)
                 return;
 
-            _TimerRenommage.Stop();
-            RenommerNode(NodeSelectionnees.First());
+            _renamingTimer.Stop();
+            RenameNode(SelectedNodes.First());
         }
         #endregion
 
         #region Navigation
-        protected void NaviguerNodes(RoutedEventArgs e, IEnumerable<NodeExplorateur> pNodes)
+        protected void NavigateToNodes(RoutedEventArgs e, IEnumerable<ExplorerNode> nodes)
         {
-            if (pNodes.Count() == 0)
+            if (nodes.Count() == 0)
                 return;
 
-            var lPremierNode = pNodes.First();
+            var firstNode = nodes.First();
 
-            if (lPremierNode is NodeExplorateurDossier lNodeDossier)
+            if (firstNode is ExplorerNodeFolder folder)
             {
-                NaviguerDossier(lNodeDossier);
+                NavigateToFolder(folder);
                 e.Handled = true;
             }
-            // Si fichier on ouvre tout les fichiers
-            else if (lPremierNode is NodeExplorateurFichier)
+            // If file, open all files
+            else if (firstNode is ExplorerNodeFile)
             {
-                ExplorateurFichierCmds.Ouvrir.Execute(pNodes.Where(x => x is NodeExplorateurFichier).Select(x => x.Chemin));
+                FileExplorerCmds.Open
+                    .Execute(nodes.Where(x => x is ExplorerNodeFile).Select(x => x.FullPath));
                 e.Handled = true;
             }
         }
 
-        protected virtual void NaviguerDossier(NodeExplorateurDossier pNodeDossier)
+        protected virtual void NavigateToFolder(ExplorerNodeFolder folder)
         {
-            // A overide dans la Liste pour set NodeRacine = pNodeDossier
-            pNodeDossier.EstOuvert = true;
+            folder.IsOpen = true;
         }
 
-        public void NaviguerParent()
+        public void NavigateToParent()
         {
-            NodeExplorateur lNodeParent = NodeSelectionnees.FirstOrDefault()?.Parent ?? NodeRacine;
+            ExplorerNode parentNode = SelectedNodes.FirstOrDefault()?.Parent ?? RootNode;
 
             // On remonte le parent du parent
-            if (lNodeParent.Parent == null)
+            if (parentNode.Parent == null)
                 return;
 
-            NaviguerDossier(lNodeParent.Parent);
+            NavigateToFolder(parentNode.Parent);
         }
         #endregion
 
-        #region Historique navigation
-        protected void AjouterHistorique(NodeExplorateurDossier pNode)
+        #region Navigation history
+        protected void AddToHistory(ExplorerNodeFolder target)
         {
-            if (_IndexeHistoriqueActuel < _HistoriqueNavigation.Count - 1)
+            if (_currentHistoryIndex < _navigationHistory.Count - 1)
             {
-                _HistoriqueNavigation.RemoveRange(
-                    _IndexeHistoriqueActuel + 1,
-                    _HistoriqueNavigation.Count - _IndexeHistoriqueActuel - 1);
+                _navigationHistory.RemoveRange(
+                    _currentHistoryIndex + 1,
+                    _navigationHistory.Count - _currentHistoryIndex - 1);
             }
-            _HistoriqueNavigation.Add(pNode);
-            _IndexeHistoriqueActuel = _HistoriqueNavigation.Count - 1;
+            _navigationHistory.Add(target);
+            _currentHistoryIndex = _navigationHistory.Count - 1;
         }
 
-        public void NaviguerEnArriere()
+        public void GoBack()
         {
-            if (_IndexeHistoriqueActuel - 1 < 0)
+            if (_currentHistoryIndex - 1 < 0)
                 return;
 
-            _IndexeHistoriqueActuel -= 1;
-            _EstEnCoursDeNavigation = true;
-            NodeRacine = _HistoriqueNavigation[_IndexeHistoriqueActuel];
-            _EstEnCoursDeNavigation = false;
+            _currentHistoryIndex -= 1;
+            _isNavigating = true;
+            RootNode = _navigationHistory[_currentHistoryIndex];
+            _isNavigating = false;
         }
 
-        public void NaviguerEnAvant()
+        public void GoForward()
         {
-            // Si rien dans l'historique ou qu'on est déjà à la fin
-            if (_IndexeHistoriqueActuel + 1 >= _HistoriqueNavigation.Count)
+            // If nothing in the history or we are already at the end
+            if (_currentHistoryIndex + 1 >= _navigationHistory.Count)
                 return;
 
-            _IndexeHistoriqueActuel += 1;
+            _currentHistoryIndex += 1;
 
-            _EstEnCoursDeNavigation = true;
-            NodeRacine = _HistoriqueNavigation[_IndexeHistoriqueActuel];
-            _EstEnCoursDeNavigation = false;
+            _isNavigating = true;
+            RootNode = _navigationHistory[_currentHistoryIndex];
+            _isNavigating = false;
         }
         #endregion
 
@@ -497,37 +491,37 @@ namespace WpfComponents.Lib.Components.FileExplorer.Controls
         // XXX : Peut être il y a un moyen d'appeler un event Handler dans une prop (GestionDnD.HandleDragMouseDown directement dans le XAML) mais je crois pas
 
         protected void HandleMouseDown(object sender, MouseButtonEventArgs e)
-        { GestionDnD.HandleDragMouseDown(sender, e); }
+        { DnDHandler.HandleDragMouseDown(sender, e); }
 
         protected void HandleMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
-        { GestionDnD.HandleDragMouseMove(sender, e); }
+        { DnDHandler.HandleDragMouseMove(sender, e); }
 
-        protected void HandleDragOver(object sender, DragEventArgs e) { GestionDnD.HandleDragOver(sender, e); }
+        protected void HandleDragOver(object sender, DragEventArgs e) { DnDHandler.HandleDragOver(sender, e); }
 
-        protected void HandleDragLeave(object sender, DragEventArgs e) { GestionDnD.HandleDragLeave(sender, e); }
+        protected void HandleDragLeave(object sender, DragEventArgs e) { DnDHandler.HandleDragLeave(sender, e); }
 
-        protected void HandleDrop(object sender, DragEventArgs e) { GestionDnD.HandleDrop(sender, e); }
+        protected void HandleDrop(object sender, DragEventArgs e) { DnDHandler.HandleDrop(sender, e); }
         #endregion
 
         #region Contexte menu
         protected virtual void ContextMenu_OnOpening(object sender, ContextMenuEventArgs e)
         {
-            var lSource = e.Source as FrameworkElement;
-            var lSourceOrigine = e.OriginalSource as FrameworkElement;
-            NodeExplorateur pNodeCible = NodeSelectionnees.FirstOrDefault() ?? NodeRacine;
+            var source = e.Source as FrameworkElement;
+            var originalSource = e.OriginalSource as FrameworkElement;
+            ExplorerNode targetNode = SelectedNodes.FirstOrDefault() ?? RootNode;
 
-            if ((Autorisations & EnumAutorisation.AutoriseContextMenu) == 0)
+            if ((Permissions & EnumPermission.AllowContextMenu) == 0)
             {
-                lSource.ContextMenu.IsOpen = false;
+                source.ContextMenu.IsOpen = false;
                 e.Handled = true;
                 return;
             }
 
             // Permet de gérer un clique droit hors de la TreeView (étant donnés que les éléments restent sélectionnés)
-            if (lSourceOrigine?.DataContext == null)
-                pNodeCible = NodeRacine;
+            if (originalSource?.DataContext == null)
+                targetNode = RootNode;
 
-            lSource.ContextMenu = new ContextMenuExplorateur(this, pNodeCible);
+            source.ContextMenu = new ContextMenuExplorer(this, targetNode);
         }
         #endregion
     }

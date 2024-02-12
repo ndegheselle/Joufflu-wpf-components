@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using WpfComponents.Lib.Components.FileExplorer.Data;
+using static WpfComponents.Lib.Components.FileExplorer.Controls.FileExplorerBase;
 
 namespace WpfComponents.Lib.Components.FileExplorer.Controls
 {

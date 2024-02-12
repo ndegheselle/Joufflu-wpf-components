@@ -15,10 +15,10 @@ using System.Windows.Threading;
 
 namespace WpfComponents.Lib.Components.FileExplorer.Data
 {
-    public interface IMediateurSelectionFichier
+    public interface IMediatorNodeSelected
     {
-        EventHandler<IEnumerable<ExplorerNode>> OnSelectionNode { get; set; }
-        void Notifier(object source, IEnumerable<ExplorerNode> nodes);
+        EventHandler<IEnumerable<ExplorerNode>> OnNodeSelected { get; set; }
+        void Notify(object source, IEnumerable<ExplorerNode> nodes);
     }
 
     public class NodeExplorerObserver : INotifyPropertyChanged, IDisposable
@@ -210,7 +210,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Data
     public class FileExplorerController
         : IDisposable,
             INotifyPropertyChanged,
-            IMediateurSelectionFichier
+            IMediatorNodeSelected
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -293,11 +293,11 @@ namespace WpfComponents.Lib.Components.FileExplorer.Data
 
         #region IMediateurSelectionFichier
 
-        public EventHandler<IEnumerable<ExplorerNode>> OnSelectionNode { get; set; }
+        public EventHandler<IEnumerable<ExplorerNode>> OnNodeSelected { get; set; }
 
-        public void Notifier(object source, IEnumerable<ExplorerNode> nodes)
+        public void Notify(object source, IEnumerable<ExplorerNode> nodes)
         {
-            OnSelectionNode.Invoke(source, nodes);
+            OnNodeSelected.Invoke(source, nodes);
         }
 
         #endregion
