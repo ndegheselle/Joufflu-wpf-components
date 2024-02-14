@@ -38,7 +38,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Data
         public event Action OnRefresh;
 
         public ObservableCollection<ExplorerNode> Children { get; set; } = new ObservableCollection<ExplorerNode>();
-        public ListCollectionView SortedChildrenView { get; }
+        public ListCollectionView SortedChildNodes { get; }
 
         private bool _isOpen;
         public bool IsOpen
@@ -55,8 +55,8 @@ namespace WpfComponents.Lib.Components.FileExplorer.Data
         {
             Type = EnumExplorerNodeType.Folder;
             FullPath = path;
-            SortedChildrenView = CollectionViewSource.GetDefaultView(Children) as ListCollectionView;
-            SortedChildrenView.CustomSort = new NameComparer(ListSortDirection.Ascending);
+            SortedChildNodes = CollectionViewSource.GetDefaultView(Children) as ListCollectionView;
+            SortedChildNodes.CustomSort = new NameComparer(ListSortDirection.Ascending);
         }
 
         public void Add(ExplorerNode childNode)
@@ -67,7 +67,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Data
 
         public void Refresh()
         {
-            SortedChildrenView.Refresh();
+            SortedChildNodes.Refresh();
         }
 
         public void RecursiveForEach(Action<ExplorerNode> callback)
@@ -189,13 +189,13 @@ namespace WpfComponents.Lib.Components.FileExplorer.Data
         }
 
         // If the node should be the only one selected in the tree (for TreeView)
-        private bool _isUniqueSelected;
-        public bool IsUniqueSelected
+        private bool _isSelectedUnique;
+        public bool IsSelectedUnique
         {
-            get { return _isUniqueSelected; }
+            get { return _isSelectedUnique; }
             set
             {
-                _isUniqueSelected = value;
+                _isSelectedUnique = value;
                 OnPropertyChanged();
             }
         }

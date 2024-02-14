@@ -9,6 +9,7 @@ using System.Windows.Media;
 using WpfComponents.Lib.Components.FileExplorer.Controls;
 using WpfComponents.Lib.Components.FileExplorer.Data;
 using System.Linq;
+using WpfComponents.Lib.Logic.Helpers;
 
 namespace WpfComponents.Lib.Components.FileExplorer
 {
@@ -17,11 +18,6 @@ namespace WpfComponents.Lib.Components.FileExplorer
     /// </summary>
     public partial class FileExplorerList : FileExplorerBase, IMediatorSortDirection
     {
-        public FileExplorerList()
-        {
-            InitializeComponent();
-        }
-
         public event EventHandler<IEnumerable<ExplorerNode>> SelectionChanged;
 
         public override IEnumerable<ExplorerNode> SelectedNodes
@@ -29,15 +25,15 @@ namespace WpfComponents.Lib.Components.FileExplorer
             get { return ListView.SelectedItems.Cast<ExplorerNode>(); }
         }
 
-        public override PopupActionDnD PopupDnD => PopupTooltipDrag;
+        public override PopupActionDnD PopupDnD => DragTooltipPopup;
 
         public FileExplorerList() { InitializeComponent(); }
 
         public static readonly DependencyProperty ScrollViewerParentProperty = DependencyProperty.Register(
-    "ScrollViewerParent",
-    typeof(ScrollViewer),
-    typeof(FileExplorerList),
-    new UIPropertyMetadata(null));
+            "ScrollViewerParent",
+            typeof(ScrollViewer),
+            typeof(FileExplorerList),
+            new UIPropertyMetadata(null));
 
         public ScrollViewer ScrollViewerParent
         {
@@ -48,9 +44,9 @@ namespace WpfComponents.Lib.Components.FileExplorer
         #region Methods
         public override void ClearSelection() { ListView.UnselectAll(); }
 
-        protected override void NavigateFolder(ExplorerNodeFolder folderNode)
+        protected override void NavigateToFolder(ExplorerNodeFolder folderNode)
         {
-            base.NavigateFolder(folderNode);
+            base.NavigateToFolder(folderNode);
             RootNode = folderNode;
         }
 
@@ -73,7 +69,7 @@ namespace WpfComponents.Lib.Components.FileExplorer
 
             ListView.UpdateLayout();
             ListViewItem listViewItem = (ListViewItem)ListView.ItemContainerGenerator.ContainerFromIndex(nodeIndex);
-            TextBox textBox = VisualTreeHelperExt.GetChildren<TextBox>(listViewItem, true).FirstOrDefault();
+            TextBox textBox = MoreVisualTreeHelper.GetChildren<TextBox>(listViewItem, true).FirstOrDefault();
 
             // Set focus on the TextBox and select all text
             if (textBox != null)
@@ -126,7 +122,7 @@ namespace WpfComponents.Lib.Components.FileExplorer
 
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _PreventRenaming = true;
+            _preventRenaming = true;
             SelectionChanged?.Invoke(this, SelectedNodes);
         }
 
@@ -142,11 +138,11 @@ namespace WpfComponents.Lib.Components.FileExplorer
             switch (e.ChangedButton)
             {
                 case MouseButton.XButton1: // Back button
-                    NavigateBack();
+                    GoBack();
                     e.Handled = true;
                     break;
                 case MouseButton.XButton2: // Forward button
-                    NavigateForward();
+                    GoForward();
                     e.Handled = true;
                     break;
                 default:
@@ -175,8 +171,8 @@ namespace WpfComponents.Lib.Components.FileExplorer
 
             // Capture and track the mouse.
             mouseDown = true;
-            mouseDownPos = e.GetPosition(GridContainer);
-            GridContainer.CaptureMouse();
+            mouseDownPos = e.GetPosition(ContainerGrid);
+            ContainerGrid.CaptureMouse();
 
             // Initial placement of the drag selection box.
             Canvas.SetLeft(selectionBox, mouseDownPos.Value.X);
@@ -196,12 +192,12 @@ namespace WpfComponents.Lib.Components.FileExplorer
 
             // Release the mouse capture and stop tracking it.
             mouseDown = false;
-            GridContainer.ReleaseMouseCapture();
+            ContainerGrid.ReleaseMouseCapture();
 
             // Hide the drag selection box.
             selectionBox.Visibility = Visibility.Collapsed;
 
-            Point mouseUpPos = e.GetPosition(GridContainer);
+            Point mouseUpPos = e.GetPosition(ContainerGrid);
 
             SelectNodesInRectangle(
                 new Rect(
@@ -219,16 +215,16 @@ namespace WpfComponents.Lib.Components.FileExplorer
 
             // When the mouse is held down, reposition the drag selection box.
 
-            Point mousePos = e.GetPosition(GridContainer);
+            Point mousePos = e.GetPosition(ContainerGrid);
 
             if (mousePos.X < 0)
                 mousePos.X = 0;
-            if (mousePos.X > GridContainer.ActualWidth)
-                mousePos.X = GridContainer.ActualWidth;
+            if (mousePos.X > ContainerGrid.ActualWidth)
+                mousePos.X = ContainerGrid.ActualWidth;
             if (mousePos.Y < 0)
                 mousePos.Y = 0;
-            if (mousePos.Y > GridContainer.ActualHeight)
-                mousePos.Y = GridContainer.ActualHeight;
+            if (mousePos.Y > ContainerGrid.ActualHeight)
+                mousePos.Y = ContainerGrid.ActualHeight;
 
             if (mouseDownPos.Value.X < mousePos.X)
             {
@@ -265,7 +261,7 @@ namespace WpfComponents.Lib.Components.FileExplorer
                 var listViewItem = ListView.ItemContainerGenerator.ContainerFromItem(item) as ListViewItem;
                 if (listViewItem != null)
                 {
-                    GeneralTransform gt = listViewItem.TransformToAncestor(GridContainer);
+                    GeneralTransform gt = listViewItem.TransformToAncestor(ContainerGrid);
                     var itemBounds = gt.TransformBounds(
                         new Rect(0, 0, listViewItem.ActualWidth, listViewItem.ActualHeight));
 
@@ -292,7 +288,7 @@ namespace WpfComponents.Lib.Components.FileExplorer
 
         private void SortButton_Click(object sender, RoutedEventArgs e)
         {
-            SortButton button = sender as SortButton;
+            ButtonSort button = sender as ButtonSort;
 
             switch (button.Target)
             {
@@ -300,7 +296,7 @@ namespace WpfComponents.Lib.Components.FileExplorer
                     RootNode.SortedChildNodes.CustomSort = new NameComparer(button.SortDirection.Value);
                     break;
                 case "DateModified":
-                    RootNode.SortedChildNodes.CustomSort = new DateModifiedComparer(button.SortDirection.Value);
+                    RootNode.SortedChildNodes.CustomSort = new ModifiedDateComparer(button.SortDirection.Value);
                     break;
                 case "Size":
                     RootNode.SortedChildNodes.CustomSort = new SizeComparer(button.SortDirection.Value);
@@ -312,14 +308,14 @@ namespace WpfComponents.Lib.Components.FileExplorer
         #endregion
 
         #region File explorer bar events
-        private void BackExplorer_Click(object sender, RoutedEventArgs e) { NavigateBack(); }
+        private void BackExplorer_Click(object sender, RoutedEventArgs e) { GoBack(); }
 
-        private void ForwardExplorer_Click(object sender, RoutedEventArgs e) { NavigateForward(); }
+        private void ForwardExplorer_Click(object sender, RoutedEventArgs e) { GoForward(); }
 
-        private void ParentExplorer_Click(object sender, RoutedEventArgs e) { NavigateParent(); }
+        private void ParentExplorer_Click(object sender, RoutedEventArgs e) { NavigateToParent(); }
 
         private void OpenPathExplorer_Click(object sender, RoutedEventArgs e)
-        { ExplorerFileCmds.Open.Execute(new List<string>() { RootNode.Path }); }
+        { FileExplorerCmds.Open.Execute(new List<string>() { RootNode.FullPath }); }
 
         private void TextBox_SelectAll(object sender, RoutedEventArgs e)
         {

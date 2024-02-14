@@ -1,12 +1,13 @@
 ﻿<controls:FileExplorerBase
-    x:Class="GerCRUD_FW3ma_Namespace.Frameworks3ma.nsWpfOutils.Controls.FileExplorerList"
+    x:Class="WpfComponents.Lib.Components.FileExplorer.FileExplorerList"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:controls="clr-namespace:WpfComponents.Lib.Components.FileExplorer.Controls"
-    xmlns:local="clr-namespace:WpfComponents.Lib.Components.FileExplorer"
     xmlns:converters="clr-namespace:WpfComponents.Lib.Components.FileExplorer.Converters"
+    xmlns:globalConverters="clr-namespace:WpfComponents.Lib.Converters"
+    xmlns:data="clr-namespace:WpfComponents.Lib.Components.FileExplorer.Data"
     xmlns:layout="clr-namespace:WpfComponents.Lib.Layout"
     mc:Ignorable="d"
     d:DesignHeight="450"
@@ -17,6 +18,7 @@
         <ContextMenu />
     </controls:FileExplorerBase.ContextMenu>
     <controls:FileExplorerBase.Resources>
+        <globalConverters:UniversalVisibilityConverter x:Key="UniversalVisibilityConverter" />
         <converters:SizeToStringConverter x:Key="SizeToStringConverter" />
     </controls:FileExplorerBase.Resources>
     <Grid>
@@ -34,7 +36,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Orientation="Horizontal">
-                <Button Width="20" Click="PreviousExplorer_Click">
+                <Button Width="20" Click="BackExplorer_Click">
                     <TextBlock
                         Text="&#xf0b0;"
                         FontFamily="{StaticResource SegoeFluentIcons}"
@@ -42,7 +44,7 @@
                 </Button>
                 <Button
                     Width="20"
-                    Click="NextExplorer_Click"
+                    Click="ForwardExplorer_Click"
                     Margin="0,0,2,0">
                     <TextBlock
                         Text="&#xf0af;"
@@ -73,7 +75,7 @@
                 Grid.Column="2"
                 Margin="2,0"
                 Width="24"
-                Click="ExplorerOpenPath_Click">
+                Click="OpenPathExplorer_Click">
                 <TextBlock Text="&#xed25;" FontFamily="{StaticResource SegoeFluentIcons}" />
             </Button>
 
@@ -114,10 +116,10 @@
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <layout:ListViewExtended
+                        x:Name="ListView"
                         VerticalAlignment="Top"
                         SelectionMode="Extended"
                         Tag="{Binding RootNode, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        x:Name="ListView"
                         Style="{StaticResource ListView_WithGrid}"
                         ItemsSource="{Binding RootNode.SortedChildViews, RelativeSource={RelativeSource AncestorType=UserControl}}"
                         MouseDoubleClick="HandleNodeDoubleClick"
@@ -137,16 +139,16 @@
                                 <GridViewColumn>
                                     <GridViewColumn.HeaderTemplate>
                                         <DataTemplate>
-                                            <controls:SortButton
+                                            <controls:ButtonSort
                                                 Click="SortButton_Click"
                                                 Target="Name"
                                                 Mediator="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}">
                                                 Name
-                                            </controls:SortButton>
+                                            </controls:ButtonSort>
                                         </DataTemplate>
                                     </GridViewColumn.HeaderTemplate>
                                     <GridViewColumn.CellTemplate>
-                                        <DataTemplate DataType="{x:Type internal:ExplorerNode}">
+                                        <DataTemplate DataType="{x:Type data:ExplorerNode}">
                                             <DockPanel MouseUp="HandleNodeMouseUp" Background="Transparent">
                                                 <!--  Image (retrieved from Windows)  -->
                                                 <Image
@@ -190,16 +192,16 @@
                                 <GridViewColumn>
                                     <GridViewColumn.HeaderTemplate>
                                         <DataTemplate>
-                                            <controls:SortButton
+                                            <controls:ButtonSort
                                                 Click="SortButton_Click"
                                                 Target="LastModified"
                                                 Mediator="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}">
                                                 Modified On
-                                            </controls:SortButton>
+                                            </controls:ButtonSort>
                                         </DataTemplate>
                                     </GridViewColumn.HeaderTemplate>
                                     <GridViewColumn.CellTemplate>
-                                        <DataTemplate DataType="{x:Type internal:ExplorerNode}">
+                                        <DataTemplate DataType="{x:Type data:ExplorerNode}">
                                             <TextBlock Text="{Binding Info.LastWriteTime, StringFormat='dd/MM/yyyy HH:mm'}" Foreground="{DynamicResource Container_SecondaryText}" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
@@ -207,16 +209,16 @@
                                 <GridViewColumn>
                                     <GridViewColumn.HeaderTemplate>
                                         <DataTemplate>
-                                            <controls:SortButton
+                                            <controls:ButtonSort
                                                 Click="SortButton_Click"
                                                 Target="Size"
                                                 Mediator="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}">
                                                 Size
-                                            </controls:SortButton>
+                                            </controls:ButtonSort>
                                         </DataTemplate>
                                     </GridViewColumn.HeaderTemplate>
                                     <GridViewColumn.CellTemplate>
-                                        <DataTemplate DataType="{x:Type internal:ExplorerFileNode}">
+                                        <DataTemplate DataType="{x:Type data:ExplorerNodeFile}">
                                             <TextBlock Text="{Binding Info, Converter={StaticResource SizeToStringConverter}}" Foreground="{DynamicResource Container_SecondaryText}" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
@@ -250,7 +252,7 @@
                         </StackPanel>
                     </StackPanel>
 
-                    <controls:DragDropPopup
+                    <controls:PopupActionDnD
                         AllowsTransparency="True"
                         x:Name="DragTooltipPopup"
                         PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}" />

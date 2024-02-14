@@ -20,7 +20,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.DnD
 
         public FileExplorerDnD(FileExplorerBase explorer) : base(
             explorer,
-            explorer.DnDPopup)
+            explorer.PopupDnD)
         { _explorer = explorer; }
 
         #region Event handling
@@ -81,9 +81,9 @@ namespace WpfComponents.Lib.Components.FileExplorer.DnD
 
             // Update popup content
             if (lFichier.IsCopy())
-                _explorer.DnDPopup.ChangeEffect(DragDropEffects.Copy);
+                _explorer.PopupDnD.ChangeEffect(DragDropEffects.Copy);
             else
-                _explorer.DnDPopup.ChangeEffect(DragDropEffects.Move);
+                _explorer.PopupDnD.ChangeEffect(DragDropEffects.Move);
 
             return true;
         }
@@ -91,7 +91,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.DnD
         protected override bool CanDrag(object sender, MouseEventArgs args)
         {
             if (_explorer.Permissions.HasFlag(EnumPermission.AllowDrag) == false ||
-                _explorer.EditingTextBox != null)
+                _explorer.CurrentRenamingTextBox != null)
                 return false;
 
             // Handle continuation after cancellation (prevent starting another drag directly)

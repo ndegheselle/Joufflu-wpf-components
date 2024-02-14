@@ -62,7 +62,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Controls
         } =
                 EnumPermission.AllowDragDrop | EnumPermission.AllowShortcuts | EnumPermission.AllowContextMenu;
 
-        public abstract PopupActionDnD DnDPopup { get; }
+        public abstract PopupActionDnD PopupDnD { get; }
 
         public FileExplorerDnD DnDHandler { get; private set; }
 
@@ -123,7 +123,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Controls
             {
                 if (sender != this)
                 {
-                    ClearSelected();
+                    ClearSelection();
                 }
             };
         }
@@ -136,7 +136,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Controls
         #endregion
 
         #region Methodes
-        public abstract void ClearSelected();
+        public abstract void ClearSelection();
 
         public void CreateNewFolder(ExplorerNodeFolder targetNode)
         {
@@ -283,7 +283,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Controls
         #region Renommage
         public void RenameNode(ExplorerNode target)
         {
-            CurrentRenamingTextBox = GetEditingTextBox(target);
+            CurrentRenamingTextBox = GetEditTextBox(target);
             if (CurrentRenamingTextBox == null)
                 return;
 
@@ -316,7 +316,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Controls
             CurrentRenamingTextBox.Select(0, 0);
             CurrentRenamingTextBox = null;
             // Fix weird selection behavior after renaming (element selected forever ?)
-            ClearSelected();
+            ClearSelection();
         }
 
         protected void CancelRenaming()
@@ -328,7 +328,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Controls
             ClearRenaming();
         }
 
-        protected abstract TextBox GetEditingTextBox(ExplorerNode target);
+        protected abstract TextBox GetEditTextBox(ExplorerNode target);
 
         protected void TextBoxNode_LostFocus(object sender, RoutedEventArgs e)
         {
@@ -370,7 +370,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Controls
             e.Handled = true;
         }
 
-        protected void NomNode_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        protected void NameNode_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             // Only allow valid characters
             Regex regex = new Regex(@"^[\w\-. ]+$");

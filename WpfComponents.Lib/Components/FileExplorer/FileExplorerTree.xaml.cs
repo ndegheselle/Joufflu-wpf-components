@@ -1,8 +1,4 @@
-﻿using GerCRUD_FW3ma_Namespace.Frameworks3ma.nsWpfOutils.Controles.Layout;
-using GerCRUD_FW3ma_Namespace.Frameworks3ma.nsWpfOutils.Fonctions;
-using GerCRUD_FW3ma_Namespace.Frameworks3ma.nsWpfOutils.Interne.Controles.ExplorateurFichiers;
-using GerCRUD_FW3ma_Namespace.Frameworks3ma.nsWpfOutils.Interne.Controles.ExplorateurFichiers.Controles;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,192 +11,151 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using WpfComponents.Lib.Components.FileExplorer.Controls;
+using WpfComponents.Lib.Components.FileExplorer.Data;
 using WpfComponents.Lib.Layout;
-using static GerCRUD_FW3ma_Namespace.Frameworks3ma.nsWpfOutils.Controles.ExplorateurFichiersTree;
+using WpfComponents.Lib.Logic.Helpers;
 
-namespace GerCRUD_FW3ma_Namespace.Frameworks3ma.nsWpfOutils.Controles
+namespace WpfComponents.Lib.Components.FileExplorer
 {
-    // Permet d'ajouter des filtres sur chaque Node sans passer par le viewmodel, à voir comment faire pour refresh (en cas de recherche par example)
-    public class ConverterViewFilter : IMultiValueConverter
-    {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            IEnumerable lCollectionOrigine = values[0] as IEnumerable;
-
-            if (lCollectionOrigine == null)
-                return null;
-
-            EnumAffichageExplorateur lAfficherFichier = (EnumAffichageExplorateur)values[1];
-
-            CollectionViewSource lCollectionViewSource = new CollectionViewSource();
-            lCollectionViewSource.Source = lCollectionOrigine;
-
-            ICollectionView lCollectionView = lCollectionViewSource.View;
-            lCollectionView.Filter += (obj) =>
-            {
-                var lNode = obj as NodeExplorateur;
-
-                bool lAffichage = false;
-                if (lAfficherFichier.HasFlag(EnumAffichageExplorateur.Dossier))
-                    lAffichage = lAffichage || lNode is NodeExplorateurDossier;
-                if (lAfficherFichier.HasFlag(EnumAffichageExplorateur.Fichier))
-                    lAffichage = lAffichage || lNode is NodeExplorateurFichier;
-
-                return lAffichage;
-            };
-
-            if (!lAfficherFichier.HasFlag(EnumAffichageExplorateur.SansTri))
-            {
-                lCollectionView.SortDescriptions.Add(new SortDescription("Type", ListSortDirection.Ascending));
-                lCollectionView.SortDescriptions.Add(new SortDescription("Nom", ListSortDirection.Ascending));
-            }
-
-            return lCollectionView;
-        }
-
-        public object[] ConvertBack(object value, Type[] targetType, object parameter, CultureInfo culture)
-        { throw new NotSupportedException(); }
-    }
-
     /// <summary>
-    /// Logique d'interaction pour ExplorateurFichiers.xaml
+    /// Interaction logic for FileExplorer.xaml
     /// </summary>
-    public partial class ExplorateurFichiersTree : BaseExplorateurFichier
+    public partial class FileExplorerTree : FileExplorerBase
     {
         [Flags]
-        public enum EnumAffichageExplorateur
+        public enum EnumExplorateurDisplay
         {
-            Rien = 1,
-            Fichier = 2,
-            Dossier = 4,
-            SansTri = 8,
-            DossierRacine = 16,
-            Tout = Fichier | Dossier
+            None = 1,
+            File = 2,
+            Folder = 4,
+            NoSorting = 8,
+            RootFolder = 16,
+            All = File | Folder
         }
 
         #region Property Changed
-        private NodeExplorateurDossier _NodeParent = null;
+        private ExplorerNodeFolder _parentNode = null;
 
-        public NodeExplorateurDossier NodeParent
+        public ExplorerNodeFolder ParentNode
         {
-            get { return _NodeParent ?? NodeRacine; }
+            get { return _parentNode ?? RootNode; }
             set
             {
-                _NodeParent = value;
-                if (_NodeParent != null)
+                _parentNode = value;
+                if (_parentNode != null)
                 {
-                    _NodeParent.Enfants.Add(NodeRacine);
+                    _parentNode.Children.Add(RootNode);
                 }
                 OnPropertyChanged();
             }
         }
 
-        private NodeExplorateur _NodeSelectionne = null;
+        private ExplorerNode _selectedNode = null;
 
-        public NodeExplorateur NodeSelectionne
+        public ExplorerNode SelectedNode
         {
-            get { return _NodeSelectionne; }
+            get { return _selectedNode; }
             set
             {
-                _NodeSelectionne = value;
-                // Permet de mettre a jour la vue
-                if (_NodeSelectionne != null)
-                    _NodeSelectionne.EstSelectionneeUnique = true;
-                if (value as NodeExplorateurDossier != null && NodeSelectionne != DossierSelectionne)
-                    DossierSelectionne = value as NodeExplorateurDossier;
+                _selectedNode = value;
+                // Update the view
+                if (_selectedNode != null)
+                    _selectedNode.IsSelectedUnique = true;
+                if (value is ExplorerNodeFolder && SelectedNode != SelectedFolder)
+                    SelectedFolder = value as ExplorerNodeFolder;
 
                 OnPropertyChanged();
             }
         }
 
-        public override IEnumerable<NodeExplorateur> NodeSelectionnees
+        public override IEnumerable<ExplorerNode> SelectedNodes
         {
-            get { return new List<NodeExplorateur>() { NodeSelectionne }; }
+            get { return new List<ExplorerNode>() { SelectedNode }; }
         }
         #endregion
 
         #region Dependency Properties
-        public static readonly DependencyProperty DossierSelectionneProperty = DependencyProperty.Register(
-            "DossierSelectionne",
-            typeof(NodeExplorateurDossier),
-            typeof(ExplorateurFichiersTree),
-            new UIPropertyMetadata(null, (o, value) => ((ExplorateurFichiersTree)o).OnDossierSelectioneChange()));
+        public static readonly DependencyProperty SelectedFolderProperty = DependencyProperty.Register(
+            "SelectedFolder",
+            typeof(ExplorerNodeFolder),
+            typeof(FileExplorerTree),
+            new UIPropertyMetadata(null, (o, value) => ((FileExplorerTree)o).OnSelectedFolderChange()));
 
-        public NodeExplorateurDossier DossierSelectionne
+        public ExplorerNodeFolder SelectedFolder
         {
-            get { return (NodeExplorateurDossier)GetValue(DossierSelectionneProperty); }
-            set { SetValue(DossierSelectionneProperty, value); }
+            get { return (ExplorerNodeFolder)GetValue(SelectedFolderProperty); }
+            set { SetValue(SelectedFolderProperty, value); }
         }
 
-        private void OnDossierSelectioneChange()
+        private void OnSelectedFolderChange()
         {
-            if (DossierSelectionne != NodeSelectionne)
-                NodeSelectionne = DossierSelectionne;
+            if (SelectedFolder != SelectedNode)
+                SelectedNode = SelectedFolder;
         }
 
-        public static readonly DependencyProperty AffichageProperty = DependencyProperty.Register(
-            "Affichage",
-            typeof(EnumAffichageExplorateur),
-            typeof(ExplorateurFichiersTree),
+        public static readonly DependencyProperty DisplayProperty = DependencyProperty.Register(
+            "Display",
+            typeof(EnumExplorateurDisplay),
+            typeof(FileExplorerTree),
             new UIPropertyMetadata(
-                EnumAffichageExplorateur.Dossier,
-                (o, value) => ((ExplorateurFichiersTree)o).OnAffichageChange()));
+                EnumExplorateurDisplay.Folder,
+                (o, value) => ((FileExplorerTree)o).OnDisplayChange()));
 
-        public EnumAffichageExplorateur Affichage
+        public EnumExplorateurDisplay Display
         {
-            get { return (EnumAffichageExplorateur)GetValue(AffichageProperty); }
-            set { SetValue(AffichageProperty, value); }
+            get { return (EnumExplorateurDisplay)GetValue(DisplayProperty); }
+            set { SetValue(DisplayProperty, value); }
         }
 
         public override PopupActionDnD PopupDnD => PopupTooltipDrag;
 
-        protected override void OnNodeRacineChange(DependencyPropertyChangedEventArgs eventArgs)
+        protected override void OnRootNodeChange(DependencyPropertyChangedEventArgs eventArgs)
         {
-            base.OnNodeRacineChange(eventArgs);
-            OnAffichageChange();
+            base.OnRootNodeChange(eventArgs);
+            OnDisplayChange();
         }
 
         #endregion
 
-        public ExplorateurFichiersTree()
+        public FileExplorerTree()
         {
-            // DragDropFichier = new DragDropFichier(NodeRacine);
+            // DragDropFile = new DragDropFile(RootNode);
             InitializeComponent();
         }
 
         #region Events
-        private void OnAffichageChange()
+        private void OnDisplayChange()
         {
-            if (NodeRacine == null)
+            if (RootNode == null)
                 return;
 
-            if (Affichage.HasFlag(EnumAffichageExplorateur.DossierRacine))
-                NodeParent = new NodeExplorateurDossier(Path.GetDirectoryName(NodeRacine.Chemin));
+            if (Display.HasFlag(EnumExplorateurDisplay.RootFolder))
+                ParentNode = new ExplorerNodeFolder(Path.GetDirectoryName(RootNode.FullPath));
             else
-                NodeParent = null;
+                ParentNode = null;
 
-            RafraichirViewNodes(NodeRacine);
+            RefreshViewNodes(RootNode);
         }
 
         private void TreeView_Expanded(object sender, RoutedEventArgs e)
         {
-            TreeViewItem tvi = e.OriginalSource as TreeViewItem;
-            NodeExplorateurDossier lNodeDossier = tvi.DataContext as NodeExplorateurDossier;
+            TreeViewItem? tvi = e.OriginalSource as TreeViewItem;
+            ExplorerNodeFolder? folderNode = tvi?.DataContext as ExplorerNodeFolder;
 
-            if (lNodeDossier == null)
+            if (folderNode == null)
                 return;
-            lNodeDossier.MettreAJourEnfants();
+            folderNode.UpdateChildren();
         }
 
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            NodeSelectionne = e.NewValue as NodeExplorateur;
-            // Notifier les autres treeview qu'il faut clear leurs sélections
-            if (NodeSelectionne != null && Mediateur != null)
-                Mediateur.Notifier(this, NodeSelectionnees);
+            SelectedNode = e.NewValue as ExplorerNode;
+            // Notify other treeviews to clear their selections
+            if (SelectedNode != null && Mediator != null)
+                Mediator.Notify(this, SelectedNodes);
 
-            if (NodeSelectionne is NodeExplorateurDossier lDossier && lDossier.EstOuvert == false)
-                lDossier.MettreAJourEnfants();
+            if (SelectedNode is ExplorerNodeFolder folder && folder.IsOpen == false)
+                folder.UpdateChildren();
         }
 
         private void TreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -215,17 +170,17 @@ namespace GerCRUD_FW3ma_Namespace.Frameworks3ma.nsWpfOutils.Controles
         }
         #endregion
 
-        #region Methodes
+        #region Methods
 
-        // Rafraichir toutes les nodes pour mettre à jour les filtres / tris
-        private void RafraichirViewNodes(NodeExplorateurDossier pNodeDossier)
+        // Refresh all nodes to update filters / sorting
+        private void RefreshViewNodes(ExplorerNodeFolder folderNode)
         {
-            pNodeDossier.Rafraichir();
-            foreach (var lEnfant in pNodeDossier.Enfants)
+            folderNode.Refresh();
+            foreach (var child in folderNode.Children)
             {
-                var lEnfantDossier = lEnfant as NodeExplorateurDossier;
-                if (lEnfantDossier != null)
-                    RafraichirViewNodes(lEnfantDossier);
+                var childFolder = child as ExplorerNodeFolder;
+                if (childFolder != null)
+                    RefreshViewNodes(childFolder);
             }
         }
 
@@ -237,12 +192,12 @@ namespace GerCRUD_FW3ma_Namespace.Frameworks3ma.nsWpfOutils.Controles
             return source as TreeViewItem;
         }
 
-        protected override TextBox RecupererTextBoxEdition(NodeExplorateur pNode)
+        protected override TextBox GetEditTextBox(ExplorerNode node)
         {
-            // XXX : il y a de grande chance qu'il y ait un crash a textBox = null (check comment c'est gérer dans la ListView si c'est le cas)
-            StretchingTreeViewItem lTreeViewItem = (StretchingTreeViewItem)TreeView.ItemContainerGenerator
+            // XXX: There is a good chance that there will be a crash if textBox = null (check how it is handled in the ListView if that's the case)
+            StretchingTreeViewItem treeViewItem = (StretchingTreeViewItem)TreeView.ItemContainerGenerator
                 .ContainerFromItem(TreeView.SelectedItem);
-            TextBox textBox = VisualTreeHelperExt.GetChildren<TextBox>(lTreeViewItem, true).FirstOrDefault();
+            TextBox textBox = MoreVisualTreeHelper.GetChildren<TextBox>(treeViewItem, true).FirstOrDefault();
 
             // Set focus on the TextBox and select all text
             if (textBox != null)
@@ -255,11 +210,11 @@ namespace GerCRUD_FW3ma_Namespace.Frameworks3ma.nsWpfOutils.Controles
 
         public override void ClearSelection()
         {
-            var lNode = TreeView.SelectedItem as NodeExplorateur;
-            if (lNode == null)
+            var node = TreeView.SelectedItem as ExplorerNode;
+            if (node == null)
                 return;
 
-            lNode.EstSelectionneeUnique = false;
+            node.IsSelectedUnique = false;
         }
         #endregion
 
@@ -271,12 +226,12 @@ namespace GerCRUD_FW3ma_Namespace.Frameworks3ma.nsWpfOutils.Controles
             if (e.Handled)
                 return;
 
-            // Permet d'expand le dossier grâce au Binding
-            FrameworkElement lDestination = e.OriginalSource as FrameworkElement;
-            NodeExplorateurDossier lDataContext = lDestination.DataContext as NodeExplorateurDossier;
+            // Expand the folder using Binding
+            FrameworkElement destination = e.OriginalSource as FrameworkElement;
+            ExplorerNodeFolder dataContext = destination.DataContext as ExplorerNodeFolder;
 
-            if (lDataContext != null)
-                lDataContext.EstOuvert = true;
+            if (dataContext != null)
+                dataContext.IsOpen = true;
         }
         #endregion
     }

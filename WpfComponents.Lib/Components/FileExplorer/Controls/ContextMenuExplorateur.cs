@@ -33,7 +33,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Controls
                                 (targetNode is ExplorerNodeFolder)
                                 ? targetNode.FullPath
                                 // Open the parent or root folder if no parent
-                                : targetNode?.Parent?.FullPath ?? explorer.RootNode.Path
+                                : targetNode?.Parent?.FullPath ?? explorer.RootNode.FullPath
                             },
                     Command = FileExplorerCmds.Open
                 });
