@@ -73,14 +73,14 @@
                             Source="{Binding Icone}"
                             Margin="0,0,2,0"
                             Height="16" />
-                        <!--  or SegoeFluentIcons icon  -->
+                        <!--  or FontAwesomeSolid icon  -->
                         <TextBlock
                             Margin="0,0,2,0"
                             DragOver="Folder_DragOver"
                             Visibility="{Binding Contexte.IconeCustom, Converter={StaticResource CvUniverselVisibility}}"
                             Text="{Binding Contexte.IconeCustom}"
                             Foreground="{Binding Contexte.IconeCustomCouleur}"
-                            FontFamily="{StaticResource SegoeFluentIcons}"
+                            FontFamily="{StaticResource FontAwesomeSolid}"
                             FontSize="14" />
                         <TextBox
                             Height="16"
@@ -113,13 +113,13 @@
                                 Source="{Binding Icone}"
                                 Margin="0,0,2,0"
                                 Height="16" />
-                            <!--  or SegoeFluentIcons icon  -->
+                            <!--  or FontAwesomeSolid icon  -->
                             <TextBlock
                                 Margin="0,0,2,0"
                                 Visibility="{Binding Contexte.IconeCustom, Converter={StaticResource CvUniverselVisibility}}"
                                 Text="{Binding Contexte.IconeCustom}"
                                 Foreground="{Binding Contexte.IconeCustomCouleur}"
-                                FontFamily="{StaticResource SegoeFluentIcons}"
+                                FontFamily="{StaticResource FontAwesomeSolid}"
                                 FontSize="14" />
                             <TextBox
                                 LostFocus="TextBoxNode_LostFocus"

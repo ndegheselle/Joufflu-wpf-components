@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
 
 namespace WpfComponents.App
@@ -65,6 +66,21 @@ namespace WpfComponents.App
         public MainWindow()
         {
             InitializeComponent();
+            // Foreach tab in MainContainer create a ListBoxItem and add it to the ListBox
+            foreach (TabItem tab in MainContainer.Items)
+            {
+                var item = new ListBoxItem
+                {
+                    Content = tab.Header,
+                    Tag = tab
+                };
+                item.Selected += (s, e) =>
+                {
+                    MainContainer.SelectedItem = (TabItem)((ListBoxItem)s).Tag;
+                };
+                SideMenu.Items.Add(item);
+            }
+
         }
 
         private void TimePickerInput_ValueChanged(object sender, System.TimeSpan? e)
