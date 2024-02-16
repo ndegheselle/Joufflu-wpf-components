@@ -22,7 +22,7 @@
                         Display="Folder,File,RootFolder"
                         Mediator="{Binding Controller, RelativeSource={RelativeSource AncestorType=local:FileExplorer}}"
                         RootNode="{Binding RootNode}"
-                        SelectedFolder="{Binding Controlleur.SelectedFolder, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=local:FileExplorer}}"
+                        SelectedFolder="{Binding Controller.SelectedFolder, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=local:FileExplorer}}"
                         Permissions="AllowContextMenu,AllowDrop" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

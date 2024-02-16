@@ -80,16 +80,7 @@
                 </StackPanel>
             </TabItem>
             <TabItem Visibility="Collapsed" Header="File explorer">
-                <explorer:FileExplorer>
-                    <explorer:FileExplorer.RootPaths>
-                        <x:Array
-                            Type="sys:String"
-                            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                            xmlns:sys="clr-namespace:System;assembly=mscorlib">
-                            <sys:String>C:\Users</sys:String>
-                        </x:Array>
-                    </explorer:FileExplorer.RootPaths>
-                </explorer:FileExplorer>
+                <explorer:FileExplorer x:Name="FileExplorerControl" />
             </TabItem>
         </TabControl>
 

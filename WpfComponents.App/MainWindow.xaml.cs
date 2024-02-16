@@ -1,4 +1,5 @@
 ﻿using AdonisUI.Controls;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -81,6 +82,7 @@ namespace WpfComponents.App
                 SideMenu.Items.Add(item);
             }
 
+            FileExplorerControl.RootPaths = new List<string> { Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) };
         }
 
         private void TimePickerInput_ValueChanged(object sender, System.TimeSpan? e)

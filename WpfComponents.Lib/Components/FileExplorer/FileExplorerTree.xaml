@@ -21,6 +21,11 @@
     <controls:FileExplorerBase.Resources>
         <converters:ViewFilterConverter x:Key="ViewFilterConverter" />
         <globalConverters:UniversalVisibilityConverter x:Key="UniversalVisibilityConverter" />
+
+        <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+            <Setter Property="Padding" Value="0" />
+        </Style>
+
     </controls:FileExplorerBase.Resources>
     <Grid
         AllowDrop="True"
@@ -28,71 +33,71 @@
         DragOver="HandleDragOver"
         DragEnter="HandleDragOver"
         DragLeave="HandleDragLeave">
-        <layout:StretchingTreeView
+        <TreeView
             x:Name="TreeView"
             TreeViewItem.Expanded="TreeView_Expanded"
             SelectedItemChanged="TreeView_SelectedItemChanged"
             PreviewMouseRightButtonDown="TreeView_PreviewMouseRightButtonDown"
             PreviewMouseWheel="PreviewMouseWheel"
-            Tag="{Binding NodeParent, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            Tag="{Binding ParentNode, RelativeSource={RelativeSource AncestorType=UserControl}}"
             Background="Transparent"
             BorderThickness="0">
-            <layout:StretchingTreeView.ItemsSource>
+            <TreeView.ItemsSource>
                 <MultiBinding Converter="{StaticResource ViewFilterConverter}">
-                    <Binding Path="NodeParent.Enfants" RelativeSource="{RelativeSource AncestorType=UserControl}" />
-                    <Binding Path="Affichage" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                    <Binding Path="ParentNode.Children" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                    <Binding Path="Display" RelativeSource="{RelativeSource AncestorType=UserControl}" />
                 </MultiBinding>
-            </layout:StretchingTreeView.ItemsSource>
-            <layout:StretchingTreeView.ItemContainerStyle>
-                <Style TargetType="{x:Type layout:StretchingTreeViewItem}" BasedOn="{StaticResource {x:Type layout:StretchingTreeViewItem}}">
+            </TreeView.ItemsSource>
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <Setter Property="IsExpanded">
                         <Setter.Value>
                             <!--  Avoids warnings for files that do not have the "EstOuvert" property  -->
                             <PriorityBinding>
-                                <Binding Path="EstOuvert" Mode="TwoWay" />
+                                <Binding Path="IsOpen" Mode="TwoWay" />
                             </PriorityBinding>
                         </Setter.Value>
                     </Setter>
-                    <Setter Property="IsSelected" Value="{Binding EstSelectionneeUnique, Mode=TwoWay}" />
+                    <Setter Property="IsSelected" Value="{Binding IsSelectedUnique, Mode=TwoWay}" />
                     <EventSetter Event="MouseDoubleClick" Handler="HandleNodeDoubleClick" />
                 </Style>
-            </layout:StretchingTreeView.ItemContainerStyle>
-            <layout:StretchingTreeView.Resources>
+            </TreeView.ItemContainerStyle>
+            <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type data:ExplorerNodeFolder}">
                     <HierarchicalDataTemplate.ItemsSource>
                         <MultiBinding Converter="{StaticResource ViewFilterConverter}">
-                            <Binding Path="Enfants" />
-                            <Binding Path="Affichage" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                            <Binding Path="Children" />
+                            <Binding Path="Display" RelativeSource="{RelativeSource AncestorType=UserControl}" />
                         </MultiBinding>
                     </HierarchicalDataTemplate.ItemsSource>
                     <DockPanel MouseMove="HandleMouseMove" Margin="2,2,5,2">
                         <!--  Image (retrieved from Windows)  -->
                         <Image
                             DragOver="Folder_DragOver"
-                            Visibility="{Binding Contexte.IconeCustom, Converter={StaticResource CvUniverselVisibility}, ConverterParameter=False}"
-                            Source="{Binding Icone}"
+                            Visibility="{Binding Context.CustomIcon, Converter={StaticResource UniversalVisibilityConverter}, ConverterParameter=False}"
+                            Source="{Binding Icon}"
                             Margin="0,0,2,0"
                             Height="16" />
                         <!--  or FontAwesomeSolid icon  -->
                         <TextBlock
                             Margin="0,0,2,0"
                             DragOver="Folder_DragOver"
-                            Visibility="{Binding Contexte.IconeCustom, Converter={StaticResource CvUniverselVisibility}}"
-                            Text="{Binding Contexte.IconeCustom}"
-                            Foreground="{Binding Contexte.IconeCustomCouleur}"
+                            Visibility="{Binding Context.CustomIcon, Converter={StaticResource UniversalVisibilityConverter}}"
+                            Text="{Binding Context.CustomIcon}"
+                            Foreground="{Binding Context.CustomIconColor}"
                             FontFamily="{StaticResource FontAwesomeSolid}"
                             FontSize="14" />
                         <TextBox
-                            Height="16"
+                            Padding="4,2"
                             LostFocus="TextBoxNode_LostFocus"
                             VerticalAlignment="Center"
-                            Text="{Binding Nom, Mode=OneWay}"
+                            Text="{Binding Name, Mode=OneWay}"
                             DataContext="{Binding}">
                             <TextBox.Style>
                                 <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
                                     <Style.Triggers>
                                         <!--  Use a DataTrigger to apply the style when IsEditing is true  -->
-                                        <DataTrigger Binding="{Binding EstEnEdition}" Value="False">
+                                        <DataTrigger Binding="{Binding IsEditing}" Value="False">
                                             <Setter Property="Background" Value="Transparent" />
                                             <Setter Property="BorderThickness" Value="0" />
                                             <Setter Property="IsHitTestVisible" Value="False" />
@@ -109,22 +114,23 @@
                         <DockPanel MouseMove="HandleMouseMove" Margin="2,2,5,2">
                             <!--  Image (retrieved from Windows)  -->
                             <Image
-                                Visibility="{Binding Contexte.IconeCustom, Converter={StaticResource CvUniverselVisibility}, ConverterParameter=False}"
-                                Source="{Binding Icone}"
+                                Visibility="{Binding Context.CustomIcon, Converter={StaticResource UniversalVisibilityConverter}, ConverterParameter=False}"
+                                Source="{Binding Icon}"
                                 Margin="0,0,2,0"
                                 Height="16" />
                             <!--  or FontAwesomeSolid icon  -->
                             <TextBlock
                                 Margin="0,0,2,0"
-                                Visibility="{Binding Contexte.IconeCustom, Converter={StaticResource CvUniverselVisibility}}"
-                                Text="{Binding Contexte.IconeCustom}"
-                                Foreground="{Binding Contexte.IconeCustomCouleur}"
+                                Visibility="{Binding Context.CustomIcon, Converter={StaticResource UniversalVisibilityConverter}}"
+                                Text="{Binding Context.CustomIcon}"
+                                Foreground="{Binding Context.CustomIconColor}"
                                 FontFamily="{StaticResource FontAwesomeSolid}"
                                 FontSize="14" />
                             <TextBox
+                                Padding="4,2"
                                 LostFocus="TextBoxNode_LostFocus"
                                 VerticalAlignment="Center"
-                                Text="{Binding Nom, Mode=OneWay}"
+                                Text="{Binding Name, Mode=OneWay}"
                                 DataContext="{Binding}">
                                 <TextBox.Style>
                                     <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
@@ -143,8 +149,8 @@
                         </DockPanel>
                     </ContentControl>
                 </DataTemplate>
-            </layout:StretchingTreeView.Resources>
-        </layout:StretchingTreeView>
+            </TreeView.Resources>
+        </TreeView>
         <controls:PopupActionDnD x:Name="PopupTooltipDrag" PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}" />
     </Grid>
 </controls:FileExplorerBase>

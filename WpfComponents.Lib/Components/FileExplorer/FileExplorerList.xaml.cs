@@ -295,7 +295,7 @@ namespace WpfComponents.Lib.Components.FileExplorer
                 case "Name":
                     RootNode.SortedChildNodes.CustomSort = new NameComparer(button.SortDirection.Value);
                     break;
-                case "DateModified":
+                case "LastModified":
                     RootNode.SortedChildNodes.CustomSort = new ModifiedDateComparer(button.SortDirection.Value);
                     break;
                 case "Size":

@@ -1,6 +1,7 @@
 ﻿<controls:FileExplorerBase
     x:Class="WpfComponents.Lib.Components.FileExplorer.FileExplorerList"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -12,14 +13,119 @@
     mc:Ignorable="d"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    MouseDown="BaseFileExplorer_MouseDown"
+    MouseDown="BaseExplorerFile_MouseDown"
     Focusable="True">
     <controls:FileExplorerBase.ContextMenu>
         <ContextMenu />
     </controls:FileExplorerBase.ContextMenu>
     <controls:FileExplorerBase.Resources>
-        <globalConverters:UniversalVisibilityConverter x:Key="UniversalVisibilityConverter" />
-        <converters:SizeToStringConverter x:Key="SizeToStringConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/FileExplorer/Controls/ButtonSort.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="{x:Type layout:ListViewExtended}" BasedOn="{StaticResource {x:Type ListView}}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListView}">
+                            <Border
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                SnapsToDevicePixels="True">
+                                <ScrollViewer Style="{DynamicResource GridViewScrollViewerStyleKey}" Focusable="False">
+                                    <ItemsPresenter />
+                                </ScrollViewer>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="GridViewScrollViewerStyleKey" TargetType="ScrollViewer">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ScrollViewer">
+                            <Grid Background="{TemplateBinding Background}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <DockPanel>
+                                    <ScrollViewer
+                                        Padding="0"
+                                        DockPanel.Dock="Top"
+                                        HorizontalScrollBarVisibility="Hidden"
+                                        VerticalScrollBarVisibility="Hidden"
+                                        Focusable="false">
+                                        <GridViewHeaderRowPresenter
+                                            x:Name="PART_GridViewHeaderRowPresenter"
+                                            AllowsColumnReorder="{Binding Path=TemplatedParent.View.AllowsColumnReorder, RelativeSource={RelativeSource TemplatedParent}}"
+                                            ColumnHeaderContainerStyle="{Binding Path=TemplatedParent.View.ColumnHeaderContainerStyle, RelativeSource={RelativeSource TemplatedParent}}"
+                                            ColumnHeaderContextMenu="{Binding Path=TemplatedParent.View.ColumnHeaderContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
+                                            ColumnHeaderTemplate="{Binding Path=TemplatedParent.View.ColumnHeaderTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                            ColumnHeaderTemplateSelector="{Binding Path=TemplatedParent.View.ColumnHeaderTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}"
+                                            ColumnHeaderToolTip="{Binding Path=TemplatedParent.View.ColumnHeaderToolTip, RelativeSource={RelativeSource TemplatedParent}}"
+                                            Columns="{Binding Path=TemplatedParent.View.Columns, RelativeSource={RelativeSource TemplatedParent}}"
+                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                    </ScrollViewer>
+                                    <ScrollContentPresenter
+                                        Name="PART_ScrollContentPresenter"
+                                        KeyboardNavigation.DirectionalNavigation="Local"
+                                        CanContentScroll="True"
+                                        CanHorizontallyScroll="False"
+                                        CanVerticallyScroll="False" />
+                                </DockPanel>
+                                <ScrollBar
+                                    Name="PART_HorizontalScrollBar"
+                                    Orientation="Horizontal"
+                                    Grid.Row="1"
+                                    Maximum="{TemplateBinding ScrollableWidth}"
+                                    ViewportSize="{TemplateBinding ViewportWidth}"
+                                    Value="{TemplateBinding HorizontalOffset}"
+                                    Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" />
+                                <ScrollBar
+                                    Name="PART_VerticalScrollBar"
+                                    Grid.Column="1"
+                                    Maximum="{TemplateBinding ScrollableHeight}"
+                                    ViewportSize="{TemplateBinding ViewportHeight}"
+                                    Value="{TemplateBinding VerticalOffset}"
+                                    Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" />
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Padding" Value="4,2" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListViewItem}">
+                            <Grid HorizontalAlignment="Left">
+                                <Border
+                                    x:Name="Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}" />
+
+                                <GridViewRowPresenter
+                                    Content="{TemplateBinding Content}"
+                                    Margin="{TemplateBinding Padding}"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <globalConverters:UniversalVisibilityConverter x:Key="UniversalVisibilityConverter" />
+            <converters:SizeToStringConverter x:Key="SizeToStringConverter" />
+        </ResourceDictionary>
     </controls:FileExplorerBase.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -28,7 +134,7 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
         <!--  Menu bar  -->
-        <Grid VerticalAlignment="Top">
+        <Grid VerticalAlignment="Top" Margin="0,0,0,1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition />
@@ -36,228 +142,210 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Orientation="Horizontal">
-                <Button Width="20" Click="BackExplorer_Click">
+                <Button Click="BackExplorer_Click">
                     <TextBlock
-                        Text="&#xf0b0;"
+                        Text="&#xf060;"
                         FontFamily="{StaticResource FontAwesomeSolid}"
                         FontSize="10" />
                 </Button>
-                <Button
-                    Width="20"
-                    Click="ForwardExplorer_Click"
-                    Margin="0,0,2,0">
+                <Button Click="ForwardExplorer_Click" Margin="0,0,1,0">
                     <TextBlock
-                        Text="&#xf0af;"
+                        Text="&#xf061;"
                         FontFamily="{StaticResource FontAwesomeSolid}"
                         FontSize="10" />
                 </Button>
-                <Button
-                    Width="20"
-                    Click="ParentExplorer_Click"
-                    Margin="0,0,2,0">
+                <Button Click="ParentExplorer_Click" Margin="0,0,1,0">
                     <TextBlock
-                        Text="&#xf0ad;"
+                        Text="&#xf062;"
                         FontFamily="{StaticResource FontAwesomeSolid}"
                         FontSize="10" />
                 </Button>
             </StackPanel>
 
             <TextBox
-                Height="22"
                 MouseDoubleClick="TextBox_SelectAll"
                 GotKeyboardFocus="TextBox_SelectAll"
                 PreviewMouseLeftButtonDown="SelectivelyIgnoreMouseButton"
                 Grid.Column="1"
                 IsReadOnly="True"
                 VerticalContentAlignment="Center"
-                Text="{Binding RootNode.Path, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-            <Button
-                Grid.Column="2"
-                Margin="2,0"
-                Width="24"
-                Click="OpenPathExplorer_Click">
+                Text="{Binding RootNode.FullPath, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+            <Button Grid.Column="2" Click="OpenPathExplorer_Click">
                 <TextBlock Text="&#xed25;" FontFamily="{StaticResource FontAwesomeSolid}" />
             </Button>
 
             <!--  Future search  -->
-            <TextBox
-                Height="22"
-                Grid.Column="3"
-                IsEnabled="False" />
+            <TextBox Grid.Column="3" IsEnabled="False" />
         </Grid>
 
-        <Grid
+        <Border
             Grid.Row="1"
             PreviewKeyDown="HandlePreviewKeyDown"
-            ContextMenuOpening="ContextMenu_OnOpening">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="auto" />
-            </Grid.RowDefinitions>
+            ContextMenuOpening="ContextMenu_OnOpening"
+            Background="{DynamicResource Generic_Background}"
+            BorderBrush="{DynamicResource Container_Border}"
+            BorderThickness="0">
+            <Grid
+                x:Name="ContainerGrid"
+                MouseDown="Grid_MouseDown"
+                MouseUp="Grid_MouseUp"
+                MouseMove="Grid_MouseMove"
+                AllowDrop="True"
+                Drop="HandleDrop"
+                DragOver="HandleDragOver"
+                DragEnter="HandleDragOver"
+                DragLeave="HandleDragLeave"
+                Background="Transparent">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <layout:ListViewExtended
+                    x:Name="ListView"
+                    VerticalAlignment="Top"
+                    SelectionMode="Extended"
+                    Tag="{Binding RootNode, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    ItemsSource="{Binding RootNode.SortedChildNodes, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    MouseDoubleClick="HandleNodeDoubleClick"
+                    SelectionChanged="ListView_SelectionChanged"
+                    MouseWheel="PreviewMouseWheel"
+                    BorderThickness="0"
+                    MouseMove="HandleMouseMove"
+                    MouseDown="HandleMouseDown">
+                    <layout:ListViewExtended.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                        </Style>
+                    </layout:ListViewExtended.ItemContainerStyle>
+                    <layout:ListViewExtended.View>
+                        <GridView>
+                            <GridView.ColumnHeaderContainerStyle>
+                                <Style TargetType="GridViewColumnHeader" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                </Style>
+                            </GridView.ColumnHeaderContainerStyle>
+                            <GridViewColumn>
+                                <GridViewColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <controls:ButtonSort
+                                            Click="SortButton_Click"
+                                            Target="Name"
+                                            Mediator="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                            Name
+                                        </controls:ButtonSort>
+                                    </DataTemplate>
+                                </GridViewColumn.HeaderTemplate>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate DataType="{x:Type data:ExplorerNode}">
+                                        <DockPanel MouseUp="HandleNodeMouseUp" Background="Transparent">
+                                            <!--  Image (retrieved from Windows)  -->
+                                            <Image
+                                                Visibility="{Binding Context.CustomIcon, Converter={StaticResource UniversalVisibilityConverter}, ConverterParameter=False}"
+                                                Source="{Binding Icon}"
+                                                Margin="0,0,2,0"
+                                                Height="16" />
+                                            <!--  or FontAwesomeSolid icon  -->
+                                            <TextBlock
+                                                Margin="0,0,2,0"
+                                                Visibility="{Binding Context.CustomIcon, Converter={StaticResource UniversalVisibilityConverter}}"
+                                                Text="{Binding Context.CustomIcon}"
+                                                Foreground="{Binding Context.CustomIconColor}"
+                                                FontFamily="{StaticResource FontAwesomeSolid}"
+                                                FontSize="14" />
+                                            <TextBox
+                                                Padding="4,2"
+                                                LostFocus="TextBoxNode_LostFocus"
+                                                VerticalAlignment="Center"
+                                                Text="{Binding Name, Mode=OneWay}"
+                                                PreviewTextInput="NameNode_PreviewTextInput"
+                                                DataContext="{Binding}">
+                                                <TextBox.Style>
+                                                    <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                                        <Style.Triggers>
+                                                            <!--  Use a DataTrigger to apply the style when IsEditing is false  -->
+                                                            <DataTrigger Binding="{Binding IsEditing}" Value="False">
+                                                                <Setter Property="Background" Value="Transparent" />
+                                                                <Setter Property="BorderThickness" Value="0" />
+                                                                <Setter Property="BorderThickness" Value="0" />
+                                                                <Setter Property="IsHitTestVisible" Value="False" />
+                                                                <Setter Property="IsReadOnly" Value="True" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBox.Style>
+                                            </TextBox>
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn>
+                                <GridViewColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <controls:ButtonSort
+                                            Click="SortButton_Click"
+                                            Target="LastModified"
+                                            Mediator="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                            Last modified
+                                        </controls:ButtonSort>
+                                    </DataTemplate>
+                                </GridViewColumn.HeaderTemplate>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate DataType="{x:Type data:ExplorerNode}">
+                                        <TextBlock Text="{Binding Info.LastWriteTime, StringFormat='dd/MM/yyyy HH:mm'}" Foreground="{DynamicResource Container_SecondaryText}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn>
+                                <GridViewColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <controls:ButtonSort
+                                            Click="SortButton_Click"
+                                            Target="Size"
+                                            Mediator="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                            Size
+                                        </controls:ButtonSort>
+                                    </DataTemplate>
+                                </GridViewColumn.HeaderTemplate>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate DataType="{x:Type data:ExplorerNodeFile}">
+                                        <TextBlock Text="{Binding Info, Converter={StaticResource SizeToStringConverter}}" Foreground="{DynamicResource Container_SecondaryText}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </layout:ListViewExtended.View>
+                </layout:ListViewExtended>
 
-            <Border
-                Background="{DynamicResource Generic_Background}"
-                BorderBrush="{DynamicResource Container_Border}"
-                BorderThickness="1">
-                <Grid
-                    x:Name="ContainerGrid"
-                    MouseDown="Grid_MouseDown"
-                    MouseUp="Grid_MouseUp"
-                    MouseMove="Grid_MouseMove"
-                    AllowDrop="True"
-                    Drop="HandleDrop"
-                    DragOver="HandleDragOver"
-                    DragEnter="HandleDragOver"
-                    DragLeave="HandleDragLeave"
-                    Background="Transparent">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="auto" />
-                    </Grid.RowDefinitions>
-                    <layout:ListViewExtended
-                        x:Name="ListView"
-                        VerticalAlignment="Top"
-                        SelectionMode="Extended"
-                        Tag="{Binding RootNode, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        Style="{StaticResource ListView_WithGrid}"
-                        ItemsSource="{Binding RootNode.SortedChildViews, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        MouseDoubleClick="HandleNodeDoubleClick"
-                        SelectionChanged="ListView_SelectionChanged"
-                        MouseWheel="PreviewMouseWheel"
-                        BorderThickness="0"
-                        Background="Transparent"
-                        MouseMove="HandleMouseMove"
-                        MouseDown="HandleMouseDown">
-                        <layout:ListViewExtended.ItemContainerStyle>
-                            <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource ListViewItem_WithGrid}">
-                                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-                            </Style>
-                        </layout:ListViewExtended.ItemContainerStyle>
-                        <layout:ListViewExtended.View>
-                            <GridView>
-                                <GridViewColumn>
-                                    <GridViewColumn.HeaderTemplate>
-                                        <DataTemplate>
-                                            <controls:ButtonSort
-                                                Click="SortButton_Click"
-                                                Target="Name"
-                                                Mediator="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}">
-                                                Name
-                                            </controls:ButtonSort>
-                                        </DataTemplate>
-                                    </GridViewColumn.HeaderTemplate>
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate DataType="{x:Type data:ExplorerNode}">
-                                            <DockPanel MouseUp="HandleNodeMouseUp" Background="Transparent">
-                                                <!--  Image (retrieved from Windows)  -->
-                                                <Image
-                                                    Visibility="{Binding Context.CustomIcon, Converter={StaticResource UniversalVisibilityConverter}, ConverterParameter=False}"
-                                                    Source="{Binding Icon}"
-                                                    Margin="0,0,2,0"
-                                                    Height="16" />
-                                                <!--  or FontAwesomeSolid icon  -->
-                                                <TextBlock
-                                                    Margin="0,0,2,0"
-                                                    Visibility="{Binding Context.CustomIcon, Converter={StaticResource UniversalVisibilityConverter}}"
-                                                    Text="{Binding Context.CustomIcon}"
-                                                    Foreground="{Binding Context.CustomIconColor}"
-                                                    FontFamily="{StaticResource FontAwesomeSolid}"
-                                                    FontSize="14" />
-                                                <TextBox
-                                                    Height="16"
-                                                    LostFocus="TextBoxNode_LostFocus"
-                                                    VerticalAlignment="Center"
-                                                    Text="{Binding Name, Mode=OneWay}"
-                                                    PreviewTextInput="NameNode_PreviewTextInput"
-                                                    DataContext="{Binding}">
-                                                    <TextBox.Style>
-                                                        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-                                                            <Style.Triggers>
-                                                                <!--  Use a DataTrigger to apply the style when IsEditing is false  -->
-                                                                <DataTrigger Binding="{Binding IsEditing}" Value="False">
-                                                                    <Setter Property="Background" Value="Transparent" />
-                                                                    <Setter Property="BorderThickness" Value="0" />
-                                                                    <Setter Property="IsHitTestVisible" Value="False" />
-                                                                    <Setter Property="IsReadOnly" Value="True" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </TextBox.Style>
-                                                </TextBox>
-                                            </DockPanel>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn>
-                                    <GridViewColumn.HeaderTemplate>
-                                        <DataTemplate>
-                                            <controls:ButtonSort
-                                                Click="SortButton_Click"
-                                                Target="LastModified"
-                                                Mediator="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}">
-                                                Modified On
-                                            </controls:ButtonSort>
-                                        </DataTemplate>
-                                    </GridViewColumn.HeaderTemplate>
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate DataType="{x:Type data:ExplorerNode}">
-                                            <TextBlock Text="{Binding Info.LastWriteTime, StringFormat='dd/MM/yyyy HH:mm'}" Foreground="{DynamicResource Container_SecondaryText}" />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn>
-                                    <GridViewColumn.HeaderTemplate>
-                                        <DataTemplate>
-                                            <controls:ButtonSort
-                                                Click="SortButton_Click"
-                                                Target="Size"
-                                                Mediator="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}">
-                                                Size
-                                            </controls:ButtonSort>
-                                        </DataTemplate>
-                                    </GridViewColumn.HeaderTemplate>
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate DataType="{x:Type data:ExplorerNodeFile}">
-                                            <TextBlock Text="{Binding Info, Converter={StaticResource SizeToStringConverter}}" Foreground="{DynamicResource Container_SecondaryText}" />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                            </GridView>
-                        </layout:ListViewExtended.View>
-                    </layout:ListViewExtended>
+                <Canvas>
+                    <Rectangle
+                        x:Name="selectionBox"
+                        Visibility="Collapsed"
+                        Stroke="{DynamicResource {x:Static adonisUi:Brushes.AccentHighlightBrush}}"
+                        Fill="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}"
+                        Opacity="0.5"
+                        StrokeThickness="1" />
+                </Canvas>
+                <StackPanel
+                    Grid.Row="1"
+                    Orientation="Horizontal"
+                    Margin="4,2">
+                    <TextBlock Text="{Binding RootNode.SortedChildNodes.Count, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                    <TextBlock Margin="4,0">item(s)</TextBlock>
 
-                    <Canvas>
-                        <Rectangle
-                            x:Name="selectionBox"
-                            Visibility="Collapsed"
-                            Stroke="{DynamicResource Element_Selection_Border}"
-                            Fill="{DynamicResource Element_Selection_Background}"
-                            Opacity="0.5"
-                            StrokeThickness="1" />
-                    </Canvas>
                     <StackPanel
-                        Grid.Row="1"
                         Orientation="Horizontal"
-                        Margin="4,2">
-                        <TextBlock Text="{Binding RootNode.SortedChildViews.Count, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-                        <TextBlock Margin="4,0">item(s)</TextBlock>
-
-                        <StackPanel
-                            Orientation="Horizontal"
-                            Margin="10,0,0,0"
-                            Visibility="{Binding SelectedItems.Count, ElementName=ListView, Converter={StaticResource UniversalVisibilityConverter}}">
-                            <TextBlock Text="{Binding SelectedItems.Count, ElementName=ListView}" />
-                            <TextBlock Margin="4,0">selected item(s)</TextBlock>
-                        </StackPanel>
+                        Margin="10,0,0,0"
+                        Visibility="{Binding SelectedItems.Count, ElementName=ListView, Converter={StaticResource UniversalVisibilityConverter}}">
+                        <TextBlock Text="{Binding SelectedItems.Count, ElementName=ListView}" />
+                        <TextBlock Margin="4,0">selected item(s)</TextBlock>
                     </StackPanel>
+                </StackPanel>
 
-                    <controls:PopupActionDnD
-                        AllowsTransparency="True"
-                        x:Name="DragTooltipPopup"
-                        PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}" />
-                </Grid>
-            </Border>
-        </Grid>
+                <controls:PopupActionDnD
+                    AllowsTransparency="True"
+                    x:Name="DragTooltipPopup"
+                    PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}" />
+            </Grid>
+        </Border>
     </Grid>
 </controls:FileExplorerBase>

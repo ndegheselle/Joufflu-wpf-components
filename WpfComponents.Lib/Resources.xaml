@@ -3,7 +3,6 @@
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Styles/NamedStyles/IconButton.xaml" />
 
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/Format/FormatTextBox.xaml" />
-
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/TimeSpanPicker.xaml" />
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/ComboBoxSearch.xaml" />
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/ComboBoxTags.xaml" />
@@ -16,5 +15,7 @@
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
     </Style>
+
+    <Style TargetType="TreeViewItem" BasedOn="{StaticResource TreeViewItemStyle}" />
 
 </ResourceDictionary>

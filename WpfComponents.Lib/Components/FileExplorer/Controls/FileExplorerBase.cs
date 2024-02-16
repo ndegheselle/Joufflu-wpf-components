@@ -264,7 +264,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Controls
         // Either :
         // - We have multiple TreeViews one after the other, we want a parent scrollviewer to handle them all
         // - We have a single TreeView and we want to let it handle its own scroll without having to add a scrollviewer
-        protected void OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        protected void PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (_ScrollParent == null)
                 _ScrollParent = MoreVisualTreeHelper.FindParent<ScrollViewer>(this);

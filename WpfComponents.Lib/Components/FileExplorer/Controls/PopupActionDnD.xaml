@@ -21,7 +21,7 @@
                 x:Name="ActionIcon"
                 Margin="0,0,4,0"
                 Text=""
-                FontFamily="{StaticResource SegoeFluentIcons}"
+                FontFamily="{StaticResource FontAwesomeSolid}"
                 FontSize="10" />
             <TextBlock x:Name="ActionText" Text="Copie" />
         </StackPanel>
