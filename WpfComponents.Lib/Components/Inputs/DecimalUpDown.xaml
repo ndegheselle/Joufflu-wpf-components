@@ -7,11 +7,8 @@
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/Format/FormatTextBox.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <Style TargetType="{x:Type local:TimeSpanPicker}" BasedOn="{StaticResource {x:Type format:FormatTextBox}}">
-        <Style.Resources>
-            <local:TimeSpanToListConverter x:Key="TimeSpanToListConverter" />
-        </Style.Resources>
-        <Setter Property="GlobalFormat" Value="numeric|min:0|padded|nullable" />
-        <Setter Property="Format" Value="{}{max:365}d {max:23}h {max:59}m {max:59}s" />
+    <Style TargetType="{x:Type local:DecimalUpDown}" BasedOn="{StaticResource {x:Type format:FormatTextBox}}">
+        <Setter Property="Format" Value="{}{decimal|noGlobalSelection}" />
+        <Setter Property="HorizontalContentAlignment" Value="Right" />
     </Style>
 </ResourceDictionary>

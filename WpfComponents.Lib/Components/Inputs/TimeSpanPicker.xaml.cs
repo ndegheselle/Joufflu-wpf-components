@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Documents;
 using WpfComponents.Lib.Components.Inputs.Format;
 
 namespace WpfComponents.Lib.Components.Inputs
@@ -30,31 +31,32 @@ namespace WpfComponents.Lib.Components.Inputs
         }
     }
 
-    public partial class TimeSpanPicker : FormatTextBox, INotifyPropertyChanged
+    public partial class TimeSpanPicker : SingleValueFormatTextBox<TimeSpan?>, INotifyPropertyChanged
     {
-        public new event EventHandler<TimeSpan?>? ValueChanged;
-
-        private TimeSpan? _previousValue;
-
         public static readonly DependencyProperty ValueProperty =
-        DependencyProperty.Register("Value", typeof(TimeSpan?), typeof(TimeSpanPicker), new PropertyMetadata(null));
+        DependencyProperty.Register("Value", typeof(TimeSpan?), typeof(TimeSpanPicker), new PropertyMetadata(default(TimeSpan?), (o, e) => ((TimeSpanPicker)o).OnValueChanged(e)
+        ));
 
-        public TimeSpan? Value
+        public override TimeSpan? Value
         {
             get { return (TimeSpan?)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
         }
 
-        public TimeSpanPicker() {}
-
-        protected override void OnValueChanged()
+        public override TimeSpan? ConvertFrom()
         {
-            base.OnValueChanged();
-            if (Value == _previousValue)
-                return;
+            if (Values.Any(x => x == null))
+                return null;
 
-            ValueChanged?.Invoke(this, Value);
-            _previousValue = Value;
+            return new TimeSpan((int)Values[0], (int)Values[1], (int)Values[2], (int)Values[3]);
+        }
+
+        public override List<object?> ConvertTo()
+        {
+            if (Value is TimeSpan date)
+                return new List<object?>() { date.Days, date.Hours, date.Minutes, date.Seconds };
+            else
+                return new List<object?>() { null, null, null, null };
         }
     }
 }

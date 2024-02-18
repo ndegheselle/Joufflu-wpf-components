@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
@@ -11,17 +12,16 @@ using System.Windows.Input;
 
 namespace WpfComponents.Lib.Components.Inputs.Format
 {
-    [TemplatePart(Name = nameof(ClearButton), Type = typeof(Button))]
-    [TemplatePart(Name = nameof(UpButton), Type = typeof(Button))]
-    [TemplatePart(Name = nameof(DownButton), Type = typeof(Button))]
+    [TemplatePart(Name = "PART_ClearButton", Type = typeof(Button))]
+    [TemplatePart(Name = "PART_UpButton", Type = typeof(Button))]
+    [TemplatePart(Name = "PART_DownButton", Type = typeof(Button))]
     public class FormatTextBox : TextBox, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName]string name = null)
         { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)); }
 
-        public event EventHandler<List<object?>>? ValueChanged;
-
+        public event EventHandler<List<object?>>? ValuesChanged;
         #region Dependency Properties
         public static readonly DependencyProperty ValuesProperty =
             DependencyProperty.Register(
@@ -31,7 +31,7 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             new FrameworkPropertyMetadata(
                 null,
                 FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
-                (o, e) => ((FormatTextBox)o).OnValueChanged()));
+                (o, e) => ((FormatTextBox)o).OnValuesChanged()));
 
         public List<object?> Values
         {
@@ -39,23 +39,22 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             set { SetValue(ValuesProperty, value); }
         }
 
-        protected virtual void OnValueChanged()
+        protected virtual void OnValuesChanged()
         {
             if (Groups.Count == 0)
                 ParseGroups(Format, GlobalFormat);
-            ValueChanged?.Invoke(this, Values);
+            ValuesChanged?.Invoke(this, Values);
             FormatText(Groups);
         }
 
-        public static readonly DependencyProperty GlobalFormatProperty =
-    DependencyProperty.Register(
-    "GlobalFormat",
-    typeof(string),
-    typeof(FormatTextBox),
-    new FrameworkPropertyMetadata(
-        "",
-        FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
-        (o, e) => ((FormatTextBox)o).OnGlobalFormatChanged()));
+        public static readonly DependencyProperty GlobalFormatProperty = DependencyProperty.Register(
+            "GlobalFormat",
+            typeof(string),
+            typeof(FormatTextBox),
+            new FrameworkPropertyMetadata(
+                "",
+                FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                (o, e) => ((FormatTextBox)o).OnGlobalFormatChanged()));
 
         public string GlobalFormat
         {
@@ -90,7 +89,6 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             ParseGroups(Format, GlobalFormat);
             FormatText(Groups);
         }
-
         #endregion
 
         #region Properties
@@ -101,6 +99,8 @@ namespace WpfComponents.Lib.Components.Inputs.Format
         public bool ShowDeleteButton { get; set; } = true;
 
         public bool ShowIncrementsButtons { get; set; } = true;
+
+        public int IncrementValue { get; set; } = 1;
         #endregion
         private int _selectedGroupIndex = -1;
 
@@ -130,6 +130,7 @@ namespace WpfComponents.Lib.Components.Inputs.Format
 
         // UI Parts
         private Button _clearButton;
+
         private Button ClearButton
         {
             get { return _clearButton; }
@@ -141,6 +142,7 @@ namespace WpfComponents.Lib.Components.Inputs.Format
         }
 
         private Button _upButton;
+
         private Button UpButton
         {
             get { return _upButton; }
@@ -152,21 +154,33 @@ namespace WpfComponents.Lib.Components.Inputs.Format
         }
 
         private Button _downButton;
+
         private Button DownButton
         {
             get { return _downButton; }
-            set {
+            set
+            {
                 _downButton = value;
                 _downButton.Click += DownButton_Click;
             }
         }
-
         #endregion
+
+        public override void OnApplyTemplate()
+        {
+            ClearButton = (Button)GetTemplateChild("PART_ClearButton");
+            UpButton = (Button)GetTemplateChild("PART_UpButton");
+            DownButton = (Button)GetTemplateChild("PART_DownButton");
+
+            base.OnApplyTemplate();
+        }
 
         #region UI Events
         protected override void OnPreviewTextInput(TextCompositionEventArgs e)
         {
             base.OnPreviewTextInput(e);
+
+            // Get the new text based on the input and the current selection
 
             bool validInput = SelectedGroup?.OnInput(e.Text) ?? false;
             if (validInput)
@@ -225,13 +239,23 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             // If arrow keys change group
             else if (e.Key == Key.Left)
             {
-                ChangeSelectedGroup(-1);
-                e.Handled = true;
+                // Numeric group with global selection allow to go to the previous group
+                IBaseNumericGroup? numericGroup = SelectedGroup as IBaseNumericGroup;
+                if (numericGroup?.NoGlobalSelection == true)
+                {
+                    ChangeSelectedGroup(-1);
+                    e.Handled = true;
+                }
             }
             else if (e.Key == Key.Right)
             {
-                ChangeSelectedGroup(1);
-                e.Handled = true;
+                // Numeric group with global selection allow to go to the next group
+                IBaseNumericGroup? numericGroup = SelectedGroup as IBaseNumericGroup;
+                if (numericGroup?.NoGlobalSelection == true)
+                {
+                    ChangeSelectedGroup(+1);
+                    e.Handled = true;
+                }
             }
             // If suppr
             else if (e.Key == Key.Delete)
@@ -260,10 +284,12 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             if (SelectedGroup == null)
                 ChangeSelectedGroup(1);
 
-            if (SelectedGroup is NumericGroup numericGroup)
+            if (SelectedGroup is IBaseNumericGroup numericGroup)
             {
-                numericGroup.Value++;
+                numericGroup.Increment();
+
                 UpdateCurrentValue();
+                SelectedGroup?.OnAfterInput();
             }
         }
 
@@ -272,10 +298,11 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             if (SelectedGroup == null)
                 ChangeSelectedGroup(1);
 
-            if (SelectedGroup is NumericGroup numericGroup)
+            if (SelectedGroup is IBaseNumericGroup numericGroup)
             {
-                numericGroup.Value--;
+                numericGroup.Decrement();
                 UpdateCurrentValue();
+                SelectedGroup?.OnAfterInput();
             }
         }
 
@@ -333,7 +360,6 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             // Trigger DP change
             Values = Groups.Select(x => x.Value).ToList();
         }
-
         #endregion
 
         #region Parsing
@@ -423,5 +449,45 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             return groups;
         }
         #endregion
+    }
+
+
+    public abstract class SingleValueFormatTextBox<T> : FormatTextBox
+    {
+        public event EventHandler<T>? ValueChanged;
+
+        private T _previousValue;
+
+        public virtual T Value { get; set; }
+
+        public virtual List<object?> ConvertTo() { return new List<object?>() { Value }; }
+
+        public virtual T ConvertFrom()
+        {
+            if (Values.Any(x => x == null))
+                return default(T);
+            return (T)Values.FirstOrDefault();
+        }
+
+        protected virtual void OnValueChanged(DependencyPropertyChangedEventArgs e)
+        {
+            if (EqualityComparer<T>.Default.Equals(Value, _previousValue))
+                return;
+
+            Values = ConvertTo();
+            _previousValue = Value;
+            ValueChanged?.Invoke(this, Value);
+        }
+
+        protected override void OnValuesChanged()
+        {
+            base.OnValuesChanged();
+
+            var newValue = ConvertFrom();
+
+            if (EqualityComparer<T>.Default.Equals(Value, newValue))
+                return;
+            Value = newValue;
+        }
     }
 }

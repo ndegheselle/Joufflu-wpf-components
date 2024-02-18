@@ -1,0 +1,288 @@
+﻿<UserControl
+    x:Class="UltraFiltre.Wpf.Lib.Controles.AffichageFiltreGroupe"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:UltraFiltre.Wpf.Lib.Controles"
+    xmlns:base="clr-namespace:UltraFiltre.Lib"
+    xmlns:converterInterne="clr-namespace:UltraFiltre.Wpf.Lib.Converters"
+    xmlns:converters="clr-namespace:WpfComponents.Lib.Converters"
+    xmlns:inputs="clr-namespace:WpfComponents.Lib.Components.Inputs"
+    xmlns:s="clr-namespace:System;assembly=mscorlib"
+    mc:Ignorable="d"
+    d:DesignHeight="450"
+    d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:EnumDescriptionConverter x:Key="EnumDescriptionConverter" />
+        <converters:UniversalVisibilityConverter x:Key="UniversalVisibilityConverter" />
+        <converterInterne:ConverterParseValue x:Key="ConverterParseValue" />
+        <converterInterne:ConverterEnumToCollection x:Key="ConverterEnumToCollection" />
+        <converterInterne:ConverterTypeComparaisons x:Key="ConverterTypeComparaisons" />
+        <converterInterne:ConverterTypeInput x:Key="ConverterTypeInput">
+            <converterInterne:ConverterTypeInput.StringTemplate>
+                <DataTemplate DataType="{x:Type base:FiltreValeur}">
+                    <TextBox
+                        Text="{Binding Valeur}"
+                        VerticalContentAlignment="Center"
+                        Height="Auto" />
+                </DataTemplate>
+            </converterInterne:ConverterTypeInput.StringTemplate>
+            <converterInterne:ConverterTypeInput.EntierTemplate>
+                <DataTemplate DataType="{x:Type base:FiltreValeur}">
+                    <inputs:NumericUpDown Value="{Binding Valeur, Converter={StaticResource ConverterParseValue}}" Height="Auto" />
+                </DataTemplate>
+            </converterInterne:ConverterTypeInput.EntierTemplate>
+            <converterInterne:ConverterTypeInput.DecimalTemplate>
+                <DataTemplate DataType="{x:Type base:FiltreValeur}">
+                    <inputs:DecimalUpDown Value="{Binding Valeur, Converter={StaticResource ConverterParseValue}}" Height="Auto" />
+                </DataTemplate>
+            </converterInterne:ConverterTypeInput.DecimalTemplate>
+            <converterInterne:ConverterTypeInput.BoolTemplate>
+                <DataTemplate DataType="{x:Type base:FiltreValeur}">
+                    <CheckBox
+                        HorizontalAlignment="Center"
+                        IsChecked="{Binding Valeur, Converter={StaticResource ConverterParseValue}}"
+                        Height="Auto" />
+                </DataTemplate>
+            </converterInterne:ConverterTypeInput.BoolTemplate>
+            <converterInterne:ConverterTypeInput.DateTimeTemplate>
+                <DataTemplate DataType="{x:Type base:FiltreValeur}">
+                    <DatePicker SelectedDate="{Binding Valeur, Converter={StaticResource ConverterParseValue}}" Height="Auto" />
+                </DataTemplate>
+            </converterInterne:ConverterTypeInput.DateTimeTemplate>
+            <converterInterne:ConverterTypeInput.TimeTemplate>
+                <DataTemplate DataType="{x:Type base:FiltreValeur}">
+                    <inputs:TimeSpanPicker Value="{Binding Valeur, Converter={StaticResource ConverterParseValue}}" Height="Auto" />
+                </DataTemplate>
+            </converterInterne:ConverterTypeInput.TimeTemplate>
+            <converterInterne:ConverterTypeInput.EnumTemplate>
+                <DataTemplate DataType="{x:Type base:FiltreValeur}">
+                    <ComboBox
+                        ItemsSource="{Binding Valeur, Converter={StaticResource ConverterEnumToCollection}, Mode=OneTime}"
+                        DisplayMemberPath="Description"
+                        SelectedValuePath="Valeur"
+                        SelectedValue="{Binding Valeur, Mode=TwoWay}"
+                        Grid.Column="1" />
+                </DataTemplate>
+            </converterInterne:ConverterTypeInput.EnumTemplate>
+        </converterInterne:ConverterTypeInput>
+    </UserControl.Resources>
+    <ItemsControl ItemsSource="{Binding GroupeRacine.Enfants, RelativeSource={RelativeSource AncestorType=local:AffichageFiltreGroupe}}" AlternationCount="{x:Static s:Int32.MaxValue}">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <!--  Preview DnD pour empecher les TextBox de capturer le Drag (Désactivé pour l'instant, D&D ne fait pas de sens sans groupes)  -->
+                <Border
+                    Background="Transparent"
+                    AllowDrop="True"
+                    PreviewDrop="HandleDrop"
+                    PreviewDragOver="HandleDragOver"
+                    PreviewDragEnter="DataGridRow_DragEnter"
+                    PreviewDragLeave="HandleDragLeave"
+                    Drop="HandleDrop"
+                    MouseMove="HandleMouseMove">
+                    <Grid x:Name="ContainerLigne">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Margin" Value="0,2,0,0" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}, Path=(ItemsControl.AlternationIndex)}" Value="0">
+                                        <Setter Property="Margin" Value="0" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid
+                            Grid.Column="0"
+                            Width="42"
+                            Margin="0,0,2,0">
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Affichage, RelativeSource={RelativeSource AncestorType=local:AffichageFiltreGroupe}}" Value="Simple">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            <!--  Conjonction placeholder  -->
+                            <Border
+                                Background="{DynamicResource Conteneur_Fond}"
+                                BorderBrush="{DynamicResource Conteneur_Bordure}"
+                                BorderThickness="1">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}, Path=(ItemsControl.AlternationIndex)}" Value="0">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+                            <!--  Conjonction  -->
+                            <ComboBox
+                                VerticalContentAlignment="Center"
+                                ItemsSource="{Binding OperateursConjonction, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                SelectedValue="{Binding Conjonction}">
+                                <ComboBox.Style>
+                                    <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}, Path=(ItemsControl.AlternationIndex)}" Value="0">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ComboBox.Style>
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
+
+                        <!--  Propriete  -->
+                        <inputs:ComboBoxSearch
+                            x:Name="ComboBoxPropriete"
+                            Grid.Column="1"
+                            Width="120"
+                            Margin="0,0,2,0"
+                            HideFilteredItems="False"
+                            ItemsSource="{Binding GroupeRacine.Props, RelativeSource={RelativeSource AncestorType=local:AffichageFiltreGroupe}}"
+                            DisplayMemberPath="Libelle"
+                            SelectedValuePath="Nom"
+                            SelectedValue="{Binding Propriete}" />
+
+                        <ContentControl Grid.Column="2" Content="{Binding Expression}">
+                            <ContentControl.Resources>
+                                <DataTemplate DataType="{x:Type base:FiltreValeur}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!--  Operateur  -->
+                                        <ComboBox
+                                            Grid.Column="0"
+                                            Margin="0,0,2,0"
+                                            ItemsSource="{Binding SelectedItem, ElementName=ComboBoxPropriete, Converter={StaticResource ConverterTypeComparaisons}}"
+                                            SelectedItem="{Binding Operateur}"
+                                            Width="120"
+                                            Height="Auto">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+
+                                        <!--  Valeur  -->
+                                        <ContentControl
+                                            Grid.Column="1"
+                                            Margin="0,0,2,0"
+                                            Content="{Binding}"
+                                            ContentTemplate="{Binding SelectedItem, ElementName=ComboBoxPropriete, Converter={StaticResource ConverterTypeInput}}" />
+
+                                        <!--  Option  -->
+                                        <Button
+                                            Grid.Column="2"
+                                            Click="AfficherActions_Click"
+                                            Width="24"
+                                            Height="auto"
+                                            VerticalContentAlignment="Center"
+                                            Tag="{Binding DataContext, ElementName=ContainerLigne}">
+                                            <Button.Resources>
+                                                <ContextMenu
+                                                    x:Key="ContextMenuFiltre"
+                                                    Placement="Bottom"
+                                                    DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
+
+                                                    <MenuItem Click="MenuItem_Ajouter_Click" Header="Ajouter">
+                                                        <MenuItem.Icon>
+                                                            <TextBlock
+                                                                Text="&#x2b;"
+                                                                VerticalAlignment="Center"
+                                                                HorizontalAlignment="Center"
+                                                                FontFamily="{StaticResource FontAwesomeSolid}" />
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <Separator />
+                                                    <MenuItem Click="MenuItem_DeplacementMonter_Click" Header="Monter">
+                                                        <MenuItem.Icon>
+                                                            <TextBlock
+                                                                Text="&#xf062;"
+                                                                VerticalAlignment="Center"
+                                                                HorizontalAlignment="Center"
+                                                                FontFamily="{StaticResource FontAwesomeSolid}" />
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <MenuItem Click="MenuItem_DeplacementDescendre_Click" Header="Descendre">
+                                                        <MenuItem.Icon>
+                                                            <TextBlock
+                                                                Text="&#xf063;"
+                                                                VerticalAlignment="Center"
+                                                                HorizontalAlignment="Center"
+                                                                FontFamily="{StaticResource FontAwesomeSolid}" />
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                    <Separator />
+                                                    <MenuItem Click="MenuItem_Supprimer_Click" Header="Supprimer">
+                                                        <MenuItem.Icon>
+                                                            <TextBlock
+                                                                Text="&#xf1f8;"
+                                                                VerticalAlignment="Center"
+                                                                HorizontalAlignment="Center"
+                                                                FontFamily="{StaticResource FontAwesomeSolid}" />
+                                                        </MenuItem.Icon>
+                                                    </MenuItem>
+                                                </ContextMenu>
+                                            </Button.Resources>
+                                            <TextBlock
+                                                Text="&#xf0d7;"
+                                                FontSize="10"
+                                                FontFamily="{StaticResource FontAwesomeSolid}" />
+                                        </Button>
+
+                                        <!--  Boutton D&D  -->
+                                        <TextBlock
+                                            Visibility="Collapsed"
+                                            Grid.Column="3"
+                                            Padding="2,0"
+                                            VerticalAlignment="Center"
+                                            Text="&#xe75f;"
+                                            MouseDown="HandleMouseDown"
+                                            FontFamily="{StaticResource FontAwesomeSolid}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Affichage, RelativeSource={RelativeSource AncestorType=local:AffichageFiltreGroupe}}" Value="Simple">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type base:FiltreGroupe}">
+                                    <local:AffichageFiltreGroupe GroupeRacine="{Binding}" GestionDnD="{Binding GestionDnD, RelativeSource={RelativeSource AncestorType=local:AffichageFiltreGroupe}}" />
+                                </DataTemplate>
+                            </ContentControl.Resources>
+                        </ContentControl>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>

@@ -4,38 +4,42 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using UltraFiltre.Lib;
 
 namespace WpfComponents.App
 {
-    public class TestValue
+    public enum EnumTest
+    {
+        None,
+        One,
+        Two,
+    }
+
+    public class TestClass
     {
         public string Name { get; set; }
-        public string Value { get; set; }
 
-        public TestValue(string name, string value)
+        public int Value { get; set; }
+
+        public bool IsTest { get; set; }
+
+        public EnumTest EnumTest { get; set; }
+
+        public TestClass(string name, int value)
         {
             Name = name;
             Value = value;
         }
 
-        public override string ToString()
-        {
-            return $"{Name} : {Value}";
-        }
+        public override string ToString() { return $"{Name} : {Value}"; }
 
-        public override bool Equals(object? obj)
-        {
-            return obj is TestValue value &&
-                   Name == value.Name;
-        }
+        public override bool Equals(object? obj) { return obj is TestClass value && Name == value.Name; }
 
-        public override int GetHashCode()
-        {
-            return Name.GetHashCode();
-        }
+        public override int GetHashCode() { return Name.GetHashCode(); }
     }
 
     /// <summary>
@@ -43,26 +47,34 @@ namespace WpfComponents.App
     /// </summary>
     public partial class MainWindow : AdonisWindow, INotifyPropertyChanged
     {
-        public List<TestValue> TestValues { get; set; } = new List<TestValue>
+        public List<TestClass> TestValues
         {
-            new TestValue("One", "1"),
-            new TestValue("Two", "2"),
-            new TestValue("Three", "3"),
-            new TestValue("Four", "4"),
-            new TestValue("Five", "5"),
-            new TestValue("Six", "6"),
-            new TestValue("Seven", "7"),
-            new TestValue("Eight", "8"),
-            new TestValue("Nine", "9"),
-            new TestValue("Ten", "10"),
-        };
+            // Create a new instance because of CollectionViewSource.GetDefaultView
+            get => new List<TestClass>
+                {
+                    new TestClass("One", 1),
+                    new TestClass("Two", 2),
+                    new TestClass("Three", 3),
+                    new TestClass("Four", 4),
+                    new TestClass("Five", 5),
+                    new TestClass("Six", 6),
+                    new TestClass("Seven", 7),
+                    new TestClass("Eight", 8),
+                    new TestClass("Nine", 9),
+                    new TestClass("Ten", 10),
+                };
+        }
 
-        public ObservableCollection<TestValue> SelectedTestValues { get; set; } = new ObservableCollection<TestValue>
+        public ObservableCollection<TestClass> SelectedTestValues
         {
-            new TestValue("One", "1"),
-            new TestValue("Two", "2"),
-            new TestValue("Three", "3"),
-        };
+            get;
+            set;
+        } = new ObservableCollection<TestClass>
+            {
+                new TestClass("One", 1),
+                new TestClass("Two", 2),
+                new TestClass("Three", 3),
+            };
 
         public MainWindow()
         {
@@ -70,11 +82,7 @@ namespace WpfComponents.App
             // Foreach tab in MainContainer create a ListBoxItem and add it to the ListBox
             foreach (TabItem tab in MainContainer.Items)
             {
-                var item = new ListBoxItem
-                {
-                    Content = tab.Header,
-                    Tag = tab
-                };
+                var item = new ListBoxItem { Content = tab.Header, Tag = tab };
                 item.Selected += (s, e) =>
                 {
                     MainContainer.SelectedItem = (TabItem)((ListBoxItem)s).Tag;
@@ -82,18 +90,33 @@ namespace WpfComponents.App
                 SideMenu.Items.Add(item);
             }
 
-            FileExplorerControl.RootPaths = new List<string> { Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) };
-        }
-
-        private void TimePickerInput_ValueChanged(object sender, System.TimeSpan? e)
-        {
-            Debug.WriteLine($"TimePicker.ValueChanged: {e}");
+            FileExplorerControl.RootPaths = new List<string>
+                {
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
+                };
         }
 
         private void PhoneNumberInput_ValueChanged(object sender, List<object?> values)
+        { Debug.WriteLine($"PhoneNumberInput.ValueChanged: {string.Join(',', values)}"); }
+
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine($"PhoneNumberInput.ValueChanged: {string.Join(',', values)}");
+            Filters.Filter<TestClass>(DatagridFiltred);
         }
-        
+
+        private void NumericUpDownInput_ValueChanged(object sender, long e)
+        {
+            Debug.WriteLine($"NumerUpDown.ValueChanged: {e}");
+        }
+
+        private void DecimalUpDownInput_ValueChanged(object sender, double e)
+        {
+            Debug.WriteLine($"DecimalUpDown.ValueChanged: {e}");
+        }
+
+        private void TimePickerInput_ValueChanged(object sender, TimeSpan? e)
+        {
+            Debug.WriteLine($"TimePicker.ValueChanged: {e}");
+        }
     }
 }

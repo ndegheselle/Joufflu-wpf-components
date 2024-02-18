@@ -7,12 +7,13 @@
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Styles/NamedStyles/IconButton.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
+    <!--  XXX: Should use adonis layout system  -->
     <Style
         x:Key="{x:Type local:FormatTextBox}"
         TargetType="{x:Type local:FormatTextBox}"
         BasedOn="{StaticResource {x:Type TextBox}}">
-        <!--  XXX: Should use adonis layout system  -->
         <Setter Property="Padding" Value="2,1" />
+        <Setter Property="Height" Value="24" />
 
         <Setter Property="Template">
             <Setter.Value>

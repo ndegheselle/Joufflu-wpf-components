@@ -4,6 +4,8 @@
 
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/Format/FormatTextBox.xaml" />
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/TimeSpanPicker.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/DecimalUpDown.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/NumericUpDown.xaml" />
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/ComboBoxSearch.xaml" />
         <ResourceDictionary Source="pack://application:,,,/WpfComponents.Lib;component/Components/Inputs/ComboBoxTags.xaml" />
     </ResourceDictionary.MergedDictionaries>

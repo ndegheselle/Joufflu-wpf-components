@@ -6,10 +6,11 @@
     xmlns:local="clr-namespace:WpfComponents.App"
     xmlns:inputs="clr-namespace:WpfComponents.Lib.Components.Inputs;assembly=WpfComponents.Lib"
     xmlns:explorer="clr-namespace:WpfComponents.Lib.Components.FileExplorer;assembly=WpfComponents.Lib"
+    xmlns:filter="clr-namespace:UltraFiltre.Wpf.Lib.Controles;assembly=WpfComponents.Lib"
     xmlns:format="clr-namespace:WpfComponents.Lib.Components.Inputs.Format;assembly=WpfComponents.Lib">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="150" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -18,26 +19,54 @@
         <TabControl x:Name="MainContainer" Grid.Column="1">
             <TabItem Visibility="Collapsed" Header="Inputs">
                 <StackPanel>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
+                    <StackPanel.Resources>
+                        <Style TargetType="UniformGrid">
+                            <Setter Property="Margin" Value="0,0,0,2" />
+                        </Style>
+                    </StackPanel.Resources>
+
+                    <UniformGrid Columns="3">
+                        <TextBlock>TimeSpan input</TextBlock>
                         <inputs:TimeSpanPicker x:Name="TimePickerInput" ValueChanged="TimePickerInput_ValueChanged" />
                         <TextBlock
                             VerticalAlignment="Center"
                             Margin="4,0,0,0"
                             Grid.Column="1"
                             Text="{Binding Value, StringFormat=dd\\:hh\\:mm\\:ss, ElementName=TimePickerInput}" />
-                    </Grid>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
+                    </UniformGrid>
+
+
+                    <UniformGrid Columns="3">
+                        <TextBlock>Numeric up down</TextBlock>
+                        <inputs:NumericUpDown
+                            Value="50"
+                            x:Name="NumericUpDownInput"
+                            ValueChanged="NumericUpDownInput_ValueChanged" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Margin="4,0,0,0"
+                            Grid.Column="1"
+                            Text="{Binding Value, ElementName=NumericUpDownInput}" />
+                    </UniformGrid>
+
+                    <UniformGrid Columns="3">
+                        <TextBlock>Decimal up down</TextBlock>
+                        <inputs:DecimalUpDown
+                            Value="50.5"
+                            x:Name="DecimalUpDownInput"
+                            ValueChanged="DecimalUpDownInput_ValueChanged" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Margin="4,0,0,0"
+                            Grid.Column="1"
+                            Text="{Binding Value, ElementName=DecimalUpDownInput}" />
+                    </UniformGrid>
+
+                    <UniformGrid Columns="3">
+                        <TextBlock>Phone number input</TextBlock>
                         <format:FormatTextBox
                             x:Name="PhoneNumberInput"
-                            ValueChanged="PhoneNumberInput_ValueChanged"
+                            ValuesChanged="PhoneNumberInput_ValueChanged"
                             GlobalFormat="numeric|min:0|padded"
                             ShowIncrementsButtons="False"
                             Format="+{max:99} {max:99} {max:9999} {max:9999}" />
@@ -48,23 +77,18 @@
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
                         </ListBox>
-                    </Grid>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <inputs:ComboBoxSearch x:Name="ComboBoxSearchInput" />
+                    </UniformGrid>
+                    <UniformGrid Columns="3">
+                        <TextBlock>ComboBox with search</TextBlock>
+                        <inputs:ComboBoxSearch x:Name="ComboBoxSearchInput" ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
                         <TextBlock
                             VerticalAlignment="Center"
                             Margin="4,0,0,0"
-                            Grid.Column="1" />
-                    </Grid>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
+                            Grid.Column="1"
+                            Text="{Binding SelectedItem, ElementName=ComboBoxSearchInput}" />
+                    </UniformGrid>
+                    <UniformGrid Columns="3">
+                        <TextBlock>ComboBox with tags</TextBlock>
                         <inputs:ComboBoxTags
                             x:Name="ComboBoxTagsInput"
                             ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}"
@@ -76,11 +100,33 @@
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
                         </ListBox>
-                    </Grid>
+                    </UniformGrid>
                 </StackPanel>
             </TabItem>
             <TabItem Visibility="Collapsed" Header="File explorer">
                 <explorer:FileExplorer x:Name="FileExplorerControl" />
+            </TabItem>
+
+            <TabItem Visibility="Collapsed" Header="Filters">
+                <StackPanel>
+                    <filter:CreationFiltres x:Name="Filters" TypeCible="{x:Type local:TestClass}" />
+
+                    <Button
+                        HorizontalAlignment="Right"
+                        Margin="0,4"
+                        Click="RefreshButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Text="&#xf021;"
+                                FontSize="10"
+                                FontFamily="{StaticResource FontAwesomeSolid}" />
+                            <TextBlock Margin="4,0">Refresh</TextBlock>
+                        </StackPanel>
+                    </Button>
+
+                    <DataGrid x:Name="DatagridFiltred" ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+                </StackPanel>
             </TabItem>
         </TabControl>
 

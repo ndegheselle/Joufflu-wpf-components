@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using WpfComponents.Lib.Logic.Helpers;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WpfComponents.Lib.Components.Inputs.Format
 {
@@ -12,7 +14,10 @@ namespace WpfComponents.Lib.Components.Inputs.Format
     {
         Dictionary<string, Func<FormatTextBox, IEnumerable<string>, BaseGroup>> _types =
             new Dictionary<string, Func<FormatTextBox, IEnumerable<string>, BaseGroup>>()
-        { { "numeric", (parent, options) => new NumericGroup(parent, options) } };
+        {
+            { "numeric", (parent, options) => new NumericGroup(parent, options) },
+            { "decimal", (parent, options) => new DecimalGroup(parent, options) },
+        };
 
         public BaseGroup CreateParams(FormatTextBox parent, string stringParams, string? globalStringParams)
         {
@@ -94,8 +99,8 @@ namespace WpfComponents.Lib.Components.Inputs.Format
                     Type type = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
 
                     string? value = paramKeyValue[displayName];
-                    if (type == typeof(int) && value != null)
-                        property.SetValue(this, int.Parse(value));
+                    if (type == typeof(long) && value != null)
+                        property.SetValue(this, long.Parse(value));
                     else if (type == typeof(string) && value != null)
                         property.SetValue(this, value);
                     else if (type == typeof(Regex) && value != null)
@@ -126,28 +131,44 @@ namespace WpfComponents.Lib.Components.Inputs.Format
         public abstract void OnDelete();
     }
 
-    public class NumericGroup : BaseGroup
+    public interface IBaseNumericGroup
+    {
+        public bool NoGlobalSelection { get; set; }
+
+        public void Increment();
+
+        public void Decrement();
+    }
+
+    public abstract class BaseNumericGroup<T> : BaseGroup, IBaseNumericGroup where T : struct
     {
         #region Options
-        public int Min { get; set; } = int.MinValue;
+        [Display(Name = "noGlobalSelection")]
+        public bool NoGlobalSelection { get; set; } = false;
 
-        public int Max { get; set; } = int.MaxValue;
+        public T? Min { get; set; }
+
+        public T? Max { get; set; }
+
+        public T? IncrementDelta { get; set; }
 
         [Display(Name = "padded")]
         public bool IsPadded { get; set; }
         #endregion
 
-        public new int? Value
+        public new T? Value
         {
-            get { return (int?)base.Value; }
+            get { return (T?)base.Value; }
             set
             {
-                if (value > Max)
+                int compareMax = Comparer<T?>.Default.Compare(value, Max);
+                int compareMin = Comparer<T?>.Default.Compare(value, Min);
+                if (compareMax > 0)
                 {
                     base.Value = Max;
                     return;
                 }
-                else if (value < Min)
+                else if (compareMin < 0)
                 {
                     base.Value = Min;
                     return;
@@ -156,32 +177,47 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             }
         }
 
-        public NumericGroup(FormatTextBox parent, IEnumerable<string> options) : base(parent, options)
+        public BaseNumericGroup(FormatTextBox parent, IEnumerable<string> options) : base(parent, options)
         {
             if (NullableChar == '\0')
                 NullableChar = '-';
 
-            if (Max != int.MaxValue && Length == 0)
-                Length = Max.ToString().Length; // Negative max number ?
-
-            if (IsPadded && StringFormat == null && Length != 0)
-                StringFormat = $":D{Length}";
-
             if (!IsNullable)
-                Value = default(int);
+                Value = default(T);
         }
 
         public override bool OnInput(string input)
         {
-            string newString = Value + input;
-
-            // If the number is too big we loop back to only the new number
-            if (newString.Length > Length)
+            string newText;
+            if (NoGlobalSelection)
             {
-                newString = input;
+                // We replace the selected text by the input
+                string oldText = _parent.Text;
+                int carretOffset = 0;
+                if (Index + Length < oldText.Length)
+                {
+                    oldText = oldText.Substring(Index, Length);
+                    carretOffset = Index;
+                }
+
+                oldText = oldText.Remove(_parent.CaretIndex - carretOffset, _parent.SelectionLength);
+                newText = oldText.Insert(_parent.CaretIndex - carretOffset, input);
+
+                _parent.CaretIndex += 1;
+                _parent.SelectionLength = 0;
+            }
+            else
+            {
+                newText = Value + input;
             }
 
-            bool isValid = int.TryParse(newString, out int newValue);
+            // If the number is too big we loop back to only the new number
+            if (newText.Length > Length)
+            {
+                newText = input;
+            }
+
+            bool isValid = TryParse(newText, out T newValue);
             if (!isValid)
                 return false;
 
@@ -195,13 +231,17 @@ namespace WpfComponents.Lib.Components.Inputs.Format
                 return;
 
             // If the next input will make the number too big, we change group
-            int futureValue = Value.Value * 10;
-            if (futureValue > Max || futureValue.ToString().Length > Length)
+            if (IsFutureValueInvalid())
                 _parent.ChangeSelectedGroup(1);
+            else
+                OnSelection();
         }
 
         public override void OnSelection()
         {
+            if (NoGlobalSelection)
+                return;
+
             // For numeric groups, we select the whole number
             _parent.Select(Index, Length);
         }
@@ -211,14 +251,103 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             if (IsNullable)
                 Value = null;
             else
-                Value = 0;
+                Value = default(T);
         }
 
         public override string ToString()
         {
             if (Value == null)
                 return new string(NullableChar, Length);
-            return string.Format("{0" + StringFormat + "}", Value);
+
+            string format = Value.ToString();
+            if (StringFormat != null)
+                format = string.Format("{0" + StringFormat + "}", Value);
+            if (IsPadded)
+                format = format.PadLeft(Length, '0');
+
+            return format;
+        }
+
+        protected abstract bool TryParse(string newText, out T value);
+
+        protected abstract bool IsFutureValueInvalid();
+
+        public abstract void Increment();
+
+        public abstract void Decrement();
+    }
+
+    public class NumericGroup : BaseNumericGroup<long>
+    {
+        public NumericGroup(FormatTextBox parent, IEnumerable<string> options) : base(parent, options)
+        {
+            IncrementDelta = 1;
+
+            if (Min == null)
+                Min = long.MinValue;
+            if (Max == null)
+                Max = long.MaxValue;
+
+            if (Length == 0)
+                Length = Max.ToString().Length;
+        }
+
+        protected override bool TryParse(string newText, out long value) { return long.TryParse(newText, out value); }
+
+        protected override bool IsFutureValueInvalid()
+        {
+            long futureValue = Value.Value * 10;
+            return futureValue > Max || futureValue.ToString().Length > Length;
+        }
+
+        public override void Increment()
+        {
+            if (Value is null)
+                Value = Max;
+            Value += IncrementDelta; 
+        }
+        public override void Decrement() {
+            if (Value is null)
+                Value = Min;
+            Value -= IncrementDelta; 
+        }
+    }
+
+    public class DecimalGroup : BaseNumericGroup<double>
+    {
+        public DecimalGroup(FormatTextBox parent, IEnumerable<string> options) : base(parent, options)
+        {
+            IncrementDelta = 0.1;
+
+            if (Min == null)
+                Min = double.MinValue;
+            if (Max == null)
+                Max = double.MaxValue;
+
+            if (Length == 0)
+                Length = Max.ToString().Length;
+        }
+
+        protected override bool TryParse(string newText, out double value)
+        { return double.TryParse(newText, out value); }
+
+        protected override bool IsFutureValueInvalid()
+        {
+            double futureValue = Value.Value * 10;
+            return futureValue > Max || futureValue.ToString().Length > Length;
+        }
+
+        public override void Increment()
+        {
+            if (Value is null)
+                Value = Max;
+            Value += IncrementDelta;
+        }
+        public override void Decrement()
+        {
+            if (Value is null)
+                Value = Min;
+            Value -= IncrementDelta;
         }
     }
 }
