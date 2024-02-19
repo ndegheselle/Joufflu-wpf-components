@@ -181,9 +181,15 @@ namespace WpfComponents.Lib.Components.Inputs.Format
         {
             if (NullableChar == '\0')
                 NullableChar = '-';
+        }
 
+        // Should be called after the constructor
+        public void Init()
+        {
             if (!IsNullable)
                 Value = default(T);
+            if (Length == 0)
+                Length = Max.ToString().Length;
         }
 
         public override bool OnInput(string input)
@@ -288,8 +294,7 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             if (Max == null)
                 Max = long.MaxValue;
 
-            if (Length == 0)
-                Length = Max.ToString().Length;
+            Init();
         }
 
         protected override bool TryParse(string newText, out long value) { return long.TryParse(newText, out value); }
@@ -324,8 +329,7 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             if (Max == null)
                 Max = double.MaxValue;
 
-            if (Length == 0)
-                Length = Max.ToString().Length;
+            Init();
         }
 
         protected override bool TryParse(string newText, out double value)

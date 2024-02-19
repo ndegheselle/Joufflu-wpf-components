@@ -30,12 +30,12 @@
             </converterInterne:ConverterTypeInput.StringTemplate>
             <converterInterne:ConverterTypeInput.EntierTemplate>
                 <DataTemplate DataType="{x:Type base:FiltreValeur}">
-                    <inputs:NumericUpDown Value="{Binding Valeur, Converter={StaticResource ConverterParseValue}}" Height="Auto" />
+                    <inputs:NumericUpDown Value="{Binding Valeur, Mode=TwoWay, Converter={StaticResource ConverterParseValue}}" Height="Auto" />
                 </DataTemplate>
             </converterInterne:ConverterTypeInput.EntierTemplate>
             <converterInterne:ConverterTypeInput.DecimalTemplate>
                 <DataTemplate DataType="{x:Type base:FiltreValeur}">
-                    <inputs:DecimalUpDown Value="{Binding Valeur, Converter={StaticResource ConverterParseValue}}" Height="Auto" />
+                    <inputs:DecimalUpDown Value="{Binding Valeur, Mode=TwoWay, Converter={StaticResource ConverterParseValue}}" Height="Auto" />
                 </DataTemplate>
             </converterInterne:ConverterTypeInput.DecimalTemplate>
             <converterInterne:ConverterTypeInput.BoolTemplate>
