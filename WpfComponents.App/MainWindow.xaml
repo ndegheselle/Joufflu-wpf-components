@@ -6,7 +6,7 @@
     xmlns:local="clr-namespace:WpfComponents.App"
     xmlns:inputs="clr-namespace:WpfComponents.Lib.Components.Inputs;assembly=WpfComponents.Lib"
     xmlns:explorer="clr-namespace:WpfComponents.Lib.Components.FileExplorer;assembly=WpfComponents.Lib"
-    xmlns:filter="clr-namespace:UltraFiltre.Wpf.Lib.Controles;assembly=WpfComponents.Lib"
+    xmlns:filter="clr-namespace:WpfComponents.Lib.Components.Filters;assembly=WpfComponents.Lib"
     xmlns:format="clr-namespace:WpfComponents.Lib.Components.Inputs.Format;assembly=WpfComponents.Lib">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -80,7 +80,10 @@
                     </UniformGrid>
                     <UniformGrid Columns="3">
                         <TextBlock>ComboBox with search</TextBlock>
-                        <inputs:ComboBoxSearch x:Name="ComboBoxSearchInput" ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+                        <inputs:ComboBoxSearch
+                            HideFilteredItems="False"
+                            x:Name="ComboBoxSearchInput"
+                            ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
                         <TextBlock
                             VerticalAlignment="Center"
                             Margin="4,0,0,0"
@@ -109,7 +112,7 @@
 
             <TabItem Visibility="Collapsed" Header="Filters">
                 <StackPanel>
-                    <filter:CreationFiltres x:Name="Filters" TypeCible="{x:Type local:TestClass}" />
+                    <filter:DataFilters x:Name="Filters" TargetType="{x:Type local:TestClass}" />
 
                     <Button
                         HorizontalAlignment="Right"

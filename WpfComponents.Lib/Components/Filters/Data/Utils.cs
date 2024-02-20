@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections;
 
-namespace UltraFiltre.Lib
+namespace  WpfComponents.Lib.Components.Filters.Data
 {
     public static class Utils
     {
-        public static bool EstEntier(Type pType)
+        public static bool IsNumeric(Type type)
         {
-            switch (Type.GetTypeCode(pType))
+            switch (Type.GetTypeCode(type))
             {
                 case TypeCode.Byte:
                 case TypeCode.SByte:
@@ -23,9 +23,9 @@ namespace UltraFiltre.Lib
             }
         }
 
-        public static bool EstDecimal(Type pType)
+        public static bool IsDecimal(Type type)
         {
-            switch (Type.GetTypeCode(pType))
+            switch (Type.GetTypeCode(type))
             {
                 case TypeCode.Decimal:
                 case TypeCode.Double:
@@ -36,19 +36,19 @@ namespace UltraFiltre.Lib
             }
         }
 
-        public static bool EstSimple(Type pType)
+        public static bool IsSimple(Type type)
         {
-            return EstEntier(pType) ||
-                EstDecimal(pType) ||
-                pType == typeof(string) ||
-                pType == typeof(bool) ||
-                pType == typeof(TimeSpan) ||
-                pType == typeof(DateTime);
+            return IsNumeric(type) ||
+                IsDecimal(type) ||
+                type == typeof(string) ||
+                type == typeof(bool) ||
+                type == typeof(TimeSpan) ||
+                type == typeof(DateTime);
         }
 
-        public static bool EstListe(Type pType)
+        public static bool IsList(Type type)
         {
-            return pType.IsGenericType && typeof(IEnumerable).IsAssignableFrom(pType);
+            return type.IsGenericType && typeof(IEnumerable).IsAssignableFrom(type);
         }
     }
 }

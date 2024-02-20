@@ -2,9 +2,9 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
-using UltraFiltre.Lib;
+using WpfComponents.Lib.Components.Filters.Data;
 
-namespace UltraFiltre.Wpf.Lib.Converters
+namespace WpfComponents.Lib.Components.Filters.Converters
 {
     /// <summary>
     /// Permet de sélectionné un template en fonction d'un type de données.
@@ -13,7 +13,7 @@ namespace UltraFiltre.Wpf.Lib.Converters
     public class ConverterTypeInput : IValueConverter
     {
         public DataTemplate StringTemplate { get; set; }
-        public DataTemplate EntierTemplate { get; set; }
+        public DataTemplate NumericTemplate { get; set; }
         public DataTemplate DecimalTemplate { get; set; }
         public DataTemplate BoolTemplate { get; set; }
         public DataTemplate DateTimeTemplate { get; set; }
@@ -22,20 +22,20 @@ namespace UltraFiltre.Wpf.Lib.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var lItem = value as Propriete;
-            if (lItem != null)
+            var item = value as Property;
+            if (item != null)
             {
-                if (lItem.Type.IsEnum)
+                if (item.Type.IsEnum)
                     return EnumTemplate;
-                else if (Utils.EstEntier(lItem.Type))
-                    return EntierTemplate;
-                else if (Utils.EstDecimal(lItem.Type))
+                else if (Utils.IsNumeric(item.Type))
+                    return NumericTemplate;
+                else if (Utils.IsDecimal(item.Type))
                     return DecimalTemplate;
-                else if (lItem.Type == typeof(bool))
+                else if (item.Type == typeof(bool))
                     return BoolTemplate;
-                else if (lItem.Type == typeof(DateTime))
+                else if (item.Type == typeof(DateTime))
                     return DateTimeTemplate;
-                else if (lItem.Type == typeof(TimeSpan))
+                else if (item.Type == typeof(TimeSpan))
                     return TimeTemplate;
             }
             return StringTemplate;

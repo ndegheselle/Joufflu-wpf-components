@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace UltraFiltre.Wpf.Lib.Converters
+namespace WpfComponents.Lib.Components.Filters.Converters
 {
     /// <summary>
     /// Permet de convertir une valeur en une autre valeur en utilisant le convertisseur par défaut
@@ -18,8 +18,8 @@ namespace UltraFiltre.Wpf.Lib.Converters
 
             try
             {
-                var lConverter = TypeDescriptor.GetConverter(targetType);
-                return lConverter.ConvertFrom(null, CultureInfo.CurrentCulture, value.ToString());
+                var converter = TypeDescriptor.GetConverter(targetType);
+                return converter.ConvertFrom(null, CultureInfo.CurrentCulture, value.ToString());
             }
             catch
             {

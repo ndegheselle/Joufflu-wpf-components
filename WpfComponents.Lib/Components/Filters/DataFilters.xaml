@@ -1,10 +1,10 @@
 ﻿<UserControl
-    x:Class="UltraFiltre.Wpf.Lib.Controles.CreationFiltres"
+    x:Class="WpfComponents.Lib.Components.Filters.DataFilters"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:UltraFiltre.Wpf.Lib.Controles"
+    xmlns:local="clr-namespace:WpfComponents.Lib.Components.Filters"
     d:DesignHeight="250"
     d:DesignWidth="600"
     mc:Ignorable="d"
@@ -15,10 +15,10 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <local:AffichageFiltreGroupe
-                Affichage="{Binding Affichage, RelativeSource={RelativeSource AncestorType=local:CreationFiltres}}"
-                GroupeRacine="{Binding GroupeRacine, RelativeSource={RelativeSource AncestorType=local:CreationFiltres}}"
-                GestionDnD="{Binding GestionDnD, RelativeSource={RelativeSource AncestorType=local:CreationFiltres}}" />
+        <local:FilterRow
+            Display="{Binding Display, RelativeSource={RelativeSource AncestorType=local:DataFilters}}"
+            RootGroup="{Binding RootGroup, RelativeSource={RelativeSource AncestorType=local:DataFilters}}"
+            GestionDnD="{Binding GestionDnD, RelativeSource={RelativeSource AncestorType=local:DataFilters}}" />
         <Popup
             x:Name="PopupDnd"
             PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}"

@@ -151,14 +151,14 @@ namespace WpfComponents.Lib.Components.Inputs
 
         private void SelectFromFilter()
         {
-            if (HideFilteredItems == false)
+            if (HideFilteredItems == false && !string.IsNullOrEmpty(Text))
             {
                 // Select closest to user input
                 for (int i = 0; i < Items.Count; i++)
                 {
-                    if (DoesItemPassFilter(Items[i]))
+                    if (DoesValueContainText(Items[i]))
                     {
-                        SelectedIndex = i;
+                        SelectedItem = i;
                         return;
                     }
                 }
@@ -194,6 +194,10 @@ namespace WpfComponents.Lib.Components.Inputs
             if (string.IsNullOrEmpty(Text))
                 return true;
 
+            return DoesValueContainText(value);
+        }
+        private bool DoesValueContainText(object value)
+        {
             return ItemGetTextFrom(value, FilterMemberPath)?.ToLower().Contains(Text.ToLower()) == true;
         }
 

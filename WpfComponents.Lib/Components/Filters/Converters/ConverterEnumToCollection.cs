@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 using WpfComponents.Lib.Logic.Helpers;
 
-namespace UltraFiltre.Wpf.Lib.Converters
+namespace WpfComponents.Lib.Components.Filters.Converters
 {
     /* Exemple d'utilisation
      <ComboBox
@@ -24,7 +21,7 @@ namespace UltraFiltre.Wpf.Lib.Converters
             var targetEnum = (Enum) value;
             return Enum.GetValues(targetEnum.GetType())
                 .Cast<Enum>()
-                .Select(e => new {Valeur = e, Description = e.GetDescription()})
+                .Select(e => new {Value = e, Description = e.GetDescription()})
                 .ToList();
         }
 
