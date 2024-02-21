@@ -14,10 +14,7 @@ using System.Windows.Input;
 namespace WpfComponents.Lib.Components.Inputs
 {
     /// <summary>
-    /// Basé sur : https://stackoverflow.com/a/41986141/10404482 Exemple :
-    /// <composants:ComboBoxFiltre><composants:ComboBoxFiltre.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel
-    /// VirtualizationMode="Recycling"/></ItemsPanelTemplate></composants:ComboBoxFiltre.ItemsPanel></composants:ComboBoxFiltre>
-    ///
+    /// Inspired from : https://stackoverflow.com/a/41986141/10404482 
     /// </summary>
     public class ComboBoxSearch : ComboBox
     {

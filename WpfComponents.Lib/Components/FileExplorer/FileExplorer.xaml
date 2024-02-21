@@ -7,33 +7,35 @@
     xmlns:local="clr-namespace:WpfComponents.Lib.Components.FileExplorer"
     mc:Ignorable="d"
     d:DesignHeight="450"
-    d:DesignWidth="800">
+    d:DesignWidth="800"
+    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
             <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="3*" />
         </Grid.ColumnDefinitions>
-
-        <ItemsControl ItemsSource="{Binding Controller.Observers, RelativeSource={RelativeSource AncestorType=local:FileExplorer}}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <local:FileExplorerTree
-                        Display="Folder,File,RootFolder"
-                        Mediator="{Binding Controller, RelativeSource={RelativeSource AncestorType=local:FileExplorer}}"
-                        RootNode="{Binding RootNode}"
-                        SelectedFolder="{Binding Controller.SelectedFolder, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=local:FileExplorer}}"
-                        Permissions="AllowContextMenu,AllowDrop" />
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Controller.Observers, RelativeSource={RelativeSource AncestorType=local:FileExplorer}}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <local:FileExplorerTree
+                            Display="Folder,File,RootFolder"
+                            Mediator="{Binding Controller, RelativeSource={RelativeSource AncestorType=local:FileExplorer}}"
+                            RootNode="{Binding RootNode}"
+                            SelectedFolder="{Binding Controller.SelectedFolder, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=local:FileExplorer}}"
+                            Permissions="AllowContextMenu,AllowDrop" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
 
         <GridSplitter
             Grid.Column="1"
             HorizontalAlignment="Center"
             VerticalAlignment="Stretch"
             ShowsPreview="True"
-            Width="5" />
+            Width="4" />
 
         <local:FileExplorerList Grid.Column="2" RootNode="{Binding Controller.SelectedFolder, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=local:FileExplorer}}" />
     </Grid>
