@@ -521,7 +521,15 @@ namespace WpfComponents.Lib.Components.FileExplorer.Controls
             if (originalSource?.DataContext == null)
                 targetNode = RootNode;
 
+            bool foreOpenning = source.ContextMenu == null;
             source.ContextMenu = new ContextMenuExplorer(this, targetNode);
+
+            // During the first opening we force the opening (otherwise the ContextMenu is not ready at the time of display)
+            if (foreOpenning)
+            {
+                source.ContextMenu.IsOpen = true;
+                e.Handled = true;
+            }
         }
         #endregion
     }

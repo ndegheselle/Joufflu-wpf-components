@@ -70,44 +70,50 @@ namespace WpfComponents.Lib.Logic
         /// </summary>
         public void HandleDragMouseMove(object sender, MouseEventArgs e)
         {
-            // Prevent D&D before the UI is loaded and after a mouse click
-            if (_parentUI.IsLoaded == false || _clickCount < 0)
+            //  Don't start the D&D before the UI is loaded
+            // -1 to be sure that the D&D starts with a MouseDown
+            if (_parentUI.IsLoaded == false || _clickCount == -1)
                 return;
 
-            if (UseMinimalDistance)
-            {
-                Point currentPosition = e.GetPosition(_parentUI);
-                // Minimum distance to trigger a D&D
-                if (Math.Abs(currentPosition.X - _clickPosition.X) < SystemParameters.MinimumHorizontalDragDistance ||
-                    Math.Abs(currentPosition.Y - _clickPosition.Y) < SystemParameters.MinimumVerticalDragDistance)
-                    return;
-            }
-
-            // Check if double click and if allowed
-            if (_clickCount > 1 || CanDrag(sender, e) == false)
-                return;
-
-            if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
-            {
-                object data = GetSourceData(e.OriginalSource as FrameworkElement);
-                UpdatePopup(data);
-
-                if (data == null)
-                    return;
-
-                try
-                {
-                    DragDrop.DoDragDrop((DependencyObject)sender, data, DragDropEffects.Copy);
-                }
-                catch (ExternalException)
-                {
-                    // DragDrop may throw an ExternalException since it's a COM object
-                }
-            }
-            else
+            if (e.LeftButton != MouseButtonState.Pressed)
             {
                 _clickCount = -1;
                 IsDragging = false;
+            }
+
+            if (UseMinimalDistance)
+            {
+                Point lPositionActuel = e.GetPosition(_parentUI);
+                // Minimal distance to start the D&D
+                if (Math.Abs(lPositionActuel.X - _clickPosition.X) < SystemParameters.MinimumHorizontalDragDistance ||
+                    Math.Abs(lPositionActuel.Y - _clickPosition.Y) < SystemParameters.MinimumVerticalDragDistance)
+                    return;
+            }
+
+            // No D&D during double click or not allowed
+            if (_clickCount > 1 || CanDrag(sender, e) == false)
+            {
+                _clickCount = -1;
+                IsDragging = false;
+                return;
+            }
+
+            object lDonnees = GetSourceData(e.OriginalSource as FrameworkElement);
+
+            if (lDonnees == null)
+                return;
+
+            UpdatePopup(lDonnees);
+
+            try
+            {
+                // We reset the clickCount to avoid starting the D&D multiple times
+                _clickCount = -1;
+                DragDrop.DoDragDrop((DependencyObject)sender, lDonnees, DragDropEffects.Copy);
+            }
+            catch (ExternalException)
+            {
+                // DragDrop is a shared resource, it can be used by another process for example
             }
         }
 
