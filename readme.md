@@ -72,4 +72,4 @@ Use :
 * [Fontawesome](https://fontawesome.com/) icons
 * [PropertyChanged.Fody](https://www.nuget.org/packages/PropertyChanged.Fody) for boilerplate
 
-I [Extended WPF Toolkit](https://github.com/xceedsoftware/wpftoolkit)  know have already done all the inputs and way more but you can't appreciate something fully without knowing how hard it is to do.
+I know [Extended WPF Toolkit](https://github.com/xceedsoftware/wpftoolkit) have already done all the inputs and way more but you can't appreciate something fully without knowing how hard it is to do.
