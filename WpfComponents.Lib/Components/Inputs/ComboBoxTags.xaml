@@ -16,7 +16,7 @@
         <Style.Resources>
             <local:DisplayMemberPathConverter x:Key="DisplayMemberPathConverter" />
         </Style.Resources>
-        <Setter Property="Height" Value="24" />
+        <Setter Property="MinHeight" Value="24" />
         <Setter Property="Padding" Value="1" />
         <Setter Property="Template">
             <Setter.Value>

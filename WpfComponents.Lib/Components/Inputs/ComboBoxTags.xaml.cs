@@ -83,12 +83,31 @@ namespace WpfComponents.Lib.Components.Inputs
         // Only add to selection then clicking or pressing enter (like combobox with IsEditable = false)
         // Sad that the combobox doesn't allow to set this behavior
         private bool _ignoreNextSelection = false;
+        private Popup _popup;
         #endregion
 
         public ComboBoxTags()
         {
             RemoveSelectedCmd = new SimpleCommand<object>((parameter) => this.InternalSelectedItems.Remove(parameter));
             InternalSelectedItems.CollectionChanged += InternalSelectedItems_CollectionChanged;
+
+            SizeChanged += (s, e) =>
+            {
+                if (_popup == null)
+                    return;
+
+                var offset = _popup.HorizontalOffset;
+                _popup.HorizontalOffset = offset + 1;
+                _popup.HorizontalOffset = offset;
+            };
+        }
+
+
+        public override void OnApplyTemplate()
+        {
+            _popup = (Popup)GetTemplateChild("PART_Popup");
+
+            base.OnApplyTemplate();
         }
 
         /// <summary>
