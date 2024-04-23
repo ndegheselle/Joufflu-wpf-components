@@ -46,7 +46,7 @@ Filters, visually create a lambda that can be used to filter data :
 
 ### Why does this exist
 
-Used train myself to create generic components that can easily be used in different projects.
+To train myself to create generic components that can easily be used in different projects.
 Tried to find the best way to do this since there is several way to acheive this in WPF :
 - Derive from ContentControl or other base component
     - Customize with a Dictionnary
