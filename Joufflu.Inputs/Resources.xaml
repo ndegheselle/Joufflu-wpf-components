@@ -1,0 +1,19 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/Components/Format/FormatTextBox.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/Components/TimeSpanPicker.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/Components/DecimalUpDown.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/Components/NumericUpDown.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/Components/ComboBoxSearch.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/Components/ComboBoxTags.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <FontFamily x:Key="FontAwesomeSolid">/Joufflu.Shared;Component/Resources/Fonts/FontAwesomeSolid.otf#Font Awesome 6 Free Solid</FontFamily>
+
+    <!--  HACK : fix a binding error  -->
+    <Style TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+    </Style>
+
+</ResourceDictionary>

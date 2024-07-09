@@ -35,7 +35,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Data
 
     public class ExplorerNodeFolder : ExplorerNode
     {
-        public event Action OnRefresh;
+        public event Action? OnRefresh;
 
         public ObservableCollection<ExplorerNode> Children { get; set; } = new ObservableCollection<ExplorerNode>();
         public ListCollectionView SortedChildNodes { get; }
@@ -55,7 +55,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Data
         {
             Type = EnumExplorerNodeType.Folder;
             FullPath = path;
-            SortedChildNodes = CollectionViewSource.GetDefaultView(Children) as ListCollectionView;
+            SortedChildNodes = (ListCollectionView)CollectionViewSource.GetDefaultView(Children);
             SortedChildNodes.CustomSort = new NameComparer(ListSortDirection.Ascending);
         }
 
@@ -93,10 +93,10 @@ namespace WpfComponents.Lib.Components.FileExplorer.Data
 
             foreach (string folderPath in Directory.GetDirectories(this.FullPath, "*", SearchOption.TopDirectoryOnly))
             {
-                var childFolderNode = new ExplorerNodeFolder(folderPath);
+                ExplorerNodeFolder childFolderNode = new ExplorerNodeFolder(folderPath);
                 if (!force && Children.Contains(childFolderNode))
                 {
-                    childFolderNode = Children.First(x => x.FullPath == folderPath) as ExplorerNodeFolder;
+                    childFolderNode = (ExplorerNodeFolder)Children.First(x => x.FullPath == folderPath);
                 }
                 else
                 {
@@ -149,8 +149,8 @@ namespace WpfComponents.Lib.Components.FileExplorer.Data
                 {
                     if (index == pathSegments.Count - 1)
                         return node;
-                    else if (node as ExplorerNodeFolder != null)
-                        return SearchNode((node as ExplorerNodeFolder).Children, pathSegments, index + 1);
+                    else if (node is ExplorerNodeFolder explorer)
+                        return SearchNode(explorer.Children, pathSegments, index + 1);
                 }
             }
             return null;
@@ -159,7 +159,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Data
 
     public abstract class ExplorerNode : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
@@ -205,7 +205,7 @@ namespace WpfComponents.Lib.Components.FileExplorer.Data
             get { return Path.GetFileName(FullPath); }
         }
 
-        private string _fullPath;
+        private string _fullPath = string.Empty;
         public string FullPath
         {
             get { return _fullPath; }

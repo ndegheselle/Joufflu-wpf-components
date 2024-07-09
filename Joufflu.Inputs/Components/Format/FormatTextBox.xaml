@@ -1,0 +1,86 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Joufflu.Inputs.Components.Format">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/NamedStyles/IconButton.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <!--  XXX: Should use adonis layout system  -->
+    <Style
+        x:Key="{x:Type local:FormatTextBox}"
+        TargetType="{x:Type local:FormatTextBox}"
+        BasedOn="{StaticResource {x:Type TextBox}}">
+        <Setter Property="Padding" Value="2,1" />
+        <Setter Property="Height" Value="24" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TextBoxBase}">
+                    <Border
+                        Name="Border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ScrollViewer x:Name="PART_ContentHost" Padding="{TemplateBinding Padding}" />
+                            <!--  Actions butons  -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Button x:Name="PART_ClearButton" Style="{StaticResource IconButton}">
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        FontFamily="{DynamicResource FontAwesomeSolid}"
+                                        FontSize="10"
+                                        Text="&#xf00d;" />
+                                </Button>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Button
+                                        x:Name="PART_UpButton"
+                                        Height="auto"
+                                        Focusable="False"
+                                        Style="{StaticResource IconButton}">
+                                        <TextBlock
+                                            FontFamily="{DynamicResource FontAwesomeSolid}"
+                                            FontSize="8"
+                                            Text="&#xf077;" />
+                                    </Button>
+                                    <Button
+                                        x:Name="PART_DownButton"
+                                        Grid.Row="1"
+                                        Height="auto"
+                                        Focusable="False"
+                                        Style="{StaticResource IconButton}">
+                                        <TextBlock
+                                            FontFamily="{DynamicResource FontAwesomeSolid}"
+                                            FontSize="8"
+                                            Text="&#xf078;" />
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding ShowDeleteButton, RelativeSource={RelativeSource Self}}" Value="False">
+                            <Setter TargetName="PART_ClearButton" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ShowIncrementsButtons, RelativeSource={RelativeSource Self}}" Value="False">
+                            <Setter TargetName="PART_DownButton" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="PART_UpButton" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

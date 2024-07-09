@@ -21,7 +21,7 @@ namespace WpfComponents.Lib.Components.Inputs
                 return new List<object?>() { null, null, null, null };
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var list = (List<object?>)value;
             if (list.Any(x => x == null))

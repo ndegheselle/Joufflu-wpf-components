@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Joufflu.Shared.Extensions;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using WpfComponents.Lib.Logic.Helpers;
-using static System.Net.Mime.MediaTypeNames;
 
-namespace WpfComponents.Lib.Components.Inputs.Format
+namespace Joufflu.Inputs.Components.Format
 {
     public class GroupsFactory
     {
@@ -19,7 +14,7 @@ namespace WpfComponents.Lib.Components.Inputs.Format
             { "decimal", (parent, options) => new DecimalGroup(parent, options) },
         };
 
-        public BaseGroup? CreateParams(FormatTextBox parent, string stringParams, string? globalStringParams)
+        public BaseGroup CreateParams(FormatTextBox parent, string stringParams, string? globalStringParams)
         {
             IEnumerable<string> splitParams = stringParams.Split("|");
             if (splitParams.Count() <= 0)
@@ -41,7 +36,7 @@ namespace WpfComponents.Lib.Components.Inputs.Format
                 }
             }
 
-            return null;
+            throw new ArgumentException("Unknow type key.");
             // May use a StringGroup
             // return new StringGroup(parent, splitParams);
         }
@@ -301,7 +296,7 @@ namespace WpfComponents.Lib.Components.Inputs.Format
 
         protected override bool IsFutureValueInvalid()
         {
-            int futureValue = Value.Value * 10;
+            int futureValue = Value!.Value * 10;
             return futureValue > Max || futureValue.ToString().Length > Length;
         }
 
@@ -309,35 +304,36 @@ namespace WpfComponents.Lib.Components.Inputs.Format
         {
             if (Value is null)
                 Value = Max;
-            Value += IncrementDelta; 
+            Value += IncrementDelta;
         }
-        public override void Decrement() {
+        public override void Decrement()
+        {
             if (Value is null)
                 Value = Min;
-            Value -= IncrementDelta; 
+            Value -= IncrementDelta;
         }
     }
 
-    public class DecimalGroup : BaseNumericGroup<double>
+    public class DecimalGroup : BaseNumericGroup<decimal>
     {
         public DecimalGroup(FormatTextBox parent, IEnumerable<string> options) : base(parent, options)
         {
-            IncrementDelta = 0.1;
+            IncrementDelta = 0.1m;
 
             if (Min == null)
-                Min = double.MinValue;
+                Min = decimal.MinValue;
             if (Max == null)
-                Max = double.MaxValue;
+                Max = decimal.MaxValue;
 
             Init();
         }
 
-        protected override bool TryParse(string newText, out double value)
-        { return double.TryParse(newText, out value); }
+        protected override bool TryParse(string newText, out decimal value)
+        { return decimal.TryParse(newText, out value); }
 
         protected override bool IsFutureValueInvalid()
         {
-            double futureValue = Value.Value * 10;
+            decimal futureValue = Value!.Value * 10;
             return futureValue > Max || futureValue.ToString().Length > Length;
         }
 

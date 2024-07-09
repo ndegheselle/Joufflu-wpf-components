@@ -1,8 +1,8 @@
-﻿using System.ComponentModel;
+﻿using Joufflu.Inputs.Components.Format;
+using System.ComponentModel;
 using System.Windows;
-using WpfComponents.Lib.Components.Inputs.Format;
 
-namespace WpfComponents.Lib.Components.Inputs
+namespace Joufflu.Inputs.Components
 {
     public partial class NumericUpDown : SingleValueFormatTextBox<int>, INotifyPropertyChanged
     {

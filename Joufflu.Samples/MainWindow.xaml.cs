@@ -1,16 +1,11 @@
 ﻿using AdonisUI.Controls;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using  WpfComponents.Lib.Components.Filters;
 
-namespace WpfComponents.App
+namespace Joufflu.Samples
 {
     public enum EnumTest
     {
@@ -89,17 +84,6 @@ namespace WpfComponents.App
                 };
                 SideMenu.Items.Add(item);
             }
-
-            FileExplorerControl.RootPaths = new List<string>
-                {
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
-                };
-        }
-
-        
-        private void RefreshButton_Click(object sender, RoutedEventArgs e)
-        {
-            Filters.Filter<TestClass>(DatagridFiltred);
         }
 
         private void PhoneNumberInput_ValueChanged(object sender, List<object?> values)
@@ -110,7 +94,7 @@ namespace WpfComponents.App
             Debug.WriteLine($"NumerUpDown.ValueChanged: {e}");
         }
 
-        private void DecimalUpDownInput_ValueChanged(object sender, double e)
+        private void DecimalUpDownInput_ValueChanged(object sender, decimal e)
         {
             Debug.WriteLine($"DecimalUpDown.ValueChanged: {e}");
         }

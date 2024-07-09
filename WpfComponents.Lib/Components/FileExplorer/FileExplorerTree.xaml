@@ -52,7 +52,7 @@
                 <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <Setter Property="IsExpanded">
                         <Setter.Value>
-                            <!--  Avoids warnings for files that do not have the "EstOuvert" property  -->
+                            <!--  Avoids warnings for files that do not have the "IsOpen" property  -->
                             <PriorityBinding>
                                 <Binding Path="IsOpen" Mode="TwoWay" />
                             </PriorityBinding>

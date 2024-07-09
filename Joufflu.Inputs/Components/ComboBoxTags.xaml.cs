@@ -1,20 +1,16 @@
-﻿using Microsoft.VisualBasic;
-using System;
+﻿using Joufflu.Shared;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
-using WpfComponents.Lib.Logic;
 
-namespace WpfComponents.Lib.Components.Inputs
+namespace Joufflu.Inputs.Components
 {
     /// <summary>
     /// Either get the display member path or the ToString() of the object
@@ -31,7 +27,7 @@ namespace WpfComponents.Lib.Components.Inputs
 
             string lDisplayMemberPath = (string)values[1];
             if (!string.IsNullOrEmpty(lDisplayMemberPath))
-                return values[0].GetType().GetProperty(lDisplayMemberPath)?.GetValue(values[0])?.ToString();
+                return values[0].GetType().GetProperty(lDisplayMemberPath)?.GetValue(values[0]).ToString();
             else
                 return values[0].ToString();
         }
@@ -78,17 +74,17 @@ namespace WpfComponents.Lib.Components.Inputs
 
         public bool AllowAdd { get; set; } = false;
 
-        public SimpleCommand<object> RemoveSelectedCmd { get; }
+        public DelegateCommand<object> RemoveSelectedCmd { get; }
 
         // Only add to selection then clicking or pressing enter (like combobox with IsEditable = false)
         // Sad that the combobox doesn't allow to set this behavior
         private bool _ignoreNextSelection = false;
-        private Popup _popup;
+        private Popup? _popup;
         #endregion
 
         public ComboBoxTags()
         {
-            RemoveSelectedCmd = new SimpleCommand<object>((parameter) => this.InternalSelectedItems.Remove(parameter));
+            RemoveSelectedCmd = new DelegateCommand<object>((parameter) => InternalSelectedItems.Remove(parameter));
             InternalSelectedItems.CollectionChanged += InternalSelectedItems_CollectionChanged;
 
             SizeChanged += (s, e) =>
