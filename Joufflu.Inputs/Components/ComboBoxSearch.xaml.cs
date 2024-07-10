@@ -14,11 +14,8 @@ namespace Joufflu.Inputs.Components
     /// </summary>
     public class ComboBoxSearch : ComboBox
     {
-        // Selection changed
-        public event SelectionChangedEventHandler? ChangesCommited;
-
-        private TextBox _editableTextBox;
-        private ICollectionView _collectionView;
+        private TextBox? _editableTextBox;
+        private ICollectionView? _collectionView;
 
         public bool HideFilteredItems { get; set; } = true;
 
@@ -81,8 +78,10 @@ namespace Joufflu.Inputs.Components
             if (IsDropDownOpen == false && !string.IsNullOrEmpty(Text))
             {
                 IsDropDownOpen = true;
+
                 // HACK : prevent the default behavior of the combobox to select all the text when the dropdown is opened
-                _editableTextBox.SelectionStart = _editableTextBox.Text.Length;
+                if (_editableTextBox != null)
+                    _editableTextBox.SelectionStart = _editableTextBox.Text.Length;
             }
             RefreshFilter();
         }
@@ -92,7 +91,7 @@ namespace Joufflu.Inputs.Components
             // Prevent having a value that doesn't match any item (could be misleading)
             if (SelectedItem == null)
                 ClearFilter();
-            else
+            else if (_editableTextBox != null)
                 _editableTextBox.FontStyle = FontStyles.Normal;
 
             base.OnPreviewLostKeyboardFocus(e);
@@ -138,7 +137,7 @@ namespace Joufflu.Inputs.Components
             if (ItemsSource == null)
                 return;
 
-            _collectionView.Refresh();
+            _collectionView?.Refresh();
             SelectFromFilter();
         }
 

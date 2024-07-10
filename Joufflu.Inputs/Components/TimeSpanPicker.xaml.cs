@@ -14,7 +14,7 @@ namespace Joufflu.Inputs.Components
 
         public override TimeSpan? Value
         {
-            get { return (TimeSpan)GetValue(ValueProperty); }
+            get { return (TimeSpan?)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
         }
 

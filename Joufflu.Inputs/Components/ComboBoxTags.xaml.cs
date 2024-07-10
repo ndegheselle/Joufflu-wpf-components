@@ -1,9 +1,11 @@
 ﻿using Joufflu.Shared;
+using PropertyChanged;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -27,7 +29,7 @@ namespace Joufflu.Inputs.Components
 
             string lDisplayMemberPath = (string)values[1];
             if (!string.IsNullOrEmpty(lDisplayMemberPath))
-                return values[0].GetType().GetProperty(lDisplayMemberPath)?.GetValue(values[0]).ToString();
+                return values[0].GetType().GetProperty(lDisplayMemberPath)?.GetValue(values[0])?.ToString();
             else
                 return values[0].ToString();
         }
@@ -39,6 +41,12 @@ namespace Joufflu.Inputs.Components
     public class ComboBoxTags : ComboBoxSearch, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         #region Dependency Properties
         public static readonly DependencyProperty SelectedItemsProperty =
             DependencyProperty.Register(
@@ -129,6 +137,7 @@ namespace Joufflu.Inputs.Components
             }
         }
 
+        [SuppressPropertyChangedWarnings]
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
             base.OnSelectionChanged(e);
@@ -145,6 +154,9 @@ namespace Joufflu.Inputs.Components
         {
             if (e.Key == Key.Up || e.Key == Key.Down)
                 _ignoreNextSelection = true;
+
+            if (e.Key == Key.Back && string.IsNullOrEmpty(Text) && InternalSelectedItems.Count > 0)
+                InternalSelectedItems.RemoveAt(InternalSelectedItems.Count - 1);
 
             base.OnPreviewKeyDown(e);
         }

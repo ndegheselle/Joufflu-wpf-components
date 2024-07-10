@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using PropertyChanged;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
@@ -13,7 +14,7 @@ namespace Joufflu.Inputs.Components.Format
     public class FormatTextBox : TextBox, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName]string name = null)
+        protected void OnPropertyChanged([CallerMemberName]string? name = null)
         { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)); }
 
         public event EventHandler<List<object?>>? ValuesChanged;
@@ -189,6 +190,7 @@ namespace Joufflu.Inputs.Components.Format
             e.Handled = true;
         }
 
+        [SuppressPropertyChangedWarnings]
         protected override void OnSelectionChanged(RoutedEventArgs e)
         {
             if (_isSelectionChanging)
@@ -464,6 +466,7 @@ namespace Joufflu.Inputs.Components.Format
             return (T?)Values.FirstOrDefault();
         }
 
+        [SuppressPropertyChangedWarnings]
         protected virtual void OnValueChanged(DependencyPropertyChangedEventArgs e)
         {
             if (EqualityComparer<T>.Default.Equals(Value, _previousValue))
