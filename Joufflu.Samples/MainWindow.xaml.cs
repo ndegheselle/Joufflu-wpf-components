@@ -57,6 +57,17 @@ namespace Joufflu.Samples
                     new TestClass("Eight", 8),
                     new TestClass("Nine", 9),
                     new TestClass("Ten", 10),
+                    new TestClass("Eleven", 11),
+                    new TestClass("Twelve", 12),
+                    new TestClass("Thirteen", 13),
+                    new TestClass("Fourteen", 14),
+                    new TestClass("Fifteen", 15),
+                    new TestClass("Sixteen", 16),
+                    new TestClass("Seventeen", 17),
+                    new TestClass("Eighteen", 18),
+                    new TestClass("Nineteen", 19),
+                    new TestClass("Twenty", 20),
+                    new TestClass("Twenty-One", 21),
                 };
         }
 
@@ -84,7 +95,11 @@ namespace Joufflu.Samples
                 };
                 SideMenu.Items.Add(item);
             }
+
+            PagingDataGrid.ItemsSource = TestValues.Take(5);
         }
+
+        #region Inputs
 
         private void PhoneNumberInput_ValueChanged(object sender, List<object?> values)
         { Debug.WriteLine($"PhoneNumberInput.ValueChanged: {string.Join(',', values)}"); }
@@ -103,5 +118,16 @@ namespace Joufflu.Samples
         {
             Debug.WriteLine($"TimePicker.ValueChanged: {e}");
         }
+
+        #endregion
+
+        #region Data
+
+        private void Paging_PagingChange(int pageNumber, int capacity)
+        {
+            PagingDataGrid.ItemsSource = TestValues.Skip((pageNumber - 1) * capacity).Take(capacity);
+        }
+
+        #endregion
     }
 }
