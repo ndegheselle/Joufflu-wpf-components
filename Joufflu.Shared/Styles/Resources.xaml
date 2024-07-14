@@ -1,0 +1,19 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/NamedStyles/IconButton.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <FontFamily x:Key="FontAwesomeSolid">/Joufflu.Shared;Component/Resources/Fonts/FontAwesomeSolid.otf#Font Awesome 6 Free Solid</FontFamily>
+
+    <Style
+        x:Key="{x:Type fonts:Icon}"
+        TargetType="{x:Type fonts:Icon}"
+        BasedOn="{StaticResource {x:Type TextBlock}}">
+        <Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+</ResourceDictionary>

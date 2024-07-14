@@ -10,6 +10,6 @@
         TargetType="Button">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="4,0" />
+        <Setter Property="Padding" Value="8" />
     </Style>
 </ResourceDictionary>
