@@ -45,7 +45,7 @@
         <StackPanel
             Orientation="Horizontal"
             Grid.Column="1"
-            HorizontalAlignment="{Binding NavigationHorizontalAlignment}">
+            HorizontalAlignment="Right">
             <Button Click="FirstPage_Click">
                 <TextBlock
                     Text="{x:Static font:IconFont.BackwardStep}"

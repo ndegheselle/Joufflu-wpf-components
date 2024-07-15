@@ -30,8 +30,6 @@ namespace Joufflu.Data.Components
 
         public event HandlePagingChange? PagingChange;
 
-        public HorizontalAlignment NavigationHorizontalAlignment { get; set; } = HorizontalAlignment.Center;
-
         #region Dependency properties
         public int Total { get { return (int)GetValue(TotalProperty); } set { SetValue(TotalProperty, value); } }
 
