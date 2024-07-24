@@ -25,7 +25,7 @@
                 Margin="4,0,0,0"
                 SelectedIndex="0"
                 ItemsSource="{Binding AvailableCapacities}"
-                SelectedValue="{Binding Capacity}" />
+                SelectedItem="{Binding Capacity}" />
 
             <StackPanel
                 Margin="4,0"
