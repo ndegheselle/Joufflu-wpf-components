@@ -26,20 +26,25 @@
                 SelectedIndex="0"
                 ItemsSource="{Binding AvailableCapacities}"
                 SelectedItem="{Binding Capacity}" />
-
-            <StackPanel
-                Margin="4,0"
-                Orientation="Horizontal"
-                HorizontalAlignment="Right">
-                <TextBlock VerticalAlignment="Center" Text="{Binding IntervalMin}" />
-                <TextBlock VerticalAlignment="Center" Margin="2,0">-</TextBlock>
-                <TextBlock VerticalAlignment="Center" Text="{Binding IntervalMax}" />
-                <TextBlock VerticalAlignment="Center" Margin="4,0">of</TextBlock>
-                <TextBlock
-                    VerticalAlignment="Center"
-                    Text="{Binding Total}"
-                    FontWeight="Bold" />
-            </StackPanel>
+            <TextBlock VerticalAlignment="Center">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Total}" Value="-1">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="Per page {1} {2}-{3} of {4}">
+                        <Binding Path="Capacity" />
+                        <Binding Path="IntervalMin" />
+                        <Binding Path="IntervalMax" />
+                        <Binding Path="Total" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
         </StackPanel>
 
         <StackPanel
@@ -67,11 +72,20 @@
                 Margin="4,0,0,0"
                 TextChanged="TextBox_PreviewTextInput"
                 KeyDown="TextBox_OnKeyDown" />
-            <TextBlock Margin="4,0,0,0" VerticalAlignment="Center">/</TextBlock>
             <TextBlock
                 Margin="4,0"
                 VerticalAlignment="Center"
-                Text="{Binding PageMax}" />
+                Text="{Binding PageMax, StringFormat='/ {0}'}">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Total}" Value="-1">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
 
             <Button Click="NextPage_Click" Margin="6,0,0,0">
                 <TextBlock

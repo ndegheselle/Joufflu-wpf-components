@@ -122,6 +122,7 @@ namespace Joufflu.Data.Components
         #endregion
 
         public Paging() { InitializeComponent(); }
+
         #region Methodes
         public void Previous() { PageNumber -= 1; }
 
