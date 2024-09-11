@@ -47,6 +47,7 @@ namespace Joufflu.Data.Components
             OnPropertyChanged(nameof(IntervalMax));
         }
 
+        // XXX : currently start a 1, start a 0 ?
         public int PageNumber
         {
             get { return (int)GetValue(PageNumberProperty); }
@@ -104,7 +105,15 @@ namespace Joufflu.Data.Components
         #region Properties
         public List<int> AvailableCapacities { get; set; } = new List<int>() { 5, 10, 25, 50, 100, 200 };
 
-        public int PageMax { get { return (int)Math.Ceiling(Total / (double)Capacity); } }
+        public int PageMax { 
+            get {
+                // Total is not set so we allow navigation to "unlimited" pages
+                if (Total <= 0)
+                    return int.MaxValue;
+                int max = (int)Math.Ceiling(Total / (double)Capacity);
+                return Math.Max(1, max);
+            } 
+        }
 
         public int IntervalMin { get { return Capacity * (PageNumber - 1) + 1; } }
 
@@ -112,7 +121,6 @@ namespace Joufflu.Data.Components
         {
             get
             {
-                int max = Capacity * (PageNumber - 1) + Capacity;
                 if (IntervalMin + Capacity > Total)
                     return Total;
                 else
