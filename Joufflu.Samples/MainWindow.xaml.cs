@@ -1,4 +1,5 @@
 ﻿using AdonisUI.Controls;
+using Joufflu.Popups;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -7,6 +8,24 @@ using System.Windows.Controls;
 
 namespace Joufflu.Samples
 {
+    public class TestModal : Modal
+    {
+        public TestModal() : base(new ModalOptions() { Title = "Modal" })
+        {
+            MinWidth = 200;
+            MinHeight = 100;
+        }
+    }
+
+    public class TestModalValidation : ModalValidation
+    {
+        public TestModalValidation() : base(new ModalValidationOptions() { Title = "Modal" })
+        {
+            MinWidth = 200;
+            MinHeight = 100;
+        }
+    }
+
     public enum EnumTest
     {
         None,
@@ -128,6 +147,24 @@ namespace Joufflu.Samples
             PagingDataGrid.ItemsSource = TestValues.Skip((pageNumber - 1) * capacity).Take(capacity);
         }
 
+        #endregion
+
+        #region Popups
+
+        private void ShowAlert_Click(object sender, RoutedEventArgs e)
+        {
+            Alert.Success("Success alert.");
+        }
+
+        private async void ShowModal_Click(object sender, RoutedEventArgs e)
+        {
+            await ModalContainer.Show(new TestModal());
+        }
+
+        private async void ShowModalValidation_Click(object sender, RoutedEventArgs e)
+        {
+            await ModalContainer.Show(new ModalValidation(new ModalValidationOptions()));
+        }
         #endregion
     }
 }

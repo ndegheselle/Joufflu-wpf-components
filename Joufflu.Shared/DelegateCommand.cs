@@ -3,73 +3,66 @@ using System.Windows.Input;
 
 namespace Joufflu.Shared
 {
-    public class DelegateCommand<T> : ICommand
+    public interface ICustomCommand : ICommand
     {
-        public event EventHandler? CanExecuteChanged;
-
-        private readonly Action<T> _Execute;
-        private readonly Predicate<T>? _CanExecute;
-
-        public DelegateCommand(Action<T> execute)
-            : this(execute, null)
-        {
-        }
-
-        public DelegateCommand(Action<T> execute, Predicate<T>? canExecute)
-        {
-            _Execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _CanExecute = canExecute;
-        }
-
-        public bool CanExecute(object? parameter)
-        {
-            return _CanExecute?.Invoke((T)parameter) ?? true;
-        }
-
-        public void Execute(object? parameter)
-        {
-            _Execute?.Invoke((T)parameter);
-        }
-
-        public void RaiseCanExecuteChanged()
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
-
+        void RaiseCanExecuteChanged();
     }
 
-    public class SimpleCommand : ICommand
+    public class DelegateCommand : ICustomCommand
     {
+        private readonly Action _action;
+        private readonly Func<bool>? _condition;
+
         public event EventHandler? CanExecuteChanged;
 
-        private readonly Action _Execute;
-        private readonly Func<bool>? _CanExecute;
-
-        public SimpleCommand(Action execute)
-            : this(execute, null)
+        public DelegateCommand(Action action, Func<bool>? executeCondition = default)
         {
+            _action = action ?? throw new ArgumentNullException(nameof(action));
+            _condition = executeCondition;
         }
 
-        public SimpleCommand(Action execute, Func<bool>? canExecute)
+        public bool CanExecute(object? parameter) => _condition?.Invoke() ?? true;
+
+        public void Execute(object? parameter) => _action();
+
+        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, new EventArgs());
+    }
+
+    public class DelegateCommand<T> : ICustomCommand
+    {
+        private readonly Action<T> _action;
+        private readonly Func<T, bool>? _condition;
+
+        public event EventHandler? CanExecuteChanged;
+
+        public DelegateCommand(Action<T> action, Func<T, bool>? executeCondition = default)
         {
-            _Execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _CanExecute = canExecute;
+            _action = action ?? throw new ArgumentNullException(nameof(action));
+            _condition = executeCondition;
         }
 
         public bool CanExecute(object? parameter)
         {
-            return _CanExecute?.Invoke() ?? true;
+            if (parameter is T value)
+            {
+                return _condition?.Invoke(value) ?? true;
+            }
+
+            return _condition?.Invoke(default!) ?? true;
         }
 
         public void Execute(object? parameter)
         {
-            _Execute();
+            if (parameter is T value)
+            {
+                _action(value);
+            }
+            else
+            {
+                _action(default!);
+            }
         }
 
-        public void RaiseCanExecuteChanged()
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
-
+        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, new EventArgs());
     }
 }

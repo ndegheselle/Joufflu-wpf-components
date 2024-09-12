@@ -1,0 +1,137 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Joufflu.Popups"
+    xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
+    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI">
+    <Style TargetType="{x:Type local:Modal}">
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <Grid DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:Modal}}}">
+                        <Border Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}" Opacity="0.8">
+                            <Border.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding CloseCommand}" />
+                            </Border.InputBindings>
+                        </Border>
+                        <Border
+                            CornerRadius="{DynamicResource {x:Static adonisUi:Dimensions.CornerRadius}}"
+                            BorderThickness="{DynamicResource {x:Static adonisUi:Dimensions.BorderThickness}}"
+                            Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}"
+                            BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+
+                                <Grid Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock
+                                        Margin="6,0"
+                                        VerticalAlignment="Center"
+                                        FontWeight="Bold"
+                                        Text="{Binding Options.Title}" />
+                                    <Button
+                                        Grid.Column="1"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalAlignment="Right"
+                                        ContentTemplate="{DynamicResource {x:Static adonisUi:Icons.WindowClose}}"
+                                        Width="23"
+                                        Height="23"
+                                        Command="{Binding CloseCommand}" />
+                                </Grid>
+                                <ContentPresenter Grid.Row="1" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="{x:Type local:ModalValidation}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:ModalValidation}">
+                    <Grid>
+                        <Border Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}" Opacity="0.8">
+                            <Border.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding CloseCommand}" />
+                            </Border.InputBindings>
+                        </Border>
+                        <Border
+                            CornerRadius="{StaticResource {x:Static adonisUi:Dimensions.CornerRadius}}"
+                            BorderThickness="{StaticResource {x:Static adonisUi:Dimensions.BorderThickness}}"
+                            Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}"
+                            BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+
+                                <Grid Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock
+                                        Margin="6,0"
+                                        VerticalAlignment="Center"
+                                        FontWeight="Bold"
+                                        Text="{Binding Options.Title}" />
+                                    <Button
+                                        Grid.Column="1"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalAlignment="Right"
+                                        ContentTemplate="{DynamicResource {x:Static adonisUi:Icons.WindowClose}}"
+                                        Width="23"
+                                        Height="23"
+                                        Command="{Binding CloseCommand}" />
+                                </Grid>
+                                <ContentPresenter Grid.Row="1" />
+
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    Grid.Row="2"
+                                    Margin="2"
+                                    HorizontalAlignment="Right">
+                                    <Button
+                                        Grid.Column="0"
+                                        Margin="2,0"
+                                        Command="{Binding CloseCommand}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <fonts:Icon Text="{x:Static fonts:IconFont.Xmark}" />
+                                            <TextBlock Margin="4,0,0,0">Cancel</TextBlock>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button
+                                        Grid.Column="1"
+                                        Command="{Binding ValidationCommand}"
+                                        IsEnabled="{Binding Options.IsValid}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <fonts:Icon Text="{x:Static fonts:IconFont.Check}" />
+                                            <TextBlock Margin="4,0,0,0" Text="{Binding Options.ValidButtonText}" />
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
