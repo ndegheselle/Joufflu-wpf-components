@@ -1,5 +1,6 @@
 ﻿using AdonisUI.Controls;
 using Joufflu.Popups;
+using Joufflu.Shared.Navigation;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -8,21 +9,44 @@ using System.Windows.Controls;
 
 namespace Joufflu.Samples
 {
-    public class TestModal : Modal
+    public class TestTextBlock : TextBlock, IPage
     {
-        public TestModal() : base(new ModalOptions() { Title = "Modal" })
+        public TestTextBlock() { Text = "agfaf"; }
+    }
+    public class TestModal : TextBlock, IModalContent
+    {
+        public Modal ParentLayout { get; set; }
+        public ModalOptions Options => new ModalOptions()
         {
+            Title = "Test",
+        };
+
+        public TestModal()
+        {
+            Text = "Beep";
             MinWidth = 200;
             MinHeight = 100;
         }
     }
 
-    public class TestModalValidation : ModalValidation
+    public class TestModalValidation : TextBlock, IModalValidationContent
     {
-        public TestModalValidation() : base(new ModalValidationOptions() { Title = "Modal" })
+        public ModalValidation ParentLayout { get; set; }
+        public ModalValidationOptions Options => new ModalValidationOptions()
         {
+            Title = "What",
+        };
+
+        public TestModalValidation()
+        {
+            Text = "Pouet";
             MinWidth = 200;
             MinHeight = 100;
+        }
+
+        public Task<bool> OnValidation()
+        {
+            return Task.FromResult(true);
         }
     }
 
@@ -61,6 +85,8 @@ namespace Joufflu.Samples
     /// </summary>
     public partial class MainWindow : AdonisWindow, INotifyPropertyChanged
     {
+        public LayoutNavigation Modal { get; private set; }
+
         public List<TestClass> TestValues
         {
             // Create a new instance because of CollectionViewSource.GetDefaultView
@@ -116,6 +142,7 @@ namespace Joufflu.Samples
             }
 
             PagingDataGrid.ItemsSource = TestValues.Take(5);
+            Modal = new LayoutNavigation();
         }
 
         #region Inputs
@@ -158,12 +185,12 @@ namespace Joufflu.Samples
 
         private async void ShowModal_Click(object sender, RoutedEventArgs e)
         {
-            await ModalContainer.Show(new TestModal());
+            await Modal.Show(new TestModal());
         }
 
         private async void ShowModalValidation_Click(object sender, RoutedEventArgs e)
         {
-            await ModalContainer.Show(new ModalValidation(new ModalValidationOptions()));
+            bool result = await Modal.Show(new TestModalValidation());
         }
         #endregion
     }

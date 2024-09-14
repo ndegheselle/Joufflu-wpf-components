@@ -5,9 +5,9 @@
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI">
     <Style TargetType="{x:Type local:Modal}">
-        <Setter Property="ContentTemplate">
+        <Setter Property="Template">
             <Setter.Value>
-                <DataTemplate>
+                <ControlTemplate TargetType="{x:Type local:Modal}">
                     <Grid DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:Modal}}}">
                         <Border Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}" Opacity="0.8">
                             <Border.InputBindings>
@@ -37,7 +37,7 @@
                                         Margin="6,0"
                                         VerticalAlignment="Center"
                                         FontWeight="Bold"
-                                        Text="{Binding Options.Title}" />
+                                        Text="{Binding ModalContent.Options.Title}" />
                                     <Button
                                         Grid.Column="1"
                                         Background="Transparent"
@@ -52,7 +52,7 @@
                             </Grid>
                         </Border>
                     </Grid>
-                </DataTemplate>
+                </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
@@ -60,15 +60,15 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ModalValidation}">
-                    <Grid>
+                    <Grid DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ModalValidation}}}">
                         <Border Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}" Opacity="0.8">
                             <Border.InputBindings>
                                 <MouseBinding MouseAction="LeftClick" Command="{Binding CloseCommand}" />
                             </Border.InputBindings>
                         </Border>
                         <Border
-                            CornerRadius="{StaticResource {x:Static adonisUi:Dimensions.CornerRadius}}"
-                            BorderThickness="{StaticResource {x:Static adonisUi:Dimensions.BorderThickness}}"
+                            CornerRadius="{DynamicResource {x:Static adonisUi:Dimensions.CornerRadius}}"
+                            BorderThickness="{DynamicResource {x:Static adonisUi:Dimensions.BorderThickness}}"
                             Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}"
                             BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
                             VerticalAlignment="Center"
@@ -90,7 +90,7 @@
                                         Margin="6,0"
                                         VerticalAlignment="Center"
                                         FontWeight="Bold"
-                                        Text="{Binding Options.Title}" />
+                                        Text="{Binding ModalContent.Options.Title}" />
                                     <Button
                                         Grid.Column="1"
                                         Background="Transparent"
@@ -102,7 +102,6 @@
                                         Command="{Binding CloseCommand}" />
                                 </Grid>
                                 <ContentPresenter Grid.Row="1" />
-
                                 <StackPanel
                                     Orientation="Horizontal"
                                     Grid.Row="2"
@@ -120,10 +119,10 @@
                                     <Button
                                         Grid.Column="1"
                                         Command="{Binding ValidationCommand}"
-                                        IsEnabled="{Binding Options.IsValid}">
+                                        IsEnabled="{Binding ModalContent.Options.IsValid, FallbackValue=true}">
                                         <StackPanel Orientation="Horizontal">
                                             <fonts:Icon Text="{x:Static fonts:IconFont.Check}" />
-                                            <TextBlock Margin="4,0,0,0" Text="{Binding Options.ValidButtonText}" />
+                                            <TextBlock Margin="4,0,0,0" Text="{Binding ModalContent.Options.ValidButtonText}" />
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
