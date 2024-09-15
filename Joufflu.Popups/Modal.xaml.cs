@@ -1,14 +1,14 @@
 ﻿using Joufflu.Shared;
 using Joufflu.Shared.Navigation;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Xml;
 
 namespace Joufflu.Popups
 {
-    public interface IModalContent : IPage<Modal>
+    public interface IModalContent : ILayoutPage<Modal>
     {
-        public ModalOptions Options { get; }
+        public ModalOptions? Options { get; }
     }
 
     public class ModalOptions : INotifyPropertyChanged
@@ -20,12 +20,15 @@ namespace Joufflu.Popups
         public string Title { get; set; } = "";
     }
 
-    public class Modal : UserControl, ILayout
+    public class Modal : UserControl, ILayout<IModalContent>
     {
         private TaskCompletionSource<bool>? _taskCompletionSource = null;
-        public IModalContent? ModalContent { get; set; }
+
         public ICustomCommand CloseCommand { get; set; }
+
         public INavigation? Navigation { get; set; }
+
+        public IModalContent? PageContent { get; set; }
 
         public Modal()
         {
@@ -35,8 +38,8 @@ namespace Joufflu.Popups
 
         public virtual Task<bool> Show(IPage page)
         {
+            PageContent = page as IModalContent;
             Content = page;
-            ModalContent = page as IModalContent;
             _taskCompletionSource = new TaskCompletionSource<bool>();
             return _taskCompletionSource.Task;
         }
@@ -46,61 +49,71 @@ namespace Joufflu.Popups
             if (_taskCompletionSource == null)
                 return;
             _taskCompletionSource.SetResult(result);
-            OnClose();
-        }
-
-        public void Close()
-        {
-            Close(false);
-        }
-
-        protected virtual void OnClose()
-        {
             _taskCompletionSource = null;
             Content = null;
-            ModalContent = null;
+            PageContent = null;
             // FIXME : will recall Close()
             Navigation?.Close();
         }
+
+        public void Close() { Close(false); }
     }
 
-    public interface IModalValidationContent : IPage<ModalValidation>
+    public interface IModalValidationContent : ILayoutPage<ModalValidation> 
     {
-        public ModalValidationOptions Options { get; }
+        public ModalValidationOptions? Options { get; }
         public Task<bool> OnValidation();
     }
 
     public class ModalValidationOptions : ModalOptions
     {
         public string ValidButtonText { get; set; } = "Ok";
+
         public bool IsValid { get; set; } = true;
     }
 
-    public class ModalValidation : Modal
+    public class ModalValidation : UserControl, INestedLayout<Modal, IModalValidationContent>, IModalContent
     {
-        public new IModalValidationContent? ModalContent { get; set; }
+        public ICustomCommand CloseCommand { get; set; }
         public ICustomCommand ValidationCommand { get; set; }
+        public INavigation? Navigation { 
+            get => Layout?.Navigation; 
+            set {
+                if (Layout != null)
+                    Layout.Navigation = value;
+            }
+        }
 
-        public ModalValidation()
-        { ValidationCommand = new DelegateCommand(Validate); }
+        public Modal? Layout { get; set; }
+        public IModalValidationContent? PageContent { get; set; }
+        public ModalOptions? Options => PageContent?.Options;
+
+        public ModalValidation() { 
+            ValidationCommand = new DelegateCommand(Validate);
+            CloseCommand = new DelegateCommand(Close);
+        }
 
         private async void Validate()
         {
-            if (ModalContent != null && await ModalContent.OnValidation() == false)
+            if (PageContent != null && await PageContent.OnValidation() == false)
                 return;
             Close(true);
         }
 
-        public override Task<bool> Show(IPage page)
+        public Task<bool> Show(IPage page)
         {
-            ModalContent = page as IModalValidationContent;
-            return base.Show(page);
+            PageContent = page as IModalValidationContent;
+            Content = page;
+            return Task.FromResult(true);
         }
 
-        protected override void OnClose()
+        public void Close() { Close(false); }
+
+        public void Close(bool result)
         {
-            ModalContent = null;
-            base.OnClose();
+            Layout?.Close(result);
+            Content = null;
+            PageContent = null;
         }
     }
 }

@@ -9,13 +9,9 @@ using System.Windows.Controls;
 
 namespace Joufflu.Samples
 {
-    public class TestTextBlock : TextBlock, IPage
-    {
-        public TestTextBlock() { Text = "agfaf"; }
-    }
     public class TestModal : TextBlock, IModalContent
     {
-        public Modal ParentLayout { get; set; }
+        public Modal? Layout { get; set; }
         public ModalOptions Options => new ModalOptions()
         {
             Title = "Test",
@@ -31,7 +27,7 @@ namespace Joufflu.Samples
 
     public class TestModalValidation : TextBlock, IModalValidationContent
     {
-        public ModalValidation ParentLayout { get; set; }
+        public ModalValidation? Layout { get; set; }
         public ModalValidationOptions Options => new ModalValidationOptions()
         {
             Title = "What",

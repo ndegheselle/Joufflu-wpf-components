@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Security.RightsManagement;
-using System.Windows;
+using System.Windows.Controls;
 
 namespace Joufflu.Shared.Navigation
 {
     public interface INavigation
     {
         public Task<bool> Show(IPage page);
-        public Task<bool> Show<TLayout>(IPage<TLayout> page) where TLayout : ILayout, new();
+        public Task<bool> Show(ILayoutPage page);
         public void Close();
     }
 
@@ -27,7 +26,6 @@ namespace Joufflu.Shared.Navigation
             set
             {
                 if (_pageLayout == value) return;
-                if (_pageLayout != null) _pageLayout.Close();
                 _pageLayout = value;
 
                 if (_pageLayout != null)
@@ -59,18 +57,33 @@ namespace Joufflu.Shared.Navigation
             Page = null;
         }
 
+        private Dictionary<Type, ILayout> _layouts = new Dictionary<Type, ILayout>();
+
         public Task<bool> Show(IPage page)
         {
+            if (PageLayout != null) PageLayout.Close();
             PageLayout = null;
             Page = page;
             return Task.FromResult(true);
         }
 
-        public Task<bool> Show<TLayout>(IPage<TLayout> page) where TLayout : ILayout, new()
+        public Task<bool> Show(ILayoutPage page)
         {
-            PageLayout = PageLayout is TLayout ? PageLayout : new TLayout();
+            if (PageLayout != null) PageLayout.Close();
+            return ShowInternal(page);
+        }
+
+        private async Task<bool> ShowInternal(ILayoutPage page)
+        {
+            ILayout layout = page.UseOrCreate(null);
+            PageLayout = layout;
+            bool result = await PageLayout.Show(page);
+            if (PageLayout is INestedLayout nested)
+            {
+                result &= await ShowInternal(nested);
+            }
             Page = page;
-            return PageLayout.Show(page);
+            return result;
         }
     }
 }
