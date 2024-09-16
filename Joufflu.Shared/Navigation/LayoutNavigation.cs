@@ -1,17 +1,20 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Controls;
 
 namespace Joufflu.Shared.Navigation
 {
     public interface INavigation
     {
-        public Task<bool> Show(IPage page);
-        public Task<bool> Show(ILayoutPage page);
+        public void Show(IPage page);
         public void Close();
     }
 
-    public class LayoutNavigation : INavigation, INotifyPropertyChanged
+    public interface IDialogNavigation : INavigation
+    {
+        public Task<bool> ShowDialog(IPage page);
+    }
+
+    public class LayoutNavigation : INavigation
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
@@ -19,20 +22,19 @@ namespace Joufflu.Shared.Navigation
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        private ILayout? _pageLayout;
-        protected ILayout? PageLayout
+        private ILayout? _rootLayout;
+        protected ILayout? RootLayout
         {
-            get => _pageLayout;
+            get => _rootLayout;
             set
             {
-                if (_pageLayout == value) return;
-                _pageLayout = value;
+                if (_rootLayout == value) return;
+                _rootLayout = value;
 
-                if (_pageLayout != null)
-                    _pageLayout.Navigation = this;
-
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(CurrentPage));
+                if (_rootLayout != null)
+                {
+                    _rootLayout.Navigation = this;
+                }
             }
         }
 
@@ -44,46 +46,72 @@ namespace Joufflu.Shared.Navigation
             {
                 if (_page == value) return;
                 _page = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(CurrentPage));
+                _page?.OnAppearing();
             }
         }
 
-        public IPage? CurrentPage => PageLayout ?? Page;
+        public IPage? CurrentPage => RootLayout ?? Page;
+
+        public void Show(IPage page)
+        {
+            // Close current page
+            Close(Page);
+
+            RootLayout = ShowLayout(page as ILayoutPage);
+            Page = page;
+            OnPropertyChanged(nameof(CurrentPage));
+        }
 
         public void Close()
         {
-            PageLayout = null;
+            Close(Page);
+            RootLayout = null;
             Page = null;
+            OnPropertyChanged(nameof(CurrentPage));
         }
 
-        private Dictionary<Type, ILayout> _layouts = new Dictionary<Type, ILayout>();
-
-        public Task<bool> Show(IPage page)
+        protected void Close(IPage? page)
         {
-            if (PageLayout != null) PageLayout.Close();
-            PageLayout = null;
-            Page = page;
-            return Task.FromResult(true);
-        }
+            if (page == null)
+                return;
 
-        public Task<bool> Show(ILayoutPage page)
-        {
-            if (PageLayout != null) PageLayout.Close();
-            return ShowInternal(page);
-        }
+            page.OnDisappearing();
 
-        private async Task<bool> ShowInternal(ILayoutPage page)
-        {
-            ILayout layout = page.UseOrCreate(null);
-            PageLayout = layout;
-            bool result = await PageLayout.Show(page);
-            if (PageLayout is INestedLayout nested)
+            if (page is ILayoutPage layoutPage)
             {
-                result &= await ShowInternal(nested);
+                Close(layoutPage.ParentLayout);
+                layoutPage.OnDisappearing();
             }
+        }
+
+        protected ILayout? ShowLayout(ILayoutPage? page)
+        {
+            if (page == null)
+                return null;
+
+            ILayout layout = page.UseOrCreate(null);
+            page.ParentLayout = layout;
+            layout?.OnAppearing();
+
+            // Show nested
+            if (layout is INestedLayout nested)
+                return ShowLayout(nested);
+            return layout;
+        }
+    }
+
+    public class DialogLayoutNavigation : LayoutNavigation
+    {
+        public IDialogLayout Dialog { get; set; }
+
+        public Task<bool> ShowDialog(IPage page)
+        {
+            // Close current page
+            Close(Page);
+
+            ILayout? layout = ShowLayout(page as ILayoutPage);
             Page = page;
-            return result;
+            return Dialog.Show(layout ?? Page);
         }
     }
 }

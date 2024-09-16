@@ -1,34 +1,31 @@
-﻿using System.Reflection;
-
-namespace Joufflu.Shared.Navigation
+﻿namespace Joufflu.Shared.Navigation
 {
     public interface IPage
     {
+        void OnAppearing() { }
+        void OnDisappearing() { }
     }
 
     public interface ILayoutPage : IPage
     {
+        public ILayout? ParentLayout { get; set; }
         public Type LayoutType { get; }
-        public ILayout UseOrCreate(ILayout? layout);
+        ILayout UseOrCreate(ILayout? layout);
     }
 
     public interface ILayoutPage<TLayout> : ILayoutPage where TLayout : class, ILayout, new()
     {
-        public TLayout? Layout { get; set; }
-
         Type ILayoutPage.LayoutType => typeof(TLayout);
         ILayout ILayoutPage.UseOrCreate(ILayout? layout)
         {
-            Layout = layout as TLayout ?? new TLayout();
-            return Layout;
+            ParentLayout = layout ?? new TLayout();
+            return ParentLayout;
         }
     }
 
     public interface ILayout : IPage
     {
         public INavigation? Navigation { get; set; }
-        public Task<bool> Show(IPage page);
-        public void Close();
     }
 
     public interface ILayout<TPage> : ILayout where TPage : class, IPage
@@ -44,9 +41,12 @@ namespace Joufflu.Shared.Navigation
     {
     }
 
-    public interface INestedLayout<TLayout, TPage> : INestedLayout, ILayout<TPage>, ILayoutPage<TLayout>
-        where TLayout : class, ILayout, new()
-        where TPage : class, IPage
+    public interface IDialogLayout : ILayout
+    {
+        public new Task<bool> Show(IPage page);
+    }
+
+    public interface IDialogLayout<TPage> : IDialogLayout, ILayout<TPage> where TPage : class, IPage
     {
     }
 }
