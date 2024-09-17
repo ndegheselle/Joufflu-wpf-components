@@ -64,7 +64,7 @@ namespace Joufflu.Popups
         public void Close() { Close(false); }
     }
 
-    public interface IModalValidationContent : IPage
+    public interface IModalValidationContent : ILayoutPage<ModalValidation>
     {
         public ModalValidationOptions? Options { get; }
         public Task<bool> OnValidation();

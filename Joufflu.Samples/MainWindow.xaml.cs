@@ -27,7 +27,7 @@ namespace Joufflu.Samples
 
     public class TestModalValidation : TextBlock, IModalValidationContent
     {
-        public ModalValidation? Layout { get; set; }
+        public ILayout? ParentLayout { get; set; }
         public ModalValidationOptions Options => new ModalValidationOptions()
         {
             Title = "What",

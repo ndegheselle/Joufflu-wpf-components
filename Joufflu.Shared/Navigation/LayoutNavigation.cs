@@ -15,7 +15,7 @@ namespace Joufflu.Shared.Navigation
         public void Close(bool result);
     }
 
-    public class LayoutNavigation : INavigation
+    public class LayoutNavigation : INavigation, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
@@ -115,6 +115,8 @@ namespace Joufflu.Shared.Navigation
             ILayout? layout = ShowLayout(page as ILayoutPage);
             Page = page;
             RootLayout = _dialog;
+            RootLayout.Navigation = this;
+            RootLayout?.OnAppearing();
             OnPropertyChanged(nameof(CurrentPage));
             return _dialog.Show(layout ?? Page);
         }
