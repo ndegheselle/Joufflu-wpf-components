@@ -12,6 +12,7 @@ namespace Joufflu.Shared.Navigation
     public interface IDialogNavigation : INavigation
     {
         public Task<bool> ShowDialog(IPage page);
+        public void Close(bool result);
     }
 
     public class LayoutNavigation : INavigation
@@ -30,11 +31,6 @@ namespace Joufflu.Shared.Navigation
             {
                 if (_rootLayout == value) return;
                 _rootLayout = value;
-
-                if (_rootLayout != null)
-                {
-                    _rootLayout.Navigation = this;
-                }
             }
         }
 
@@ -62,7 +58,7 @@ namespace Joufflu.Shared.Navigation
             OnPropertyChanged(nameof(CurrentPage));
         }
 
-        public void Close()
+        public virtual void Close()
         {
             Close(Page);
             RootLayout = null;
@@ -91,6 +87,8 @@ namespace Joufflu.Shared.Navigation
 
             ILayout layout = page.UseOrCreate(null);
             page.ParentLayout = layout;
+            layout.Show(page);
+            layout.Navigation = this;
             layout?.OnAppearing();
 
             // Show nested
@@ -100,9 +98,14 @@ namespace Joufflu.Shared.Navigation
         }
     }
 
-    public class DialogLayoutNavigation : LayoutNavigation
+    public class DialogLayoutNavigation : LayoutNavigation, IDialogNavigation
     {
-        public IDialogLayout Dialog { get; set; }
+        private readonly IDialogLayout _dialog;
+
+        public DialogLayoutNavigation(IDialogLayout dialog)
+        {
+            _dialog = dialog;
+        }
 
         public Task<bool> ShowDialog(IPage page)
         {
@@ -111,7 +114,23 @@ namespace Joufflu.Shared.Navigation
 
             ILayout? layout = ShowLayout(page as ILayoutPage);
             Page = page;
-            return Dialog.Show(layout ?? Page);
+            RootLayout = _dialog;
+            OnPropertyChanged(nameof(CurrentPage));
+            return _dialog.Show(layout ?? Page);
+        }
+
+        public override void Close()
+        {
+            Close(false);
+            base.Close();
+        }
+
+        public void Close(bool result)
+        {
+            // Set dialog result
+            _dialog.Close(result);
+            // Close the interface
+            base.Close();
         }
     }
 }

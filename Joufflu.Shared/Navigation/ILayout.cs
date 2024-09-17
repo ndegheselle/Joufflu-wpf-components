@@ -26,6 +26,7 @@
     public interface ILayout : IPage
     {
         public INavigation? Navigation { get; set; }
+        public void Show(IPage page);
     }
 
     public interface ILayout<TPage> : ILayout where TPage : class, IPage
@@ -43,7 +44,8 @@
 
     public interface IDialogLayout : ILayout
     {
-        public new Task<bool> Show(IPage page);
+        public Task<bool> Show(IPage page);
+        public void Close(bool result);
     }
 
     public interface IDialogLayout<TPage> : IDialogLayout, ILayout<TPage> where TPage : class, IPage

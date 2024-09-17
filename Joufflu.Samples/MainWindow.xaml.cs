@@ -81,7 +81,7 @@ namespace Joufflu.Samples
     /// </summary>
     public partial class MainWindow : AdonisWindow, INotifyPropertyChanged
     {
-        public LayoutNavigation Modal { get; private set; }
+        public DialogLayoutNavigation Modal { get; private set; }
 
         public List<TestClass> TestValues
         {
@@ -138,7 +138,7 @@ namespace Joufflu.Samples
             }
 
             PagingDataGrid.ItemsSource = TestValues.Take(5);
-            Modal = new LayoutNavigation();
+            Modal = new DialogLayoutNavigation(new Modal());
         }
 
         #region Inputs
@@ -181,12 +181,12 @@ namespace Joufflu.Samples
 
         private async void ShowModal_Click(object sender, RoutedEventArgs e)
         {
-            await Modal.Show(new TestModal());
+            await Modal.ShowDialog(new TestModal());
         }
 
         private async void ShowModalValidation_Click(object sender, RoutedEventArgs e)
         {
-            bool result = await Modal.Show(new TestModalValidation());
+            bool result = await Modal.ShowDialog(new TestModalValidation());
         }
         #endregion
     }
