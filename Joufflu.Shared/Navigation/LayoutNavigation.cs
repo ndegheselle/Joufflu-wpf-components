@@ -15,7 +15,7 @@ namespace Joufflu.Shared.Navigation
         public void Close(bool result);
     }
 
-    public class LayoutNavigation : INavigation, INotifyPropertyChanged
+    public class BaseLayoutNavigation : INavigation
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
@@ -23,116 +23,54 @@ namespace Joufflu.Shared.Navigation
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        private ILayout? _rootLayout;
-        protected ILayout? RootLayout
-        {
-            get => _rootLayout;
-            set
-            {
-                if (_rootLayout == value) return;
-                _rootLayout = value;
-            }
-        }
+        public ILayout CurrentLayout { get; set; }
 
-        private IPage? _page;
-        protected IPage? Page
+        public BaseLayoutNavigation(ILayout rootLayout)
         {
-            get => _page;
-            set
-            {
-                if (_page == value) return;
-                _page = value;
-                _page?.OnAppearing();
-            }
+            CurrentLayout = rootLayout;
         }
-
-        public IPage? CurrentPage => RootLayout ?? Page;
 
         public void Show(IPage page)
         {
-            // Close current page
-            Close(Page);
-
-            RootLayout = ShowLayout(page as ILayoutPage);
-            Page = page;
-            OnPropertyChanged(nameof(CurrentPage));
+            CurrentLayout.Show(page);
+            if (page is ILayout layout)
+                CurrentLayout = layout;
         }
 
-        public virtual void Close()
+        public void Show<TLayout>(IPage<TLayout> page) where TLayout : class, ILayout, new()
         {
-            Close(Page);
-            RootLayout = null;
-            Page = null;
-            OnPropertyChanged(nameof(CurrentPage));
+            CurrentLayout = CurrentLayout is TLayout ? CurrentLayout : new TLayout();
+            Show((IPage)page);
         }
 
-        protected void Close(IPage? page)
+        public void Close()
         {
-            if (page == null)
-                return;
-
-            page.OnDisappearing();
-
-            if (page is ILayoutPage layoutPage)
-            {
-                Close(layoutPage.ParentLayout);
-                layoutPage.OnDisappearing();
-            }
-        }
-
-        protected ILayout? ShowLayout(ILayoutPage? page)
-        {
-            if (page == null)
-                return null;
-
-            ILayout layout = page.UseOrCreate(null);
-            page.ParentLayout = layout;
-            layout.Show(page);
-            layout.Navigation = this;
-            layout?.OnAppearing();
-
-            // Show nested
-            if (layout is INestedLayout nested)
-                return ShowLayout(nested);
-            return layout;
+            CurrentLayout.Hide();
         }
     }
 
-    public class DialogLayoutNavigation : LayoutNavigation, IDialogNavigation
+    public class LayoutNavigation : BaseLayoutNavigation<ILayout> {
     {
-        private readonly IDialogLayout _dialog;
+        public LayoutNavigation(ILayout layout) : base(layout) 
+        { }
+    }
 
-        public DialogLayoutNavigation(IDialogLayout dialog)
-        {
-            _dialog = dialog;
-        }
-
-        public Task<bool> ShowDialog(IPage page)
-        {
-            // Close current page
-            Close(Page);
-
-            ILayout? layout = ShowLayout(page as ILayoutPage);
-            Page = page;
-            RootLayout = _dialog;
-            RootLayout.Navigation = this;
-            RootLayout?.OnAppearing();
-            OnPropertyChanged(nameof(CurrentPage));
-            return _dialog.Show(layout ?? Page);
-        }
-
-        public override void Close()
-        {
-            Close(false);
-            base.Close();
-        }
+    public class DialogLayoutNavigation : BaseLayoutNavigation<IDialogLayout>, IDialogNavigation
+    {
+        public DialogLayoutNavigation(IDialogLayout layout) : base(layout)
+        {}
 
         public void Close(bool result)
         {
-            // Set dialog result
-            _dialog.Close(result);
-            // Close the interface
-            base.Close();
+            CurrentLayout.Hide(result);
+        }
+
+        public async Task<bool> ShowDialog(IPage page)
+        {
+            bool result = await CurrentLayout.ShowDialog(page);
+            if (page is IDialogLayout layout)
+                CurrentLayout = layout;
+            return result;
         }
     }
 }
