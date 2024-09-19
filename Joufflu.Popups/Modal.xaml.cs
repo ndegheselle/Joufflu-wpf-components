@@ -1,8 +1,8 @@
 ﻿using Joufflu.Shared;
-using Joufflu.Shared.Navigation;
+using Joufflu.Shared.Layouts;
 using System.ComponentModel;
-using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows;
 
 namespace Joufflu.Popups
 {
@@ -23,8 +23,8 @@ namespace Joufflu.Popups
     public class Modal : UserControl, IDialogLayout
     {
         private TaskCompletionSource<bool>? _taskCompletionSource = null;
-
         public ICustomCommand CloseCommand { get; set; }
+        public IModalContent? PageContent { get; set; }
 
         public ILayout? ParentLayout { get; set; }
 
@@ -32,11 +32,20 @@ namespace Joufflu.Popups
         {
             DefaultStyleKey = typeof(Modal);
             CloseCommand = new DelegateCommand(() => Hide(false));
+            Visibility = Visibility.Collapsed;
         }
 
-        public Task<bool> ShowDialog(IPage page)
+        public virtual Task<bool> ShowDialog(IPage page)
         {
+            // If already open close first
+            if (_taskCompletionSource != null)
+                Hide(false);
+
+            page.ParentLayout = this;
+            PageContent = page as IModalContent;
             Content = page;
+            Visibility = Visibility.Visible;
+
             _taskCompletionSource = new TaskCompletionSource<bool>();
             return _taskCompletionSource.Task;
         }
@@ -48,16 +57,14 @@ namespace Joufflu.Popups
             _taskCompletionSource.SetResult(result);
             _taskCompletionSource = null;
             Content = null;
+            PageContent = null;
+            Visibility = Visibility.Collapsed;
         }
-
-        public void Show(IPage page) { ShowDialog(page); }
-        public void Hide() { Hide(false); }
     }
 
-    public interface IModalValidationContent : IPage
+    public interface IModalValidationContent : IPage<ModalValidation>
     {
         public ModalValidationOptions? Options { get; }
-
         public Task<bool> OnValidation();
     }
 
@@ -68,10 +75,13 @@ namespace Joufflu.Popups
         public bool IsValid { get; set; } = true;
     }
 
-    public class ModalValidation : Modal, IDialogLayout
+    public class ModalValidation : UserControl, ILayout, IModalContent
     {
         public ICustomCommand ValidationCommand { get; set; }
+        public ICustomCommand CloseCommand { get; set; }
         public IModalValidationContent? PageContent { get; set; }
+        public ModalOptions? Options => PageContent?.Options;
+        public ILayout? ParentLayout { get; set; }
 
         public ModalValidation()
         {
@@ -83,7 +93,20 @@ namespace Joufflu.Popups
         {
             if (PageContent != null && await PageContent.OnValidation() == false)
                 return;
-            Hide(true);
+            ((IDialogLayout)ParentLayout!).Hide(true);
+        }
+
+        public void Hide()
+        {
+            Content = null;
+            PageContent = null;
+            ParentLayout?.Hide();
+        }
+
+        public void Show(IPage page)
+        {
+            PageContent = page as IModalValidationContent;
+            Content = page;
         }
     }
 }

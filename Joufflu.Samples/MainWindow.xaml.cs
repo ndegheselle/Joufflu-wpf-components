@@ -1,6 +1,6 @@
 ﻿using AdonisUI.Controls;
 using Joufflu.Popups;
-using Joufflu.Shared.Navigation;
+using Joufflu.Shared.Layouts;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -11,7 +11,7 @@ namespace Joufflu.Samples
 {
     public class TestModal : TextBlock, IModalContent
     {
-        public Modal? Layout { get; set; }
+        public ILayout? ParentLayout { get; set; }
         public ModalOptions Options => new ModalOptions()
         {
             Title = "Test",
@@ -81,8 +81,6 @@ namespace Joufflu.Samples
     /// </summary>
     public partial class MainWindow : AdonisWindow, INotifyPropertyChanged
     {
-        public DialogLayoutNavigation Modal { get; private set; }
-
         public List<TestClass> TestValues
         {
             // Create a new instance because of CollectionViewSource.GetDefaultView
@@ -138,7 +136,6 @@ namespace Joufflu.Samples
             }
 
             PagingDataGrid.ItemsSource = TestValues.Take(5);
-            Modal = new DialogLayoutNavigation(new Modal());
         }
 
         #region Inputs
@@ -186,7 +183,7 @@ namespace Joufflu.Samples
 
         private async void ShowModalValidation_Click(object sender, RoutedEventArgs e)
         {
-            bool result = await Modal.ShowDialog(new TestModalValidation());
+            bool result = await ((IDialogLayout)Modal).ShowDialog(new TestModalValidation());
         }
         #endregion
     }

@@ -7,7 +7,7 @@
     xmlns:inputs="clr-namespace:Joufflu.Inputs.Components;assembly=Joufflu.Inputs"
     xmlns:popups="clr-namespace:Joufflu.Popups;assembly=Joufflu.Popups"
     xmlns:data="clr-namespace:Joufflu.Data.Components;assembly=Joufflu.Data"
-    xmlns:navigation="clr-namespace:Joufflu.Shared.Navigation;assembly=Joufflu.Shared"
+    xmlns:layouts="clr-namespace:Joufflu.Shared.Layouts;assembly=Joufflu.Shared"
     xmlns:format="clr-namespace:Joufflu.Inputs.Components.Format;assembly=Joufflu.Inputs">
     <adonisControls:AdonisWindow.Resources>
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Popups;component/Resources.xaml" />
@@ -131,7 +131,7 @@
             </TabControl>
         </Grid>
 
-        <ContentControl Content="{Binding Modal.CurrentPage, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+        <popups:Modal x:Name="Modal" />
         <popups:Alert x:Name="Alert" />
     </Grid>
 </adonisControls:AdonisWindow>
