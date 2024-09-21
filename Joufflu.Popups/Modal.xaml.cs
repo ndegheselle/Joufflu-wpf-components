@@ -65,7 +65,9 @@ namespace Joufflu.Popups
     public interface IModalValidationContent : IPage<ModalValidation>
     {
         public ModalValidationOptions? Options { get; }
-        public Task<bool> OnValidation();
+        public Task<bool> OnValidation() {
+            return Task.FromResult(true);
+        }
     }
 
     public class ModalValidationOptions : ModalOptions
