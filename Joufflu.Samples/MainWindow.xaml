@@ -109,6 +109,17 @@
                                 </ListBox.ItemsPanel>
                             </ListBox>
                         </UniformGrid>
+
+                        <UniformGrid Columns="3">
+                            <TextBlock>File picker</TextBlock>
+                            <inputs:FilePicker FilePath="{Binding TestValue.FilePath, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+                            <Button
+                                Margin="4,0,0,0"
+                                Click="ButtonCheckFile_Click"
+                                HorizontalAlignment="Left">
+                                Check
+                            </Button>
+                        </UniformGrid>
                     </StackPanel>
                 </TabItem>
                 <TabItem Visibility="Collapsed" Header="Data">

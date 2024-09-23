@@ -36,15 +36,14 @@ namespace Joufflu.Shared
             }
         }
 
-        public void ClearAllErrors()
-        {
-            _errorsByPropertyName.Clear();
-            OnErrorsChanged();
-        }
-
         public void ClearErrors([CallerMemberName] string? propertyName = null)
         {
-            if (!string.IsNullOrEmpty(propertyName) && _errorsByPropertyName.ContainsKey(propertyName))
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                _errorsByPropertyName.Clear();
+                OnErrorsChanged();
+            }
+            else if (_errorsByPropertyName.ContainsKey(propertyName))
             {
                 _errorsByPropertyName.Remove(propertyName);
                 OnErrorsChanged(propertyName);

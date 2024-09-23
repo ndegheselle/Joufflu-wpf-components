@@ -1,5 +1,6 @@
 ﻿using AdonisUI.Controls;
 using Joufflu.Popups;
+using Joufflu.Shared;
 using Joufflu.Shared.Layouts;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -53,7 +54,7 @@ namespace Joufflu.Samples
         Two,
     }
 
-    public class TestClass
+    public class TestClass : BaseNotifyDataError
     {
         public string Name { get; set; }
 
@@ -62,6 +63,8 @@ namespace Joufflu.Samples
         public bool IsTest { get; set; }
 
         public EnumTest EnumTest { get; set; }
+
+        public string FilePath { get; set; } = "";
 
         public TestClass(string name, int value)
         {
@@ -109,6 +112,7 @@ namespace Joufflu.Samples
                     new TestClass("Twenty-One", 21),
                 };
         }
+        public TestClass TestValue { get; set; } = new TestClass("Minus", -1);
 
         public ObservableCollection<TestClass> SelectedTestValues
         {
@@ -158,6 +162,12 @@ namespace Joufflu.Samples
             Debug.WriteLine($"TimePicker.ValueChanged: {e}");
         }
 
+        private void ButtonCheckFile_Click(object sender, RoutedEventArgs e)
+        {
+            TestValue.ClearErrors();
+            if (string.IsNullOrEmpty(TestValue.FilePath))
+                TestValue.AddError("No file selected", nameof(TestClass.FilePath));
+        }
         #endregion
 
         #region Data

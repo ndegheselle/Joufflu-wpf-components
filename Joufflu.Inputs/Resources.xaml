@@ -6,6 +6,7 @@
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/Components/NumericUpDown.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/Components/ComboBoxSearch.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/Components/ComboBoxTags.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/Components/FilePicker.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <FontFamily x:Key="FontAwesomeSolid">/Joufflu.Shared;Component/Resources/Fonts/FontAwesomeSolid.otf#Font Awesome 6 Free Solid</FontFamily>
