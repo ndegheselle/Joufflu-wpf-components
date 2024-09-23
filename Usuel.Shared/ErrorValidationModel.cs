@@ -1,10 +1,9 @@
 ﻿using System.Collections;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
-namespace Joufflu.Shared
+namespace Usuel.Shared
 {
-    public class BaseNotifyDataError : INotifyDataErrorInfo
+    public class ErrorValidationModel : INotifyDataErrorInfo
     {
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
         public bool HasErrors => _errorsByPropertyName.Any();
@@ -12,8 +11,9 @@ namespace Joufflu.Shared
 
         public IEnumerable GetErrors(string? propertyName)
         {
-            return !string.IsNullOrEmpty(propertyName) && _errorsByPropertyName.ContainsKey(propertyName) ?
-            _errorsByPropertyName[propertyName] : new List<string>();
+            if (propertyName == null)
+                return _errorsByPropertyName.Values;
+            return _errorsByPropertyName.ContainsKey(propertyName) ? _errorsByPropertyName[propertyName] : [];
         }
 
         private void OnErrorsChanged(string? propertyName = null)
@@ -21,29 +21,38 @@ namespace Joufflu.Shared
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
 
-        public void AddError(string error, [CallerMemberName] string? propertyName = null)
+        public void AddError(string propertyName, string error)
         {
-            if (propertyName == null)
-                return;
+            AddErrors(propertyName, new List<string> { error });
+        }
 
+        public void AddErrors(string propertyName, List<string> errors)
+        {
             if (!_errorsByPropertyName.ContainsKey(propertyName))
                 _errorsByPropertyName[propertyName] = new List<string>();
 
-            if (!_errorsByPropertyName[propertyName].Contains(error))
+            _errorsByPropertyName[propertyName].AddRange(errors);
+            OnErrorsChanged(propertyName);
+        }
+
+        public void AddErrors(Dictionary<string, List<string>> errors)
+        {
+            foreach (var error in errors)
             {
-                _errorsByPropertyName[propertyName].Add(error);
-                OnErrorsChanged(propertyName);
+                AddErrors(error.Key, error.Value);
             }
         }
 
-        public void ClearErrors([CallerMemberName] string? propertyName = null)
+        public void ClearErrors(string? propertyName = null)
         {
-            if (string.IsNullOrEmpty(propertyName))
+            if (propertyName == null)
             {
                 _errorsByPropertyName.Clear();
                 OnErrorsChanged();
+                return;
             }
-            else if (_errorsByPropertyName.ContainsKey(propertyName))
+
+            if (_errorsByPropertyName.ContainsKey(propertyName))
             {
                 _errorsByPropertyName.Remove(propertyName);
                 OnErrorsChanged(propertyName);

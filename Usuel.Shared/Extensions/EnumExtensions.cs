@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Joufflu.Shared.Extensions
+﻿namespace Usuel.Shared.Extensions
 {
     public static class EnumExtensions
     {

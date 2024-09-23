@@ -1,4 +1,4 @@
-﻿namespace Joufflu.Shared.Extensions
+﻿namespace Usuel.Shared.Extensions
 {
     public static class StringExtensions
     {

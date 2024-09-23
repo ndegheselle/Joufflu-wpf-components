@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using Usuel.Shared;
 
 namespace Joufflu.Samples
 {
@@ -54,7 +55,7 @@ namespace Joufflu.Samples
         Two,
     }
 
-    public class TestClass : BaseNotifyDataError
+    public class TestClass : ErrorValidationModel
     {
         public string Name { get; set; }
 

@@ -1,7 +1,6 @@
-﻿using System;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
-namespace Joufflu.Shared
+namespace Usuel.Shared
 {
     public interface ICustomCommand : ICommand
     {

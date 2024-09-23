@@ -1,8 +1,8 @@
-﻿using Joufflu.Shared;
-using Joufflu.Shared.Layouts;
+﻿using Joufflu.Shared.Layouts;
 using System.ComponentModel;
-using System.Windows.Controls;
 using System.Windows;
+using System.Windows.Controls;
+using Usuel.Shared;
 
 namespace Joufflu.Popups
 {
