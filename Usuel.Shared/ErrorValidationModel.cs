@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Usuel.Shared
 {
@@ -16,18 +17,21 @@ namespace Usuel.Shared
             return _errorsByPropertyName.ContainsKey(propertyName) ? _errorsByPropertyName[propertyName] : [];
         }
 
-        private void OnErrorsChanged(string? propertyName = null)
+        private void OnErrorsChanged([CallerMemberName]string? propertyName = null)
         {
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
 
-        public void AddError(string propertyName, string error)
+        public void AddError(string error, [CallerMemberName] string? propertyName = null)
         {
-            AddErrors(propertyName, new List<string> { error });
+            AddErrors(new List<string> { error }, propertyName);
         }
 
-        public void AddErrors(string propertyName, List<string> errors)
+        public void AddErrors(List<string> errors, [CallerMemberName] string? propertyName = null)
         {
+            if (propertyName == null)
+                return;
+
             if (!_errorsByPropertyName.ContainsKey(propertyName))
                 _errorsByPropertyName[propertyName] = new List<string>();
 
@@ -39,11 +43,11 @@ namespace Usuel.Shared
         {
             foreach (var error in errors)
             {
-                AddErrors(error.Key, error.Value);
+                AddErrors(error.Value, error.Key);
             }
         }
 
-        public void ClearErrors(string? propertyName = null)
+        public void ClearErrors([CallerMemberName] string? propertyName = null)
         {
             if (propertyName == null)
             {

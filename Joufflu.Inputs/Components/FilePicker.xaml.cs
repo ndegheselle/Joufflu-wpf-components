@@ -19,7 +19,7 @@ namespace Joufflu.Inputs.Components
             nameof(FilePath),
             typeof(string),
             typeof(FilePicker),
-            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+            new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
         public string? FilePath
         {
