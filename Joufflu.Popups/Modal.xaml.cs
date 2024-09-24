@@ -6,6 +6,11 @@ using Usuel.Shared;
 
 namespace Joufflu.Popups
 {
+    public interface IModal : ILayout
+    {
+        public Task<bool> Show(IModalContent page);
+    }
+
     public interface IModalContent : IPage
     {
         public ModalOptions? Options { get; }
@@ -20,54 +25,13 @@ namespace Joufflu.Popups
         public string Title { get; set; } = "";
     }
 
-    public class Modal : UserControl, IDialogLayout
+    public interface IModalContentValidation : IModalContent
     {
-        private TaskCompletionSource<bool>? _taskCompletionSource = null;
-        public ICustomCommand CloseCommand { get; set; }
-        public IModalContent? PageContent { get; set; }
+        public new ModalValidationOptions? Options { get; }
 
-        public ILayout? ParentLayout { get; set; }
+        ModalOptions? IModalContent.Options => Options;
 
-        public Modal()
-        {
-            DefaultStyleKey = typeof(Modal);
-            CloseCommand = new DelegateCommand(() => Hide(false));
-            Visibility = Visibility.Collapsed;
-        }
-
-        public virtual Task<bool> ShowDialog(IPage page)
-        {
-            // If already open close first
-            if (_taskCompletionSource != null)
-                Hide(false);
-
-            page.ParentLayout = this;
-            PageContent = page as IModalContent;
-            Content = page;
-            Visibility = Visibility.Visible;
-
-            _taskCompletionSource = new TaskCompletionSource<bool>();
-            return _taskCompletionSource.Task;
-        }
-
-        public void Hide(bool result)
-        {
-            if (_taskCompletionSource == null)
-                return;
-            _taskCompletionSource.SetResult(result);
-            _taskCompletionSource = null;
-            Content = null;
-            PageContent = null;
-            Visibility = Visibility.Collapsed;
-        }
-    }
-
-    public interface IModalValidationContent : IPage<ModalValidation>
-    {
-        public ModalValidationOptions? Options { get; }
-        public Task<bool> OnValidation() {
-            return Task.FromResult(true);
-        }
+        public Task<bool> OnValidation() { return Task.FromResult(true); }
     }
 
     public class ModalValidationOptions : ModalOptions
@@ -77,38 +41,80 @@ namespace Joufflu.Popups
         public bool IsValid { get; set; } = true;
     }
 
-    public class ModalValidation : UserControl, ILayout, IModalContent
+    public class Modal : UserControl, IModal, INotifyPropertyChanged
     {
-        public ICustomCommand ValidationCommand { get; set; }
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         public ICustomCommand CloseCommand { get; set; }
-        public IModalValidationContent? PageContent { get; set; }
-        public ModalOptions? Options => PageContent?.Options;
-        public ILayout? ParentLayout { get; set; }
+        public ICustomCommand ValidationCommand { get; set; }
 
-        public ModalValidation()
+        // XXX : only use Content with cast instead ?
+        public IPage? CurrentPage { get; set; }
+        public IModalContent? CurrentContent { get; set; }
+        public IModalContentValidation? CurrentContentValidation { get; set; }
+        private readonly Dictionary<IPage, TaskCompletionSource<bool>> _stack = [];
+
+        public Modal()
         {
+            DefaultStyleKey = typeof(Modal);
+            CloseCommand = new DelegateCommand(() => Hide(false));
             ValidationCommand = new DelegateCommand(Validate);
-            CloseCommand = new DelegateCommand(Hide);
+            Visibility = Visibility.Collapsed;
         }
 
-        private async void Validate()
+        public Task<bool> Show(IModalContent page)
         {
-            if (PageContent != null && await PageContent.OnValidation() == false)
-                return;
-            ((IDialogLayout)ParentLayout!).Hide(true);
-        }
-
-        public void Hide()
-        {
-            Content = null;
-            PageContent = null;
-            ParentLayout?.Hide();
+            CurrentContent = page;
+            CurrentContentValidation = page as IModalContentValidation;
+            Show((IPage)page);
+            var taskCompletionSource = new TaskCompletionSource<bool>();
+            _stack.Add(page, taskCompletionSource);
+            return taskCompletionSource.Task;
         }
 
         public void Show(IPage page)
         {
-            PageContent = page as IModalValidationContent;
+            if (page is IPage<Modal> pageModal)
+                pageModal.ParentLayout = this;
+            CurrentPage = page;
             Content = page;
+            Visibility = Visibility.Visible;
+        }
+
+        public void Hide() { Hide(false); }
+
+        public void Hide(bool result)
+        {
+            if (CurrentPage == null)
+                return;
+
+            // Free current page
+            if (_stack.ContainsKey(CurrentPage))
+            {
+                _stack[CurrentPage].SetResult(result);
+                _stack.Remove(CurrentPage);
+            }
+
+            // Show next page or hide if stack is empty
+            if (_stack.Count > 0)
+            {
+                Show(_stack.Last().Key);
+            }
+            else
+            {
+                CurrentPage = null;
+                CurrentContent = null;
+                CurrentContentValidation = null;
+                Content = null;
+                Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private async void Validate()
+        {
+            if (CurrentPage is IModalContentValidation validation && await validation.OnValidation() == false)
+                return;
+            Hide(true);
         }
     }
 }
