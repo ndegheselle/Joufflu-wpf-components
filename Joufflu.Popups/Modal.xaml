@@ -34,11 +34,48 @@
                                         <ColumnDefinition Width="auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBlock
-                                        Margin="6,0"
+                                    <!--  Items names  -->
+                                    <ItemsControl
+                                        ItemsSource="{Binding Items}"
                                         VerticalAlignment="Center"
-                                        FontWeight="Bold"
-                                        Text="{Binding CurrentContent.Options.Title}" />
+                                        Margin="6,0">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <fonts:Icon
+                                                        Margin="6,0"
+                                                        x:Name="separator"
+                                                        Text="{x:Static fonts:IconFont.ChevronRight}">
+                                                        <fonts:Icon.Style>
+                                                            <Style TargetType="{x:Type fonts:Icon}" BasedOn="{StaticResource {x:Type fonts:Icon}}">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Content.Options.Title, TargetNullValue=''}" Value="">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </fonts:Icon.Style>
+                                                    </fonts:Icon>
+                                                    <TextBlock
+                                                        FontWeight="Bold"
+                                                        Text="{Binding Content.Options.Title}"
+                                                        VerticalAlignment="Center" />
+
+                                                </StackPanel>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}" Value="{x:Null}">
+                                                        <Setter TargetName="separator" Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
                                     <Button
                                         Grid.Column="1"
                                         Background="Transparent"
@@ -64,7 +101,7 @@
                                         <StackPanel.Style>
                                             <Style TargetType="StackPanel">
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding CurrentContentValidation}" Value="{x:Null}">
+                                                    <DataTrigger Binding="{Binding Current.ContentValidation}" Value="{x:Null}">
                                                         <Setter Property="Visibility" Value="Collapsed" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
@@ -82,10 +119,10 @@
                                         <Button
                                             Grid.Column="1"
                                             Command="{Binding ValidationCommand}"
-                                            IsEnabled="{Binding CurrentContentValidation.Options.IsValid, FallbackValue=true}">
+                                            IsEnabled="{Binding Current.ContentValidation.Options.IsValid, FallbackValue=true}">
                                             <StackPanel Orientation="Horizontal">
                                                 <fonts:Icon Text="{x:Static fonts:IconFont.Check}" />
-                                                <TextBlock Margin="4,0,0,0" Text="{Binding CurrentContentValidation.Options.ValidButtonText}" />
+                                                <TextBlock Margin="4,0,0,0" Text="{Binding Current.ContentValidation.Options.ValidButtonText}" />
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>

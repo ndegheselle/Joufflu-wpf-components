@@ -3,4 +3,7 @@
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Popups;component/Modal.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Popups;component/Alert.xaml" />
     </ResourceDictionary.MergedDictionaries>
+
+    <FontFamily x:Key="FontAwesomeSolid">/Joufflu.Shared;Component/Resources/Fonts/FontAwesomeSolid.otf#Font Awesome 6 Free Solid</FontFamily>
+
 </ResourceDictionary>

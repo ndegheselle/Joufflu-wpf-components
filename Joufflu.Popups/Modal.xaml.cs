@@ -1,7 +1,9 @@
 ﻿using Joufflu.Shared.Layouts;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using Usuel.Shared;
 
 namespace Joufflu.Popups
@@ -41,6 +43,20 @@ namespace Joufflu.Popups
         public bool IsValid { get; set; } = true;
     }
 
+    public class ModalStackItem
+    {
+        public IPage Page { get; set; }
+        public IModalContent? Content => Page as IModalContent;
+        public IModalContentValidation? ContentValidation => Page as IModalContentValidation;
+
+        public TaskCompletionSource<bool>? TaskCompletion { get; set; }
+
+        public ModalStackItem(IPage page)
+        {
+            Page = page;
+        }
+    }
+
     public class Modal : UserControl, IModal, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -48,11 +64,9 @@ namespace Joufflu.Popups
         public ICustomCommand CloseCommand { get; set; }
         public ICustomCommand ValidationCommand { get; set; }
 
-        // XXX : only use Content with cast instead ?
-        public IPage? CurrentPage { get; set; }
-        public IModalContent? CurrentContent { get; set; }
-        public IModalContentValidation? CurrentContentValidation { get; set; }
-        private readonly Dictionary<IPage, TaskCompletionSource<bool>> _stack = [];
+        // XXX : only use Content with cast instead of CurrentPage ?
+        public ModalStackItem? Current { get; set; }
+        public ObservableCollection<ModalStackItem> Items { get; } = [];
 
         public Modal()
         {
@@ -64,55 +78,50 @@ namespace Joufflu.Popups
 
         public Task<bool> Show(IModalContent page)
         {
-            CurrentContent = page;
-            CurrentContentValidation = page as IModalContentValidation;
             Show((IPage)page);
-            var taskCompletionSource = new TaskCompletionSource<bool>();
-            _stack.Add(page, taskCompletionSource);
-            return taskCompletionSource.Task;
+            Current!.TaskCompletion = new TaskCompletionSource<bool>();
+            return Current.TaskCompletion.Task;
         }
 
         public void Show(IPage page)
         {
+            Current = new ModalStackItem(page);
+            Items.Add(Current);
+            ShowInternal(page);
+        }
+
+        private void ShowInternal(IPage page)
+        {
             if (page is IPage<Modal> pageModal)
                 pageModal.ParentLayout = this;
-            CurrentPage = page;
             Content = page;
             Visibility = Visibility.Visible;
+
         }
 
         public void Hide() { Hide(false); }
 
         public void Hide(bool result)
         {
-            if (CurrentPage == null)
+            if (Current == null)
                 return;
 
-            // Free current page
-            if (_stack.ContainsKey(CurrentPage))
-            {
-                _stack[CurrentPage].SetResult(result);
-                _stack.Remove(CurrentPage);
-            }
+            Current = null;
+            Content = null;
+            Visibility = Visibility.Collapsed;
+            Items.RemoveAt(Items.Count - 1);
 
-            // Show next page or hide if stack is empty
-            if (_stack.Count > 0)
-            {
-                Show(_stack.Last().Key);
-            }
-            else
-            {
-                CurrentPage = null;
-                CurrentContent = null;
-                CurrentContentValidation = null;
-                Content = null;
-                Visibility = Visibility.Collapsed;
-            }
+            if (Items.Count <= 0)
+                return;
+
+            // Show previous page
+            Current = Items.Last();
+            ShowInternal(Current.Page);
         }
 
         private async void Validate()
         {
-            if (CurrentPage is IModalContentValidation validation && await validation.OnValidation() == false)
+            if (Current?.ContentValidation != null && await Current.ContentValidation.OnValidation() == false)
                 return;
             Hide(true);
         }
