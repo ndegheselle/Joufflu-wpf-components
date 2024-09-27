@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using Usuel.Shared;
 
 namespace Joufflu.Popups
@@ -13,7 +12,7 @@ namespace Joufflu.Popups
         public Task<bool> Show(IModalContent page);
     }
 
-    public interface IModalContent : IPage
+    public interface IModalContent : IPage<Modal>
     {
         public ModalOptions? Options { get; }
     }
