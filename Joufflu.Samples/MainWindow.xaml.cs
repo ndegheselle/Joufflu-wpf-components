@@ -13,7 +13,6 @@ namespace Joufflu.Samples
 {
     public class TestModal : TextBlock, IModalContent
     {
-        public ILayout? ParentLayout { get; set; }
         public ModalOptions Options => new ModalOptions()
         {
             Title = "Test",
@@ -27,17 +26,16 @@ namespace Joufflu.Samples
         }
     }
 
-    public class TestModalValidation : TextBlock, IModalValidationContent
+    public class TestModalValidation : TextBlock, IModalContentValidation
     {
-        public ILayout? ParentLayout { get; set; }
         public ModalValidationOptions Options => new ModalValidationOptions()
         {
             Title = "What",
         };
 
-        public TestModalValidation()
+        public TestModalValidation(string text)
         {
-            Text = "Pouet";
+            Text = text;
             MinWidth = 200;
             MinHeight = 100;
         }
@@ -189,13 +187,21 @@ namespace Joufflu.Samples
 
         private async void ShowModal_Click(object sender, RoutedEventArgs e)
         {
-            await Modal.ShowDialog(new TestModal());
+            await Modal.Show(new TestModal());
         }
 
         private async void ShowModalValidation_Click(object sender, RoutedEventArgs e)
         {
-            bool result = await ((IDialogLayout)Modal).ShowDialog(new TestModalValidation());
+            bool result = await Modal.Show(new TestModalValidation("what"));
+        }
+
+        private async void ShowMultiple_Click(object sender, RoutedEventArgs e)
+        {
+
+            Modal.Show(new TestModalValidation("boop"));
+            Modal.Show(new TestModalValidation("beep"));
         }
         #endregion
+
     }
 }

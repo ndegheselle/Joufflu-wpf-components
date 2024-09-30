@@ -8,6 +8,7 @@
     xmlns:popups="clr-namespace:Joufflu.Popups;assembly=Joufflu.Popups"
     xmlns:data="clr-namespace:Joufflu.Data.Components;assembly=Joufflu.Data"
     xmlns:layouts="clr-namespace:Joufflu.Shared.Layouts;assembly=Joufflu.Shared"
+    xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:format="clr-namespace:Joufflu.Inputs.Components.Format;assembly=Joufflu.Inputs">
     <adonisControls:AdonisWindow.Resources>
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Popups;component/Resources.xaml" />
@@ -137,6 +138,7 @@
                         <Button Margin="1" Click="ShowAlert_Click">Show alert</Button>
                         <Button Margin="1" Click="ShowModal_Click">Show modal</Button>
                         <Button Margin="1" Click="ShowModalValidation_Click">Show modal Validation</Button>
+                        <Button Margin="1" Click="ShowMultiple_Click">Show multiple modal</Button>
                     </UniformGrid>
                 </TabItem>
             </TabControl>

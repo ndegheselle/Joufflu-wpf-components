@@ -4,90 +4,131 @@
     xmlns:local="clr-namespace:Joufflu.Popups"
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI">
-    <ControlTemplate x:Key="BaseModalTemplate" TargetType="{x:Type local:Modal}">
-        <Grid DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:Modal}}}">
-            <Border Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}" Opacity="0.8">
-                <Border.InputBindings>
-                    <MouseBinding MouseAction="LeftClick" Command="{Binding CloseCommand}" />
-                </Border.InputBindings>
-            </Border>
-            <Border
-                CornerRadius="{DynamicResource {x:Static adonisUi:Dimensions.CornerRadius}}"
-                BorderThickness="{DynamicResource {x:Static adonisUi:Dimensions.BorderThickness}}"
-                Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}"
-                BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-
-                    <Grid Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock
-                            Margin="6,0"
-                            VerticalAlignment="Center"
-                            FontWeight="Bold"
-                            Text="{Binding PageContent.Options.Title}" />
-                        <Button
-                            Grid.Column="1"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            HorizontalAlignment="Right"
-                            ContentTemplate="{DynamicResource {x:Static adonisUi:Icons.WindowClose}}"
-                            Width="23"
-                            Height="23"
-                            Command="{Binding CloseCommand}" />
-                    </Grid>
-                    <ContentPresenter Grid.Row="1" />
-                </Grid>
-            </Border>
-        </Grid>
-    </ControlTemplate>
-
     <Style TargetType="{x:Type local:Modal}">
-        <Setter Property="Template" Value="{StaticResource BaseModalTemplate}" />
-    </Style>
-    <Style TargetType="{x:Type local:ModalValidation}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:ModalValidation}">
-                    <Grid DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:ModalValidation}}}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition Height="auto" />
-                        </Grid.RowDefinitions>
-                        <ContentPresenter />
-                        <StackPanel
-                            Orientation="Horizontal"
-                            Grid.Row="1"
-                            Margin="2"
-                            HorizontalAlignment="Right">
-                            <Button
-                                Grid.Column="0"
-                                Margin="2,0"
-                                Command="{Binding CloseCommand}">
-                                <StackPanel Orientation="Horizontal">
-                                    <fonts:Icon Text="{x:Static fonts:IconFont.Xmark}" />
-                                    <TextBlock Margin="4,0,0,0">Cancel</TextBlock>
-                                </StackPanel>
-                            </Button>
-                            <Button
-                                Grid.Column="1"
-                                Command="{Binding ValidationCommand}"
-                                IsEnabled="{Binding PageContent.Options.IsValid, FallbackValue=true}">
-                                <StackPanel Orientation="Horizontal">
-                                    <fonts:Icon Text="{x:Static fonts:IconFont.Check}" />
-                                    <TextBlock Margin="4,0,0,0" Text="{Binding PageContent.Options.ValidButtonText}" />
-                                </StackPanel>
-                            </Button>
-                        </StackPanel>
+                <ControlTemplate TargetType="{x:Type local:Modal}">
+                    <Grid DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:Modal}}}">
+                        <Border Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}" Opacity="0.8">
+                            <Border.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding CloseCommand}" />
+                            </Border.InputBindings>
+                        </Border>
+                        <Border
+                            CornerRadius="{DynamicResource {x:Static adonisUi:Dimensions.CornerRadius}}"
+                            BorderThickness="{DynamicResource {x:Static adonisUi:Dimensions.BorderThickness}}"
+                            Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}"
+                            BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+
+                                <Grid Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!--  Items names  -->
+                                    <ItemsControl
+                                        ItemsSource="{Binding Items}"
+                                        VerticalAlignment="Center"
+                                        Margin="6,0">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <fonts:Icon
+                                                        Margin="6,0"
+                                                        x:Name="separator"
+                                                        Text="{x:Static fonts:IconFont.ChevronRight}">
+                                                        <fonts:Icon.Style>
+                                                            <Style TargetType="{x:Type fonts:Icon}" BasedOn="{StaticResource {x:Type fonts:Icon}}">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Content.Options.Title, TargetNullValue=''}" Value="">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </fonts:Icon.Style>
+                                                    </fonts:Icon>
+                                                    <TextBlock
+                                                        FontWeight="Bold"
+                                                        Text="{Binding Content.Options.Title}"
+                                                        VerticalAlignment="Center" />
+
+                                                </StackPanel>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}" Value="{x:Null}">
+                                                        <Setter TargetName="separator" Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <Button
+                                        Grid.Column="1"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        HorizontalAlignment="Right"
+                                        ContentTemplate="{DynamicResource {x:Static adonisUi:Icons.WindowClose}}"
+                                        Width="23"
+                                        Height="23"
+                                        Command="{Binding CloseCommand}" />
+                                </Grid>
+                                <ContentPresenter Grid.Row="1" />
+                                <Grid Grid.Row="2">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition Height="auto" />
+                                    </Grid.RowDefinitions>
+                                    <ContentPresenter />
+                                    <StackPanel
+                                        Orientation="Horizontal"
+                                        Grid.Row="1"
+                                        Margin="2"
+                                        HorizontalAlignment="Right">
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Current.ContentValidation}" Value="{x:Null}">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        <Button
+                                            Grid.Column="0"
+                                            Margin="2,0"
+                                            Command="{Binding CloseCommand}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <fonts:Icon Text="{x:Static fonts:IconFont.Xmark}" />
+                                                <TextBlock Margin="4,0,0,0">Cancel</TextBlock>
+                                            </StackPanel>
+                                        </Button>
+                                        <Button
+                                            Grid.Column="1"
+                                            Command="{Binding ValidationCommand}"
+                                            IsEnabled="{Binding Current.ContentValidation.Options.IsValid, FallbackValue=true}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <fonts:Icon Text="{x:Static fonts:IconFont.Check}" />
+                                                <TextBlock Margin="4,0,0,0" Text="{Binding Current.ContentValidation.Options.ValidButtonText}" />
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </Border>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
