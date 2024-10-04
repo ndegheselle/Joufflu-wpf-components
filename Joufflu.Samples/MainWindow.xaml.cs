@@ -13,6 +13,7 @@ namespace Joufflu.Samples
 {
     public class TestModal : TextBlock, IModalContent
     {
+        public Modal? ParentLayout { get; set; }
         public ModalOptions Options => new ModalOptions()
         {
             Title = "Test",
@@ -28,6 +29,7 @@ namespace Joufflu.Samples
 
     public class TestModalValidation : TextBlock, IModalContentValidation
     {
+        public Modal? ParentLayout { get; set; }
         public ModalValidationOptions Options => new ModalValidationOptions()
         {
             Title = "What",
@@ -167,6 +169,7 @@ namespace Joufflu.Samples
             if (string.IsNullOrEmpty(TestValue.FilePath))
                 TestValue.AddError("No file selected", nameof(TestClass.FilePath));
         }
+
         #endregion
 
         #region Data
@@ -202,6 +205,5 @@ namespace Joufflu.Samples
             Modal.Show(new TestModalValidation("beep"));
         }
         #endregion
-
     }
 }

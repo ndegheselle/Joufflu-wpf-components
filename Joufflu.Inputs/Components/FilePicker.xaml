@@ -39,7 +39,7 @@
                                 Command="{Binding ClearCommand}"
                                 Margin="0,0,1,0"
                                 Padding="6,5">
-                                <Button.Resources>
+                                <Button.Style>
                                     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource IconButton}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding FilePath}" Value="">
@@ -47,7 +47,7 @@
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
-                                </Button.Resources>
+                                </Button.Style>
                                 <fonts:Icon Text="{x:Static fonts:IconFont.CircleXmark}" />
                             </Button>
                         </Grid>

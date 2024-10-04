@@ -121,6 +121,13 @@
                                 Check
                             </Button>
                         </UniformGrid>
+
+                        <UniformGrid Columns="3">
+                            <TextBlock>Text editable</TextBlock>
+                            <inputs:TextEditable Text="{Binding Text, Mode=TwoWay, ElementName=TestTextBox}" />
+                            <TextBox 
+                                Margin="4,0,0,0" x:Name="TestTextBox"/>
+                        </UniformGrid>
                     </StackPanel>
                 </TabItem>
                 <TabItem Visibility="Collapsed" Header="Data">
