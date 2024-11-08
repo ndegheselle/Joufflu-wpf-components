@@ -61,7 +61,7 @@ namespace Joufflu.Shared.Helpers
         /// <returns></returns>
         public static bool IsInSubfolder(string childPath, string rootPath)
         {
-            if (File.Exists(rootPath)) rootPath = Path.GetDirectoryName(rootPath);
+            if (File.Exists(rootPath)) rootPath = Path.GetDirectoryName(rootPath)!;
             return childPath.StartsWith(rootPath);
         }
     }

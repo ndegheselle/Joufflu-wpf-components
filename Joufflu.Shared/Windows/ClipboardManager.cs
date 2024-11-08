@@ -29,11 +29,11 @@ namespace Joufflu.Shared.Windows
     /// </summary>
     public class ClipboardManager
     {
-        public event EventHandler ClipboardChanged;
+        public event EventHandler? ClipboardChanged;
 
         public ClipboardManager(Window windowSource)
         {
-            HwndSource source = PresentationSource.FromVisual(windowSource) as HwndSource;
+            HwndSource? source = PresentationSource.FromVisual(windowSource) as HwndSource;
             if (source == null)
             {
                 Debug.WriteLine($"{nameof(ClipboardManager)} : Window source MUST be initialized first, such as in the Window's OnSourceInitialized handler.");

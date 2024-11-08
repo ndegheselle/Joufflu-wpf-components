@@ -102,7 +102,7 @@ namespace Joufflu.Inputs.Components.Format
                         property.SetValue(this, new Regex(value));
                     else if (type == typeof(bool))
                         property.SetValue(this, true);
-                    else if (type == typeof(char))
+                    else if (type == typeof(char) && value != null)
                         property.SetValue(this, value[0]);
                     else
                         throw new ArgumentException("Invalid option type : " + property.PropertyType);
@@ -184,7 +184,7 @@ namespace Joufflu.Inputs.Components.Format
             if (!IsNullable)
                 Value = default(T);
             if (Length == 0)
-                Length = Max.ToString().Length;
+                Length = Max.ToString()!.Length;
         }
 
         public override bool OnInput(string input)
@@ -255,16 +255,16 @@ namespace Joufflu.Inputs.Components.Format
                 Value = default(T);
         }
 
-        public override string ToString()
+        public override string? ToString()
         {
             if (Value == null)
                 return new string(NullableChar, Length);
 
-            string format = Value.ToString();
+            string? format = Value.ToString();
             if (StringFormat != null)
                 format = string.Format("{0" + StringFormat + "}", Value);
             if (IsPadded)
-                format = format.PadLeft(Length, '0');
+                format = format?.PadLeft(Length, '0');
 
             return format;
         }

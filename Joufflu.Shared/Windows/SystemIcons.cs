@@ -102,7 +102,7 @@ namespace Joufflu.Shared.Windows
         /// <param name="strPath">Chemin du fichier dont ont veut l'icone</param>
         /// <param name="bSmall">Taille de l'iconne</param>
         /// <returns>Une ImageSource contenant l'icone ou null si le fichier n'existe pas</returns>
-        public static ImageSource GetIcon(string strPath, bool bSmall)
+        public static ImageSource? GetIcon(string strPath, bool bSmall)
         {
             Interop.FileAttribute fileAttribute;
 

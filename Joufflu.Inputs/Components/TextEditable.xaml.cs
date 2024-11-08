@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -49,9 +50,14 @@ namespace Joufflu.Inputs.Components
             IsEditing = false;
         }
 
+        private void NotifyPropertyChanged([CallerMemberName] string? propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         private void Edit()
         {
-            if (!IsEditing)
+            if (!IsEditing && EditTextBox != null)
             {
                 EditTextBox.Text = Text;
                 IsEditing = true;

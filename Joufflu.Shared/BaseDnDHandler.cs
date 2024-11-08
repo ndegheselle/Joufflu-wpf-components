@@ -14,8 +14,8 @@ namespace Joufflu.Shared
     /// </summary>
     public abstract class BaseDnDHandler : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
         { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)); }
 
         #region Properties
@@ -98,7 +98,10 @@ namespace Joufflu.Shared
                 return;
             }
 
-            object lDonnees = GetSourceData(e.OriginalSource as FrameworkElement);
+            var destinationElement = e.OriginalSource as FrameworkElement;
+            if (destinationElement == null)
+                return;
+            object? lDonnees = GetSourceData(destinationElement);
 
             if (lDonnees == null)
                 return;
@@ -212,7 +215,7 @@ namespace Joufflu.Shared
         /// <summary>
         /// Get data from the source of the D&D event
         /// </summary>
-        protected virtual object GetSourceData(FrameworkElement source)
+        protected virtual object? GetSourceData(FrameworkElement source)
         { return GetDataContext<object>(source); }
 
         protected virtual void UpdatePopup(object data)
@@ -235,13 +238,13 @@ namespace Joufflu.Shared
         /// <summary>
         /// Get destination DataContext
         /// </summary>
-        protected TData GetDataContext<TData>(FrameworkElement destination) where TData : class
+        protected TData? GetDataContext<TData>(FrameworkElement destination) where TData : class
         { return destination?.DataContext as TData; }
 
         /// <summary>
         /// Get data from the dropped object
         /// </summary>
-        protected TData GetDroppedData<TData>(IDataObject dataObject) where TData : class
+        protected TData? GetDroppedData<TData>(IDataObject dataObject) where TData : class
         {
             if (!dataObject.GetDataPresent(typeof(TData)))
                 return null;
@@ -266,25 +269,38 @@ namespace Joufflu.Shared
         protected override void ApplyDrop(object sender, DragEventArgs e)
         {
             var data = GetDroppedData<TData>(e.Data);
-            var destination = GetDataContext<TData>(e.OriginalSource as FrameworkElement);
+            var destinationElement = e.OriginalSource as FrameworkElement;
+            if (destinationElement == null || data == null)
+                return;
+
+            var destination = GetDataContext<TData>(destinationElement);
 
             int oldIndex = _list.IndexOf(data);
             _list.RemoveAt(oldIndex);
-            int newIndex = _list.IndexOf(destination);
+            int newIndex = -1;
 
             if (destination == null)
+            {
+                newIndex = _list.Count;
                 _list.Add(data);
+            }
             else
+            {
+                newIndex= _list.IndexOf(destination);
                 _list.Insert(newIndex, data);
+            }
 
             OnMove?.Invoke(oldIndex, newIndex);
         }
 
         protected override bool CanDrop(object sender, DragEventArgs args)
         {
-            object sourceData = GetDroppedData<TData>(args.Data);
-            object destinationData = GetDataContext<TData>(args.OriginalSource as FrameworkElement);
+            object? sourceData = GetDroppedData<TData>(args.Data);
+            var destinationElement = args.OriginalSource as FrameworkElement;
+            if (destinationElement == null)
+                return false;
 
+            object? destinationData = GetDataContext<TData>(destinationElement);
             if (sourceData == null || destinationData == null)
                 return false;
 

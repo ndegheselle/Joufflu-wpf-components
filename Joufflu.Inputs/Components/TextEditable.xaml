@@ -25,7 +25,7 @@
                                 </Style>
                             </Grid.Style>
 
-                            <TextBlock VerticalAlignment="Center" Text="{TemplateBinding Text}" ToolTip="Double click to edit" Cursor="Hand">
+                            <TextBlock VerticalAlignment="Center" Text="{Binding Text}" ToolTip="Double click to edit" Cursor="Hand">
                                 <TextBlock.InputBindings>
                                     <MouseBinding Gesture="LeftDoubleClick" Command="{Binding EditCommand}" />
                                 </TextBlock.InputBindings>
@@ -68,9 +68,10 @@
                                 </Style>
                             </Grid.Style>
 
-                            <TextBox x:Name="PART_TextBox" Text="{TemplateBinding Text}">
+                            <TextBox x:Name="PART_TextBox">
                                 <TextBox.InputBindings>
                                     <KeyBinding Key="Enter" Command="{Binding ValidateCommand}" />
+                                    <KeyBinding Key="Esc" Command="{Binding CancelCommand}" />
                                 </TextBox.InputBindings>
                             </TextBox>
                             <Button

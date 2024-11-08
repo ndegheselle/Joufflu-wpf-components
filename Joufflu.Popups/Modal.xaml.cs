@@ -1,6 +1,7 @@
 ﻿using Joufflu.Shared.Layouts;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using Usuel.Shared;
@@ -20,10 +21,14 @@ namespace Joufflu.Popups
     public class ModalOptions : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
-
         public EnumDialogType Type { get; set; } = EnumDialogType.Info;
 
         public string Title { get; set; } = "";
+
+        protected void NotifyPropertyChanged([CallerMemberName] string? propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     public interface IModalContentValidation : IModalContent
@@ -59,6 +64,10 @@ namespace Joufflu.Popups
     public class Modal : UserControl, IModal, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] string? propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public ICustomCommand CloseCommand { get; set; }
         public ICustomCommand ValidationCommand { get; set; }

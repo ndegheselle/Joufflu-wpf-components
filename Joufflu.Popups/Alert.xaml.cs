@@ -1,5 +1,6 @@
 ﻿using Joufflu.Shared;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -30,6 +31,10 @@ namespace Joufflu.Popups
     public class AlertOptions : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] string? propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public EnumDialogType Type { get; set; }
         public string Message { get; set; } = "";
