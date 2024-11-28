@@ -15,7 +15,11 @@ namespace Joufflu.Popups
 
     public interface IModalContent : IPage<Modal>
     {
-        public ModalOptions? Options { get; }
+        public ModalOptions Options { get; }
+    }
+    public interface IModalContentValidation : IModalContent
+    {
+        public Task OnValidation() { return Task.CompletedTask; }
     }
 
     public class ModalOptions : INotifyPropertyChanged
@@ -31,27 +35,10 @@ namespace Joufflu.Popups
         }
     }
 
-    public interface IModalContentValidation : IModalContent
-    {
-        public new ModalValidationOptions? Options { get; }
-
-        ModalOptions? IModalContent.Options => Options;
-
-        public Task<bool> OnValidation() { return Task.FromResult(true); }
-    }
-
-    public class ModalValidationOptions : ModalOptions
-    {
-        public string ValidButtonText { get; set; } = "Ok";
-
-        public bool IsValid { get; set; } = true;
-    }
-
     public class ModalStackItem
     {
         public IPage Page { get; set; }
         public IModalContent? Content => Page as IModalContent;
-        public IModalContentValidation? ContentValidation => Page as IModalContentValidation;
 
         public TaskCompletionSource<bool>? TaskCompletion { get; set; }
 
@@ -70,7 +57,7 @@ namespace Joufflu.Popups
         }
 
         public ICustomCommand CloseCommand { get; set; }
-        public ICustomCommand ValidationCommand { get; set; }
+        public ICustomCommand ValidateCommand { get; set; }
 
         // XXX : only use Content with cast instead of CurrentPage ?
         public ModalStackItem? Current { get; set; }
@@ -80,7 +67,8 @@ namespace Joufflu.Popups
         {
             DefaultStyleKey = typeof(Modal);
             CloseCommand = new DelegateCommand(() => Hide(false));
-            ValidationCommand = new DelegateCommand(Validate);
+            ValidateCommand = new DelegateCommand(() => Hide(true));
+
             Visibility = Visibility.Collapsed;
         }
 
@@ -130,8 +118,8 @@ namespace Joufflu.Popups
 
         private async void Validate()
         {
-            if (Current?.ContentValidation != null && await Current.ContentValidation.OnValidation() == false)
-                return;
+            if (Current?.Content is IModalContentValidation content)
+                await content.OnValidation();
             Hide(true);
         }
     }
