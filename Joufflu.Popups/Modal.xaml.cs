@@ -19,7 +19,7 @@ namespace Joufflu.Popups
     }
     public interface IModalContentValidation : IModalContent
     {
-        public Task OnValidation() { return Task.CompletedTask; }
+        public Task<bool> OnValidation();
     }
 
     public class ModalOptions : INotifyPropertyChanged
@@ -67,7 +67,7 @@ namespace Joufflu.Popups
         {
             DefaultStyleKey = typeof(Modal);
             CloseCommand = new DelegateCommand(() => Hide(false));
-            ValidateCommand = new DelegateCommand(() => Hide(true));
+            ValidateCommand = new DelegateCommand(Validate);
 
             Visibility = Visibility.Collapsed;
         }
@@ -118,8 +118,8 @@ namespace Joufflu.Popups
 
         private async void Validate()
         {
-            if (Current?.Content is IModalContentValidation content)
-                await content.OnValidation();
+            if (Current?.Content is IModalContentValidation content && await content.OnValidation() == false)
+                return;
             Hide(true);
         }
     }
