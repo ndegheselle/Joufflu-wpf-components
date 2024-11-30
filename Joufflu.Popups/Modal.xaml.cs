@@ -17,6 +17,7 @@ namespace Joufflu.Popups
     {
         public ModalOptions Options { get; }
     }
+
     public interface IModalContentValidation : IModalContent
     {
         public Task<bool> OnValidation();
