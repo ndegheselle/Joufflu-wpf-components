@@ -1,7 +1,5 @@
 ﻿using AdonisUI.Controls;
 using Joufflu.Popups;
-using Joufflu.Shared;
-using Joufflu.Shared.Layouts;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -30,7 +28,7 @@ namespace Joufflu.Samples
     public class TestModalValidation : TextBlock, IModalContentValidation
     {
         public Modal? ParentLayout { get; set; }
-        public ModalValidationOptions Options => new ModalValidationOptions()
+        public ModalOptions Options => new ModalOptions()
         {
             Title = "What",
         };
