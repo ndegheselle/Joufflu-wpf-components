@@ -1,10 +1,10 @@
 ﻿<UserControl
-    x:Class="Joufflu.Data.Components.Paging"
+    x:Class="Joufflu.Data.Paging"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:Joufflu.Data.Components"
+    xmlns:local="clr-namespace:Joufflu.Data"
     xmlns:font="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     mc:Ignorable="d">
     <UserControl.Resources>

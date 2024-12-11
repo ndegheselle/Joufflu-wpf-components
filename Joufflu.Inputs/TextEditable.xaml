@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
-    xmlns:local="clr-namespace:Joufflu.Inputs.Components">
+    xmlns:local="clr-namespace:Joufflu.Inputs">
     <Style TargetType="{x:Type local:TextEditable}">
         <Setter Property="Template">
             <Setter.Value>

@@ -13,7 +13,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Usuel.Shared;
 
-namespace Joufflu.Inputs.Components
+namespace Joufflu.Inputs
 {
     /// <summary>
     /// Either get the display member path or the ToString() of the object

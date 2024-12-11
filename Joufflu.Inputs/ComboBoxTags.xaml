@@ -1,12 +1,12 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:Joufflu.Inputs.Components"
+    xmlns:local="clr-namespace:Joufflu.Inputs"
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/NamedStyles/IconButton.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/Components/ComboBoxSearch.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/ComboBoxSearch.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <Style
@@ -68,9 +68,7 @@
                                                             Style="{StaticResource IconButton}"
                                                             Command="{Binding RemoveSelectedCmd, RelativeSource={RelativeSource AncestorType=local:ComboBoxTags}}"
                                                             CommandParameter="{Binding}">
-                                                            <fonts:Icon 
-                                                                FontSize="10"
-                                                                Text="{x:Static fonts:IconFont.Xmark}"/>
+                                                            <fonts:Icon FontSize="10" Text="{x:Static fonts:IconFont.Xmark}" />
                                                         </Button>
 
                                                     </StackPanel>

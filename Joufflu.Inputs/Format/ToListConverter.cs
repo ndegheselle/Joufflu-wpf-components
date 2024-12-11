@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Windows.Data;
 
-namespace Joufflu.Inputs.Components.Format
+namespace Joufflu.Inputs.Format
 {
     // Should be possible to bind directly a MultiBinding to a object[] property ...
     public class ToListConverter : IMultiValueConverter

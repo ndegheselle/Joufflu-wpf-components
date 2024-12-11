@@ -11,7 +11,7 @@
     <None Remove="ComboBoxSearch.xaml" />
     <None Remove="ComboBoxTags.xaml" />
     <None Remove="DecimalUpDown.xaml" />
-    <None Remove="Components\Format\FormatTextBox.xaml" />
+    <None Remove="Format\FormatTextBox.xaml" />
     <None Remove="NumericUpDown.xaml" />
     <None Remove="TimeSpanPicker.xaml" />
   </ItemGroup>
@@ -19,7 +19,7 @@
   <ItemGroup>
     <PackageReference Include="AdonisUI" Version="1.17.1" />
     <PackageReference Include="AdonisUI.ClassicTheme" Version="1.17.1" />
-    <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" PrivateAssets="All"/>
+    <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,21 +28,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Components\ComboBoxSearch.xaml">
+    <Page Update="ComboBoxSearch.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Components\ComboBoxTags.xaml">
+    <Page Update="ComboBoxTags.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Components\DecimalUpDown.xaml">
+    <Page Update="DecimalUpDown.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Components\NumericUpDown.xaml">
+    <Page Update="NumericUpDown.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="Components\TimeSpanPicker.xaml">
+    <Page Update="TimeSpanPicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

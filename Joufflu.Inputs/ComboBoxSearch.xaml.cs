@@ -7,7 +7,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 
-namespace Joufflu.Inputs.Components
+namespace Joufflu.Inputs
 {
     /// <summary>
     /// Inspired from : https://stackoverflow.com/a/41986141/10404482 

@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace Joufflu.Data.Components
+namespace Joufflu.Data
 {
     /// <summary>
     /// Logique d'interaction pour Paging.xaml
@@ -94,14 +94,16 @@ namespace Joufflu.Data.Components
         #region Properties
         public List<int> AvailableCapacities { get; set; } = new List<int>() { 5, 10, 25, 50, 100, 200 };
 
-        public int PageMax { 
-            get {
+        public int PageMax
+        {
+            get
+            {
                 // Total is not set so we allow navigation to "unlimited" pages
                 if (Total <= 0)
                     return int.MaxValue;
                 int max = (int)Math.Ceiling(Total / (double)Capacity);
                 return Math.Max(1, max);
-            } 
+            }
         }
 
         public int IntervalMin { get { return Capacity * (PageNumber - 1) + 1; } }

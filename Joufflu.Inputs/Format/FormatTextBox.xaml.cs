@@ -1,4 +1,5 @@
-﻿using PropertyChanged;
+﻿using Joufflu.Inputs.Format;
+using PropertyChanged;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace Joufflu.Inputs.Components.Format
+namespace Joufflu.Inputs.Format
 {
     [TemplatePart(Name = "PART_ClearButton", Type = typeof(Button))]
     [TemplatePart(Name = "PART_UpButton", Type = typeof(Button))]

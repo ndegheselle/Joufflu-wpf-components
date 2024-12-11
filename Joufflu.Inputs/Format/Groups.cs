@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace Joufflu.Inputs.Components.Format
+namespace Joufflu.Inputs.Format
 {
     public class GroupsFactory
     {

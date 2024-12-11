@@ -1,16 +1,17 @@
-﻿using Joufflu.Inputs.Components.Format;
+﻿using Joufflu.Inputs.Format;
 using System.ComponentModel;
-using System.Globalization;
 using System.Windows;
-using System.Windows.Data;
 
-namespace Joufflu.Inputs.Components
+namespace Joufflu.Inputs
 {
     public partial class TimeSpanPicker : SingleValueFormatTextBox<TimeSpan?>, INotifyPropertyChanged
     {
         public static readonly DependencyProperty ValueProperty =
-        DependencyProperty.Register("Value", typeof(TimeSpan?), typeof(TimeSpanPicker), new PropertyMetadata(default(TimeSpan?), (o, e) => ((TimeSpanPicker)o).OnValueChanged(e)
-        ));
+        DependencyProperty.Register(
+            nameof(Value),
+            typeof(TimeSpan?),
+            typeof(TimeSpanPicker),
+            new PropertyMetadata(default(TimeSpan?), (o, e) => ((TimeSpanPicker)o).OnValueChanged(e)));
 
         public override TimeSpan? Value
         {

@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Usuel.Shared;
 
-namespace Joufflu.Inputs.Components
+namespace Joufflu.Inputs
 {
     [TemplatePart(Name = ElementTextBox, Type = typeof(FrameworkElement))]
     public class TextEditable : ContentControl, INotifyPropertyChanged
@@ -33,7 +33,8 @@ namespace Joufflu.Inputs.Components
         public ICommand ValidateCommand { get; set; }
         public ICommand CancelCommand { get; set; }
 
-        public TextEditable() {
+        public TextEditable()
+        {
             EditCommand = new DelegateCommand(Edit);
             ValidateCommand = new DelegateCommand(ValidateEdit);
             CancelCommand = new DelegateCommand(EndEditing);
@@ -73,7 +74,7 @@ namespace Joufflu.Inputs.Components
                 {
                     string oldText = Text;
                     Text = EditTextBox.Text;
-                    TextChanged?.Invoke(this, new TextEditedArgs() { Text = Text, OldText = oldText});
+                    TextChanged?.Invoke(this, new TextEditedArgs() { Text = Text, OldText = oldText });
                 }
             }
         }
