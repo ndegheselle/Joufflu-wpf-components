@@ -1,7 +1,10 @@
 ﻿namespace Joufflu.Shared.Layouts
 {
     public interface IPage
-    {}
+    {
+        public void OnHide()
+        { }
+    }
 
     public interface IPage<TLayout> : IPage where TLayout : ILayout
     {

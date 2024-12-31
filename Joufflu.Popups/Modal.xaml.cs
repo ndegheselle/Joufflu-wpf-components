@@ -104,6 +104,7 @@ namespace Joufflu.Popups
                 return;
 
             Current.TaskCompletion?.SetResult(result);
+            Current.Page.OnHide();
             Current = null;
             Content = null;
             Visibility = Visibility.Collapsed;
