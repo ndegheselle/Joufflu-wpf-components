@@ -7,6 +7,7 @@ namespace Usuel.Shared
     public class ErrorValidationModel : INotifyDataErrorInfo
     {
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
+
         public bool HasErrors => _errorsByPropertyName.Any();
         private readonly Dictionary<string, List<string>> _errorsByPropertyName = new Dictionary<string, List<string>>();
 
