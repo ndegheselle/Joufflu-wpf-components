@@ -11,7 +11,7 @@
                     <Grid DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:Modal}}}">
                         <Border Background="{DynamicResource {x:Static adonisUi:Brushes.Layer0BackgroundBrush}}" Opacity="0.8">
                             <Border.InputBindings>
-                                <MouseBinding MouseAction="LeftClick" Command="{Binding CloseCommand}" />
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding HideCommand}" />
                             </Border.InputBindings>
                         </Border>
                         <Border
@@ -84,7 +84,7 @@
                                         ContentTemplate="{DynamicResource {x:Static adonisUi:Icons.WindowClose}}"
                                         Width="23"
                                         Height="23"
-                                        Command="{Binding CloseCommand}" />
+                                        Command="{Binding HideCommand}" />
                                 </Grid>
                                 <ContentPresenter Grid.Row="1" />
                             </Grid>

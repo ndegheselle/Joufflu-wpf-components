@@ -18,11 +18,6 @@ namespace Joufflu.Popups
         public ModalOptions Options { get; }
     }
 
-    public interface IModalContentValidation : IModalContent
-    {
-        public Task<bool> OnValidation();
-    }
-
     public class ModalOptions : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -57,18 +52,15 @@ namespace Joufflu.Popups
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public ICustomCommand CloseCommand { get; set; }
-        public ICustomCommand ValidateCommand { get; set; }
+        public ICustomCommand HideCommand { get; set; }
 
-        // XXX : only use Content with cast instead of CurrentPage ?
         public ModalStackItem? Current { get; set; }
         public ObservableCollection<ModalStackItem> Items { get; } = [];
 
         public Modal()
         {
             DefaultStyleKey = typeof(Modal);
-            CloseCommand = new DelegateCommand(() => Hide(false));
-            ValidateCommand = new DelegateCommand(Validate);
+            HideCommand = new DelegateCommand<bool>(Hide);
 
             Visibility = Visibility.Collapsed;
         }
@@ -116,13 +108,6 @@ namespace Joufflu.Popups
             // Show previous page
             Current = Items.Last();
             ShowInternal(Current.Page);
-        }
-
-        private async void Validate()
-        {
-            if (Current?.Content is IModalContentValidation content && await content.OnValidation() == false)
-                return;
-            Hide(true);
         }
     }
 }
