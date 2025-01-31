@@ -1,0 +1,58 @@
+﻿<UserControl
+    x:Class="Joufflu.Inputs.ShortcutSelector"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Joufflu.Inputs"
+    xmlns:display="clr-namespace:Joufflu.Inputs.Display"
+    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+    xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+    LostKeyboardFocus="UserControl_LostKeyboardFocus"
+    PreviewKeyDown="UserControl_PreviewKeyDown">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="22" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+        </Grid.ColumnDefinitions>
+        <Border
+            adonisExtensions:LayerExtension.IncreaseLayer="True"
+            Padding="2"
+            Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}"
+            BorderBrush="{DynamicResource {x:Static adonisUi:Brushes.Layer1BorderBrush}}"
+            BorderThickness="1,1,0,1">
+            <display:ShortcutDisplay Shortcut="{Binding Shortcut, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+        </Border>
+
+        <Button
+            Visibility="{Binding Shortcut.Count, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource UniversalVisibilityConverter}}"
+            Grid.Column="1"
+            BorderThickness="0,1,1,1"
+            Click="Clear_Click">
+            <TextBlock
+                Text="&#xf00d;"
+                FontFamily="{StaticResource FontAwesomeSolid}"
+                VerticalAlignment="Center" />
+        </Button>
+        <Button Grid.Column="2" Click="Edit_Click">
+            <TextBlock
+                Text="&#xf304;"
+                FontFamily="{StaticResource FontAwesomeSolid}"
+                VerticalAlignment="Center" />
+        </Button>
+
+        <TextBlock
+            Grid.Row="1"
+            Grid.ColumnSpan="3"
+            x:Name="EditingText"
+            TextAlignment="Center"
+            Visibility="{Binding IsEditing, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource UniversalVisibilityConverter}}">
+            Press any key (Escape to cancel)
+        </TextBlock>
+    </Grid>
+</UserControl>
