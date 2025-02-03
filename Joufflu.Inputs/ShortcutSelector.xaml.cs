@@ -16,7 +16,7 @@ namespace Joufflu.Inputs
         #region Dependency properties
 
         public static readonly DependencyProperty ShortcutProperty = DependencyProperty.Register(
-            "Shortcut", typeof(ObservableCollection<Key>), typeof(ShortcutSelector), new FrameworkPropertyMetadata(new ObservableCollection<Key>(), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+            nameof(Shortcut), typeof(ObservableCollection<Key>), typeof(ShortcutSelector), new FrameworkPropertyMetadata(new ObservableCollection<Key>(), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
         public ObservableCollection<Key> Shortcut
         {
