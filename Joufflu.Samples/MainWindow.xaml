@@ -4,12 +4,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
     xmlns:local="clr-namespace:Joufflu.Samples"
-    xmlns:inputs="clr-namespace:Joufflu.Inputs.Components;assembly=Joufflu.Inputs"
+    xmlns:inputs="clr-namespace:Joufflu.Inputs;assembly=Joufflu.Inputs"
     xmlns:popups="clr-namespace:Joufflu.Popups;assembly=Joufflu.Popups"
-    xmlns:data="clr-namespace:Joufflu.Data.Components;assembly=Joufflu.Data"
+    xmlns:data="clr-namespace:Joufflu.Data;assembly=Joufflu.Data"
     xmlns:layouts="clr-namespace:Joufflu.Shared.Layouts;assembly=Joufflu.Shared"
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
-    xmlns:format="clr-namespace:Joufflu.Inputs.Components.Format;assembly=Joufflu.Inputs">
+    xmlns:format="clr-namespace:Joufflu.Inputs.Format;assembly=Joufflu.Inputs">
     <adonisControls:AdonisWindow.Resources>
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Popups;component/Resources.xaml" />
     </adonisControls:AdonisWindow.Resources>
@@ -86,10 +86,7 @@
                         </UniformGrid>
                         <UniformGrid Columns="3">
                             <TextBlock>ComboBox with search</TextBlock>
-                            <inputs:ComboBoxSearch
-                                HideFilteredItems="False"
-                                x:Name="ComboBoxSearchInput"
-                                ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+                            <inputs:ComboBoxSearch x:Name="ComboBoxSearchInput" ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Margin="4,0,0,0"
@@ -103,6 +100,7 @@
                                 ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}"
                                 SelectedItems="{Binding SelectedTestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
                             <ListBox Grid.Column="1" ItemsSource="{Binding SelectedItems, ElementName=ComboBoxTagsInput}">
+
                                 <ListBox.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel IsItemsHost="True" />
@@ -125,8 +123,7 @@
                         <UniformGrid Columns="3">
                             <TextBlock>Text editable</TextBlock>
                             <inputs:TextEditable Text="{Binding Text, Mode=TwoWay, ElementName=TestTextBox}" />
-                            <TextBox 
-                                Margin="4,0,0,0" x:Name="TestTextBox"/>
+                            <TextBox Margin="4,0,0,0" x:Name="TestTextBox" />
                         </UniformGrid>
                     </StackPanel>
                 </TabItem>

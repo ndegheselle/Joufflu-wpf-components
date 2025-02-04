@@ -16,9 +16,6 @@ namespace Joufflu.Inputs
     {
         private TextBox? _editableTextBox;
         private ICollectionView? _collectionView;
-
-        public bool HideFilteredItems { get; set; } = true;
-
         public string? FilterMemberPath { get; set; }
 
         public ComboBoxSearch()
@@ -103,11 +100,6 @@ namespace Joufflu.Inputs
             {
                 ClearFilter();
             }
-            else if (HideFilteredItems == false)
-            {
-                Text = ItemGetTextFrom(SelectedItem, DisplayMemberPath);
-            }
-
             base.OnDropDownClosed(e);
         }
 
@@ -143,28 +135,13 @@ namespace Joufflu.Inputs
 
         private void SelectFromFilter()
         {
-            if (HideFilteredItems == false && !string.IsNullOrEmpty(Text))
+            // Select item that matches user input exactly
+            for (int i = 0; i < Items.Count; i++)
             {
-                // Select closest to user input
-                for (int i = 0; i < Items.Count; i++)
+                if (Text == ItemGetTextFrom(Items[i], FilterMemberPath))
                 {
-                    if (DoesValueContainText(Items[i]))
-                    {
-                        SelectedItem = i;
-                        return;
-                    }
-                }
-            }
-            else
-            {
-                // Select item that matches user input exactly
-                for (int i = 0; i < Items.Count; i++)
-                {
-                    if (Text == ItemGetTextFrom(Items[i], FilterMemberPath))
-                    {
-                        SelectedIndex = i;
-                        return;
-                    }
+                    SelectedIndex = i;
+                    return;
                 }
             }
         }
@@ -177,10 +154,6 @@ namespace Joufflu.Inputs
 
         protected virtual bool DoesItemPassFilter(object value)
         {
-            // If the filter is disabled, we don't filter the items
-            if (HideFilteredItems == false)
-                return true;
-
             if (value == null)
                 return false;
             if (string.IsNullOrEmpty(Text))

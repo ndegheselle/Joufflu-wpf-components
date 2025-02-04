@@ -2,6 +2,7 @@
 using Joufflu.Popups;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,24 +26,27 @@ namespace Joufflu.Samples
         }
     }
 
-    public class TestModalValidation : TextBlock, IModalContentValidation
+    public class TestModalValidation : TextBlock, IModalContent
     {
         public Modal? ParentLayout { get; set; }
-        public ModalOptions Options => new ModalOptions()
+        public ModalOptions Options { get; } = new ModalOptions()
         {
             Title = "What",
         };
+        public ICustomCommand ValidateCommand { get; protected set; }
 
         public TestModalValidation(string text)
         {
             Text = text;
             MinWidth = 200;
             MinHeight = 100;
+            ValidateCommand = new DelegateCommand(Validate);
+            // Use ParentLayout?.HideCommand() or ParentLayout?.Hide() to close the modal
         }
 
-        public Task<bool> OnValidation()
+        public void Validate()
         {
-            return Task.FromResult(true);
+            // Do validation work
         }
     }
 
