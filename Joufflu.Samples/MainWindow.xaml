@@ -86,7 +86,13 @@
                         </UniformGrid>
                         <UniformGrid Columns="3">
                             <TextBlock>ComboBox with search</TextBlock>
-                            <inputs:ComboBoxSearch x:Name="ComboBoxSearchInput" ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+                            <inputs:ComboBoxSearch
+                                x:Name="ComboBoxSearchInput"
+                                ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}"
+                                DisplayMemberPath="Name" />
+                            <inputs:ComboBoxSearch
+                                ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}"
+                                DisplayMemberPath="Name" />
                             <TextBlock
                                 VerticalAlignment="Center"
                                 Margin="4,0,0,0"

@@ -12,11 +12,11 @@ namespace Joufflu.Inputs
     /// <summary>
     /// Inspired from : https://stackoverflow.com/a/41986141/10404482 
     /// </summary>
+
     public class ComboBoxSearch : ComboBox
     {
         private TextBox? _editableTextBox;
         private ICollectionView? _collectionView;
-        public string? FilterMemberPath { get; set; }
 
         public ComboBoxSearch()
         {
@@ -37,8 +37,17 @@ namespace Joufflu.Inputs
 
         protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
         {
-            _collectionView = CollectionViewSource.GetDefaultView(newValue);
+            if (newValue is not IList)
+                return;
+
+            // Create a new ICollectionView for this ComboBoxSearch instance
+            // Allow multiple ComboBoxSearch on the same list
+            _collectionView = new ListCollectionView((IList)newValue);
             _collectionView.Filter += DoesItemPassFilter;
+
+            // Will call OnItemsSourceChanged again
+            ItemsSource = _collectionView;
+
             base.OnItemsSourceChanged(oldValue, newValue);
         }
 
@@ -68,7 +77,7 @@ namespace Joufflu.Inputs
 
         void OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            if (SelectedItem != null && Text == ItemGetTextFrom(SelectedItem, DisplayMemberPath))
+            if (SelectedItem != null && Text == GetTextFromItem(SelectedItem))
                 return;
 
             SelectedIndex = -1;
@@ -103,7 +112,6 @@ namespace Joufflu.Inputs
             base.OnDropDownClosed(e);
         }
 
-
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
             if (_editableTextBox == null)
@@ -112,7 +120,7 @@ namespace Joufflu.Inputs
             // Show italic text if no item is selected
             if (SelectedItem != null)
             {
-                Text = ItemGetTextFrom(SelectedItem, DisplayMemberPath);
+                Text = GetTextFromItem(SelectedItem);
                 _editableTextBox.FontStyle = FontStyles.Normal;
                 _editableTextBox.SelectAll();
             }
@@ -138,7 +146,7 @@ namespace Joufflu.Inputs
             // Select item that matches user input exactly
             for (int i = 0; i < Items.Count; i++)
             {
-                if (Text == ItemGetTextFrom(Items[i], FilterMemberPath))
+                if (Text == GetTextFromItem(Items[i]))
                 {
                     SelectedIndex = i;
                     return;
@@ -159,21 +167,22 @@ namespace Joufflu.Inputs
             if (string.IsNullOrEmpty(Text))
                 return true;
 
-            return DoesValueContainText(value);
-        }
-        private bool DoesValueContainText(object value)
-        {
-            return ItemGetTextFrom(value, FilterMemberPath)?.ToLower().Contains(Text.ToLower()) == true;
+            return DoesValueContainSearch(value);
         }
 
-        private string? ItemGetTextFrom(object item, string? propertyName)
+        private bool DoesValueContainSearch(object value)
+        {
+            return GetTextFromItem(value)?.ToLower().Contains(Text.ToLower()) == true;
+        }
+
+        private string? GetTextFromItem(object item)
         {
             if (item == null)
                 return string.Empty;
-            if (propertyName == null)
+            if (string.IsNullOrEmpty(DisplayMemberPath))
                 return item.ToString();
 
-            PropertyInfo? displayMemberProperty = item.GetType().GetProperty(propertyName);
+            PropertyInfo? displayMemberProperty = item.GetType().GetProperty(DisplayMemberPath);
             if (displayMemberProperty != null)
                 return displayMemberProperty.GetValue(item)?.ToString();
             return item.ToString();
