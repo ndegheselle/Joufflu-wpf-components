@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -12,6 +13,10 @@ namespace Joufflu.Inputs
     public partial class ShortcutSelector : UserControl, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
+        protected void NotifyPropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
 
         #region Dependency properties
 
