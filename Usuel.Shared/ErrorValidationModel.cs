@@ -18,7 +18,7 @@ namespace Usuel.Shared
             return _errorsByPropertyName.ContainsKey(propertyName) ? _errorsByPropertyName[propertyName] : [];
         }
 
-        private void OnErrorsChanged([CallerMemberName]string? propertyName = null)
+        private void NotifyErrorsChanged([CallerMemberName]string? propertyName = null)
         {
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
@@ -37,7 +37,7 @@ namespace Usuel.Shared
                 _errorsByPropertyName[propertyName] = new List<string>();
 
             _errorsByPropertyName[propertyName].AddRange(errors);
-            OnErrorsChanged(propertyName);
+            NotifyErrorsChanged(propertyName);
         }
 
         public void AddErrors(Dictionary<string, List<string>> errors)
@@ -53,14 +53,14 @@ namespace Usuel.Shared
             if (propertyName == null)
             {
                 _errorsByPropertyName.Clear();
-                OnErrorsChanged();
+                NotifyErrorsChanged();
                 return;
             }
 
             if (_errorsByPropertyName.ContainsKey(propertyName))
             {
                 _errorsByPropertyName.Remove(propertyName);
-                OnErrorsChanged(propertyName);
+                NotifyErrorsChanged(propertyName);
             }
         }
     }
