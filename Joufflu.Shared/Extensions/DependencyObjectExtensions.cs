@@ -1,5 +1,5 @@
 ﻿using Joufflu.Shared.Helpers;
-using Joufflu.Shared.Layouts;
+using Joufflu.Shared.Navigation;
 using System.Windows;
 
 namespace Joufflu.Shared.Extensions

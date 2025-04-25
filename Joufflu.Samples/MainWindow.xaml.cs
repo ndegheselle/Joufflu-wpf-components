@@ -200,9 +200,8 @@ namespace Joufflu.Samples
             bool result = await Modal.Show(new TestModalValidation("what"));
         }
 
-        private async void ShowMultiple_Click(object sender, RoutedEventArgs e)
+        private void ShowMultiple_Click(object sender, RoutedEventArgs e)
         {
-
             Modal.Show(new TestModalValidation("boop"));
             Modal.Show(new TestModalValidation("beep"));
         }

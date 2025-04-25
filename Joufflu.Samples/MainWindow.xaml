@@ -6,8 +6,8 @@
     xmlns:local="clr-namespace:Joufflu.Samples"
     xmlns:inputs="clr-namespace:Joufflu.Inputs;assembly=Joufflu.Inputs"
     xmlns:popups="clr-namespace:Joufflu.Popups;assembly=Joufflu.Popups"
+    xmlns:layouts="clr-namespace:Joufflu.Layouts;assembly=Joufflu.Layouts"
     xmlns:data="clr-namespace:Joufflu.Data;assembly=Joufflu.Data"
-    xmlns:layouts="clr-namespace:Joufflu.Shared.Layouts;assembly=Joufflu.Shared"
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:format="clr-namespace:Joufflu.Inputs.Format;assembly=Joufflu.Inputs">
     <adonisControls:AdonisWindow.Resources>
@@ -150,6 +150,24 @@
                         <Button Margin="1" Click="ShowModalValidation_Click">Show modal Validation</Button>
                         <Button Margin="1" Click="ShowMultiple_Click">Show multiple modal</Button>
                     </UniformGrid>
+                </TabItem>
+
+                <TabItem Visibility="Collapsed" Header="Layouts">
+                    <layouts:FlexibleGrid Columns="2" Gap="4,10" ColumnsWidth="200,*" >
+                        <Button Content="Button 1" />
+                        <Button Content="Button 2" />
+
+                        <Button Content="Button 3" />
+                        <Button Content="Button 4" />
+
+                        <Button Content="Button 5" />
+                        <Button Content="Button 6" />
+
+                        <Button Content="Button 7" />
+                        <Button Content="Button 8" />
+
+                        <Button Content="Button 9" />
+                    </layouts:FlexibleGrid>
                 </TabItem>
             </TabControl>
         </Grid>

@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Joufflu.Popups", "Joufflu.P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Usuel.Shared", "Usuel.Shared\Usuel.Shared.csproj", "{8FF90277-4617-42C5-933C-8FF1913F5B39}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Joufflu.Layouts", "Joufflu.Layouts\Joufflu.Layouts.csproj", "{0EC3BE51-D5A9-49A8-AAA3-E082FA1F7001}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{8FF90277-4617-42C5-933C-8FF1913F5B39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8FF90277-4617-42C5-933C-8FF1913F5B39}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8FF90277-4617-42C5-933C-8FF1913F5B39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EC3BE51-D5A9-49A8-AAA3-E082FA1F7001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EC3BE51-D5A9-49A8-AAA3-E082FA1F7001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EC3BE51-D5A9-49A8-AAA3-E082FA1F7001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EC3BE51-D5A9-49A8-AAA3-E082FA1F7001}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,6 +63,7 @@ Global
 		{4FBCA29E-FF1D-4F53-9FE4-B1A05C9922DD} = {DB72DC5E-D46F-42BB-A6CB-F75A8F74F7AB}
 		{E2F97A17-0E49-49B5-8D42-6243949DD270} = {DB72DC5E-D46F-42BB-A6CB-F75A8F74F7AB}
 		{8FF90277-4617-42C5-933C-8FF1913F5B39} = {DB72DC5E-D46F-42BB-A6CB-F75A8F74F7AB}
+		{0EC3BE51-D5A9-49A8-AAA3-E082FA1F7001} = {DB72DC5E-D46F-42BB-A6CB-F75A8F74F7AB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A0C9F7DF-8AFE-4B1A-BC6C-D18AA5E6D2DC}
