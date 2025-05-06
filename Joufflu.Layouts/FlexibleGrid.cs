@@ -234,7 +234,7 @@ namespace Joufflu.Layouts
         {
             int effectiveRows = EffectiveRows;
             // Default definition
-            if (RowsHeight == null)
+            if (RowsHeight == null || RowsHeight.Count <= 0)
                 return Enumerable.Repeat(new GridLength(1, GridUnitType.Star), effectiveRows).ToList();
 
             // Definition too large
@@ -254,7 +254,7 @@ namespace Joufflu.Layouts
             int effectiveColumns = EffectiveColumns;
 
             // Default definition
-            if (ColumnsWidth == null)
+            if (ColumnsWidth == null || ColumnsWidth.Count <= 0)
                 return Enumerable.Repeat(new GridLength(1, GridUnitType.Star), effectiveColumns).ToList();
 
             // Definition too large
