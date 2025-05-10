@@ -63,7 +63,7 @@ namespace Joufflu.Layouts
     /// <summary>
     /// Grid layout with flexible columns and rows definitions.
     /// </summary>
-    public class FlexibleGrid : Panel
+    public class FlexibleGrid : Grid
     {
         #region DependencyProperties
         public static readonly DependencyProperty RowsProperty =
@@ -71,39 +71,39 @@ namespace Joufflu.Layouts
             nameof(Rows),
             typeof(int?),
             typeof(FlexibleGrid),
-            new PropertyMetadata(null, OnLayoutPropertyChanged));
+            new PropertyMetadata(null, OnRowsChanged));
         public static readonly DependencyProperty ColumnsProperty =
             DependencyProperty.Register(
             nameof(Columns),
             typeof(int?),
             typeof(FlexibleGrid),
-            new PropertyMetadata(null, OnLayoutPropertyChanged));
+            new PropertyMetadata(null, OnColumnsChanged));
 
         public static readonly DependencyProperty RowsHeightProperty =
             DependencyProperty.Register(
             nameof(RowsHeight),
             typeof(List<GridLength>),
             typeof(FlexibleGrid),
-            new PropertyMetadata(null, OnLayoutPropertyChanged));
+            new PropertyMetadata(null, OnRowsWidthChanged));
         public static readonly DependencyProperty ColumnsWidthProperty =
             DependencyProperty.Register(
             nameof(ColumnsWidth),
             typeof(List<GridLength>),
             typeof(FlexibleGrid),
-            new PropertyMetadata(null, OnLayoutPropertyChanged));
+            new PropertyMetadata(null, OnColumnsWidthChanged));
 
         public static readonly DependencyProperty RowGapProperty =
         DependencyProperty.Register(
             nameof(RowGap),
             typeof(double),
             typeof(FlexibleGrid),
-            new PropertyMetadata(0.0, OnLayoutPropertyChanged));
+            new PropertyMetadata(0.0, OnGapChanged));
         public static readonly DependencyProperty ColumnGapProperty =
             DependencyProperty.Register(
             nameof(ColumnGap),
             typeof(double),
             typeof(FlexibleGrid),
-            new PropertyMetadata(0.0, OnLayoutPropertyChanged));
+            new PropertyMetadata(0.0, OnGapChanged));
 
         public static readonly DependencyProperty GapProperty =
             DependencyProperty.Register(
@@ -154,8 +154,8 @@ namespace Joufflu.Layouts
                 if (Rows != null && Rows != 0)
                     return Rows.Value;
                 if (Columns == null || Columns == 0)
-                    return this.Children.Count;
-                return (Children.Count + Columns.Value - 1) / Columns.Value;
+                    return this.VisualChildrenCount;
+                return (VisualChildrenCount + Columns.Value - 1) / Columns.Value;
             }
         }
 
@@ -178,8 +178,8 @@ namespace Joufflu.Layouts
                 if (Columns != null && Columns != 0)
                     return Columns.Value;
                 if (Rows == null || Rows == 0)
-                    return this.Children.Count;
-                return (Children.Count + Rows.Value - 1) / Rows.Value;
+                    return this.VisualChildrenCount;
+                return (VisualChildrenCount + Rows.Value - 1) / Rows.Value;
             }
         }
 
@@ -282,153 +282,107 @@ namespace Joufflu.Layouts
             return repeatedList;
         }
 
-        protected override Size MeasureOverride(Size availableSize)
+        #region On changed
+
+        private static void OnColumnsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var rowDefs = GetEffectiveRowSizes();
-            var colDefs = GetEffectiveColumnSizes();
-
-            var rowCount = rowDefs.Count;
-            var colCount = colDefs.Count;
-
-            double fixedHeight = 0, fixedWidth = 0;
-            double totalStarHeight = 0, totalStarWidth = 0;
-
-            var autoHeights = new double[rowCount];
-            var autoWidths = new double[colCount];
-
-            // Calculate fixed sizes and accumulate star units
-            for (int i = 0; i < rowCount; i++)
-            {
-                if (rowDefs[i].GridUnitType == GridUnitType.Pixel)
-                    fixedHeight += rowDefs[i].Value;
-                else if (rowDefs[i].GridUnitType == GridUnitType.Star)
-                    totalStarHeight += rowDefs[i].Value;
-            }
-
-            for (int i = 0; i < colCount; i++)
-            {
-                if (colDefs[i].GridUnitType == GridUnitType.Pixel)
-                    fixedWidth += colDefs[i].Value;
-                else if (colDefs[i].GridUnitType == GridUnitType.Star)
-                    totalStarWidth += colDefs[i].Value;
-            }
-
-            double rowSpacing = RowGap * Math.Max(0, rowCount - 1);
-            double colSpacing = ColumnGap * Math.Max(0, colCount - 1);
-
-            // Measure children
-            for (int i = 0; i < InternalChildren.Count; i++)
-            {
-                var child = InternalChildren[i];
-                child.Measure(availableSize);
-
-                int row = i / colCount;
-                int col = i % colCount;
-
-                if (row < rowCount && rowDefs[row].GridUnitType == GridUnitType.Auto)
-                    autoHeights[row] = Math.Max(autoHeights[row], child.DesiredSize.Height);
-
-                if (col < colCount && colDefs[col].GridUnitType == GridUnitType.Auto)
-                    autoWidths[col] = Math.Max(autoWidths[col], child.DesiredSize.Width);
-            }
-
-            double autoHeight = autoHeights.Sum();
-            double autoWidth = autoWidths.Sum();
-
-            double desiredHeight = fixedHeight + autoHeight + rowSpacing;
-            double desiredWidth = fixedWidth + autoWidth + colSpacing;
-
-            return new Size(
-                double.IsInfinity(availableSize.Width) ? desiredWidth : availableSize.Width,
-                double.IsInfinity(availableSize.Height) ? desiredHeight : availableSize.Height);
+            var grid = (FlexibleGrid)d;
+            grid.AssignChildrenPositions();
         }
 
-        protected override Size ArrangeOverride(Size finalSize)
+        private static void OnRowsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var rowSizes = GetEffectiveRowSizes();
-            var columnSizes = GetEffectiveColumnSizes();
+            var grid = (FlexibleGrid)d;
+            grid.AssignChildrenPositions();
+        }
 
-            var rowHeights = new double[rowSizes.Count];
-            var colWidths = new double[columnSizes.Count];
-            double totalStarRow = 0, totalStarCol = 0;
-            double fixedHeight = 0, fixedWidth = 0;
+        private static void OnRowsWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var grid = (FlexibleGrid)d;
+            grid.UpdateRowDefinitions();
+        }
 
-            // Compute fixed and star size contributions
-            void ComputeSizes(IList<GridLength> sizes, double[] lengths, ref double fixedSize, ref double totalStar)
+        private static void OnColumnsWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var grid = (FlexibleGrid)d;
+            grid.UpdateColumnDefinitions();
+        }
+
+        private static void OnGapChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var grid = (FlexibleGrid)d;
+            grid.UpdateColumnDefinitions();
+            grid.UpdateRowDefinitions();
+        }
+
+        protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
+        {
+            base.OnVisualChildrenChanged(visualAdded, visualRemoved);
+            AssignChildrenPositions();
+        }
+
+        #endregion
+
+        private void UpdateColumnDefinitions()
+        {
+            if (this.VisualChildrenCount == 0)
+                return;
+
+            ColumnDefinitions.Clear();
+            var effectiveColumnSizes = GetEffectiveColumnSizes();
+            for (int i = 0; i < EffectiveColumns; i++)
             {
-                for (int i = 0; i < sizes.Count; i++)
+                GridLength width = effectiveColumnSizes[i];
+                ColumnDefinitions.Add(new ColumnDefinition { Width = width });
+                if (i < EffectiveColumns - 1)
                 {
-                    var size = sizes[i];
-                    if (size.GridUnitType == GridUnitType.Pixel)
+                    ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(Gap.Left) });
+                }
+            }
+        }
+
+        private void UpdateRowDefinitions()
+        {
+            if (this.VisualChildrenCount == 0)
+                return;
+
+            RowDefinitions.Clear();
+            var effectiveRowSizes = GetEffectiveRowSizes();
+            for (int i = 0; i < EffectiveRows; i++)
+            {
+                GridLength height = effectiveRowSizes[i];
+                RowDefinitions.Add(new RowDefinition { Height = height });
+                if (i < EffectiveRows - 1)
+                {
+                    RowDefinitions.Add(new RowDefinition { Height = new GridLength(Gap.Top) });
+                }
+            }
+        }
+
+        private void AssignChildrenPositions()
+        {
+            int row = 0;
+            int col = 0;
+            foreach (UIElement child in Children)
+            {
+                SetRow(child, row * 2);
+                SetColumn(child, col * 2);
+
+                col++;
+                if (col >= EffectiveColumns)
+                {
+                    col = 0;
+                    row++;
+                    if (row >= EffectiveRows)
                     {
-                        lengths[i] = size.Value;
-                        fixedSize += size.Value;
-                    }
-                    else if (size.GridUnitType == GridUnitType.Star)
-                    {
-                        totalStar += size.Value;
+                        row = 0;
                     }
                 }
             }
 
-            ComputeSizes(rowSizes, rowHeights, ref fixedHeight, ref totalStarRow);
-            ComputeSizes(columnSizes, colWidths, ref fixedWidth, ref totalStarCol);
-
-            // Calculate Auto sizes
-            for (int i = 0; i < InternalChildren.Count; i++)
-            {
-                var child = InternalChildren[i];
-                int row = i / columnSizes.Count;
-                int col = i % columnSizes.Count;
-
-                if (rowSizes[row].GridUnitType == GridUnitType.Auto)
-                    rowHeights[row] = Math.Max(rowHeights[row], child.DesiredSize.Height);
-
-                if (columnSizes[col].GridUnitType == GridUnitType.Auto)
-                    colWidths[col] = Math.Max(colWidths[col], child.DesiredSize.Width);
-            }
-
-            // Add auto sizes to fixed size totals
-            fixedHeight += rowHeights.Where((_, i) => rowSizes[i].GridUnitType == GridUnitType.Auto).Sum();
-            fixedWidth += colWidths.Where((_, i) => columnSizes[i].GridUnitType == GridUnitType.Auto).Sum();
-
-            // Calculate star sizes
-            double availHeight = Math.Max(0, finalSize.Height - fixedHeight - RowGap * (rowSizes.Count - 1));
-            double availWidth = Math.Max(0, finalSize.Width - fixedWidth - ColumnGap * (columnSizes.Count - 1));
-
-            void AssignStarSizes(IList<GridLength> sizes, double[] lengths, double totalStar, double available)
-            {
-                if (totalStar <= 0) return;
-                double unit = available / totalStar;
-                for (int i = 0; i < sizes.Count; i++)
-                    if (sizes[i].GridUnitType == GridUnitType.Star)
-                        lengths[i] = sizes[i].Value * unit;
-            }
-
-            AssignStarSizes(rowSizes, rowHeights, totalStarRow, availHeight);
-            AssignStarSizes(columnSizes, colWidths, totalStarCol, availWidth);
-
-            // Compute offsets
-            double[] Offsets(double[] sizes, double gap) =>
-                sizes.Select((_, i) => sizes.Take(i).Sum() + gap * i).ToArray();
-
-            var rowOffsets = Offsets(rowHeights, RowGap);
-            var colOffsets = Offsets(colWidths, ColumnGap);
-
-            // Arrange children
-            for (int i = 0; i < InternalChildren.Count; i++)
-            {
-                var child = InternalChildren[i];
-                int row = i / columnSizes.Count;
-                int col = i % columnSizes.Count;
-
-                if (row < rowHeights.Length && col < colWidths.Length)
-                {
-                    child.Arrange(new Rect(colOffsets[col], rowOffsets[row], colWidths[col], rowHeights[row]));
-                }
-            }
-
-            return finalSize;
+            // Update the grid definitions based on the current number of children
+            UpdateColumnDefinitions();
+            UpdateRowDefinitions();
         }
     }
 }

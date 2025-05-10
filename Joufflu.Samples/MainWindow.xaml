@@ -150,7 +150,7 @@
                 <TabItem Visibility="Collapsed" Header="Layouts">
                     <layouts:FlexibleGrid
                         Columns="2"
-                        Gap="4,10"
+                        Gap="4"
                         ColumnsWidth="200,*">
                         <Button Content="Button 1" />
                         <Button Content="Button 2" />
