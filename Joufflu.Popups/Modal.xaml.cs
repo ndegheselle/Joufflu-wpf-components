@@ -11,9 +11,10 @@ namespace Joufflu.Popups
     public interface IModal : ILayout
     {
         public Task<bool> Show(IModalContent page);
+        public void Hide(bool result = false);
     }
 
-    public interface IModalContent : IPage<Modal>
+    public interface IModalContent : IPage<IModal>
     {
         public ModalOptions Options { get; }
     }
