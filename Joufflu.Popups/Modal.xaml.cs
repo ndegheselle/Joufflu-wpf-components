@@ -82,7 +82,7 @@ namespace Joufflu.Popups
 
         private void ShowInternal(IPage page)
         {
-            if (page is IPage<Modal> pageModal)
+            if (page is IModalContent pageModal)
                 pageModal.ParentLayout = this;
             Content = page;
             Visibility = Visibility.Visible;
