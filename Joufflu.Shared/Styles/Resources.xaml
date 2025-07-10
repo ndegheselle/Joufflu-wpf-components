@@ -7,7 +7,6 @@
     </ResourceDictionary.MergedDictionaries>
 
     <FontFamily x:Key="FontAwesomeSolid">/Joufflu.Shared;Component/Resources/Fonts/FontAwesomeSolid.otf#Font Awesome 6 Free Solid</FontFamily>
-
     <Style
         x:Key="{x:Type fonts:Icon}"
         TargetType="{x:Type fonts:Icon}"
