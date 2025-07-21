@@ -1,5 +1,6 @@
 ﻿using AdonisUI.Controls;
 using Joufflu.Popups;
+using Joufflu.Shared.Navigation;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -12,7 +13,7 @@ namespace Joufflu.Samples
 {
     public class TestModal : TextBlock, IModalContent
     {
-        public Modal? ParentLayout { get; set; }
+        public IModal? ParentLayout { get; set; }
         public ModalOptions Options => new ModalOptions()
         {
             Title = "Test",
@@ -28,7 +29,7 @@ namespace Joufflu.Samples
 
     public class TestModalValidation : TextBlock, IModalContent
     {
-        public Modal? ParentLayout { get; set; }
+        public IModal? ParentLayout { get; set; }
         public ModalOptions Options { get; } = new ModalOptions()
         {
             Title = "What",
@@ -145,35 +146,6 @@ namespace Joufflu.Samples
             PagingDataGrid.ItemsSource = TestValues.Take(5);
         }
 
-        #region Inputs
-
-        private void PhoneNumberInput_ValueChanged(object sender, List<object?> values)
-        { Debug.WriteLine($"PhoneNumberInput.ValueChanged: {string.Join(',', values)}"); }
-
-        private void NumericUpDownInput_ValueChanged(object sender, int e)
-        {
-            Debug.WriteLine($"NumerUpDown.ValueChanged: {e}");
-        }
-
-        private void DecimalUpDownInput_ValueChanged(object sender, decimal e)
-        {
-            Debug.WriteLine($"DecimalUpDown.ValueChanged: {e}");
-        }
-
-        private void TimePickerInput_ValueChanged(object sender, TimeSpan? e)
-        {
-            Debug.WriteLine($"TimePicker.ValueChanged: {e}");
-        }
-
-        private void ButtonCheckFile_Click(object sender, RoutedEventArgs e)
-        {
-            TestValue.ClearErrors();
-            if (string.IsNullOrEmpty(TestValue.FilePath))
-                TestValue.AddError("No file selected", nameof(TestClass.FilePath));
-        }
-
-        #endregion
-
         #region Data
 
         private void Paging_PagingChange(int pageNumber, int capacity)
@@ -193,11 +165,6 @@ namespace Joufflu.Samples
         private async void ShowModal_Click(object sender, RoutedEventArgs e)
         {
             await Modal.Show(new TestModal());
-        }
-
-        private async void ShowModalValidation_Click(object sender, RoutedEventArgs e)
-        {
-            bool result = await Modal.Show(new TestModalValidation("what"));
         }
 
         private void ShowMultiple_Click(object sender, RoutedEventArgs e)

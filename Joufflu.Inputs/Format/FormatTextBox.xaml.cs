@@ -3,6 +3,7 @@ using PropertyChanged;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -19,16 +20,17 @@ namespace Joufflu.Inputs.Format
         { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)); }
 
         public event EventHandler<List<object?>>? ValuesChanged;
-        #region Dependency Properties
-        public static readonly DependencyProperty ValuesProperty =
-            DependencyProperty.Register(
-            "Values",
+
+        public static readonly DependencyProperty ValuesProperty = DependencyProperty.Register(
+            nameof(Values),
             typeof(List<object?>),
             typeof(FormatTextBox),
             new FrameworkPropertyMetadata(
                 null,
                 FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
                 (o, e) => ((FormatTextBox)o).OnValuesChanged()));
+
+        #region Dependency Properties
 
         public List<object?> Values
         {
@@ -44,48 +46,6 @@ namespace Joufflu.Inputs.Format
             FormatText(Groups);
         }
 
-        public static readonly DependencyProperty GlobalFormatProperty = DependencyProperty.Register(
-            "GlobalFormat",
-            typeof(string),
-            typeof(FormatTextBox),
-            new FrameworkPropertyMetadata(
-                "",
-                FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
-                (o, e) => ((FormatTextBox)o).OnGlobalFormatChanged()));
-
-        public string GlobalFormat
-        {
-            get { return (string)GetValue(GlobalFormatProperty); }
-            set { SetValue(GlobalFormatProperty, value); }
-        }
-
-        protected void OnGlobalFormatChanged()
-        {
-            ParseGroups(Format, GlobalFormat);
-            FormatText(Groups);
-        }
-
-        public static readonly DependencyProperty FormatProperty =
-            DependencyProperty.Register(
-            "Format",
-            typeof(string),
-            typeof(FormatTextBox),
-            new FrameworkPropertyMetadata(
-                "",
-                FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
-                (o, e) => ((FormatTextBox)o).OnFormatChanged()));
-
-        public string Format
-        {
-            get { return (string)GetValue(FormatProperty); }
-            set { SetValue(FormatProperty, value); }
-        }
-
-        protected void OnFormatChanged()
-        {
-            ParseGroups(Format, GlobalFormat);
-            FormatText(Groups);
-        }
         #endregion
 
         #region Properties
@@ -98,7 +58,12 @@ namespace Joufflu.Inputs.Format
         public bool ShowIncrementsButtons { get; set; } = true;
 
         public int IncrementValue { get; set; } = 1;
+
+        public string? GlobalFormat { get; set; }
+
+        public string Format { get; set; } = "";
         #endregion
+
         private int _selectedGroupIndex = -1;
 
         public int SelectedGroupIndex
@@ -127,6 +92,7 @@ namespace Joufflu.Inputs.Format
 
         // UI Parts
         private Button? _clearButton;
+
         private Button? ClearButton
         {
             get { return _clearButton; }
@@ -140,6 +106,7 @@ namespace Joufflu.Inputs.Format
         }
 
         private Button? _upButton;
+
         private Button? UpButton
         {
             get { return _upButton; }
@@ -152,6 +119,7 @@ namespace Joufflu.Inputs.Format
         }
 
         private Button? _downButton;
+
         private Button? DownButton
         {
             get { return _downButton; }
@@ -164,6 +132,17 @@ namespace Joufflu.Inputs.Format
             }
         }
         #endregion
+
+        public FormatTextBox()
+        {
+            this.Loaded += OnLoaded;
+        }
+
+        protected virtual void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            ParseGroups(Format, GlobalFormat);
+            FormatText(Groups);
+        }
 
         public override void OnApplyTemplate()
         {
@@ -363,7 +342,7 @@ namespace Joufflu.Inputs.Format
         #endregion
 
         #region Parsing
-        public void ParseGroups(string format, string globalFormat)
+        public void ParseGroups(string format, string? globalFormat)
         {
             Groups.Clear();
             List<object> groups = ParseFormatString(format, globalFormat);
@@ -397,54 +376,41 @@ namespace Joufflu.Inputs.Format
             }
         }
 
-        private List<object> ParseFormatString(string format, string globalFormat)
+        /// <summary>
+        /// Parse the format string
+        /// </summary>
+        /// <param name="format">Format string</param>
+        /// <param name="globalFormat">Global format string</param>
+        /// <returns></returns>
+        private List<object> ParseFormatString(string format, string? globalFormat)
         {
             GroupsFactory groupsFactory = new GroupsFactory();
-            StringBuilder outputFormatBuilder = new StringBuilder();
             List<object> groups = new List<object>();
-
-            StringBuilder groupBuilder = new StringBuilder();
-            int depth = 0;
             int index = 0;
-            char previousChar = '\0';
-            foreach (char c in format)
+
+            // This regex matches the content inside curly braces, ignoring escaped ones
+            string pattern = @"(?<!\\)\{(.*?)(?<!\\)\}|[^{}]+";
+            MatchCollection matches = Regex.Matches(format, pattern);
+
+            foreach (Match match in matches)
             {
-                if (c == '}' && previousChar != '\\')
-                    depth -= 1;
-
-                if (depth > 0)
-                    groupBuilder.Append(c);
-                else if (c != '{' && c != '}')
-                    outputFormatBuilder.Append(c);
-
-                if (c == '{' && previousChar != '\\')
-                    depth += 1;
-
-                // Group params & mask
-                if (depth == 0 && c == '}')
+                if (match.Value.StartsWith("{") && match.Value.EndsWith("}"))
                 {
-                    BaseGroup group = groupsFactory.CreateParams(this, groupBuilder.ToString(), globalFormat);
+                    // Extract the content inside the curly braces
+                    string groupContent = match.Groups[1].Value;
+                    BaseGroup group = groupsFactory.CreateGroupFromParams(this, groupContent, globalFormat);
+
                     group.Index = index;
                     groups.Add(group);
-                    groupBuilder.Clear();
-
                     index += group.Length;
                 }
-                else if (depth > 0 && outputFormatBuilder.Length > 0)
+                else
                 {
-                    groups.Add(outputFormatBuilder.ToString());
-                    index += outputFormatBuilder.Length;
-                    outputFormatBuilder.Clear();
+                    // Add the literal text to the groups
+                    groups.Add(match.Value);
+                    index += match.Value.Length;
                 }
-
-                previousChar = c;
             }
-
-            if (depth > 0)
-                throw new Exception("Invalid format, was expecting '}'");
-
-            if (outputFormatBuilder.Length > 0)
-                groups.Add(outputFormatBuilder.ToString());
 
             return groups;
         }
@@ -456,6 +422,7 @@ namespace Joufflu.Inputs.Format
         public event EventHandler<T?>? ValueChanged;
 
         private T? _previousValue = default;
+
         public virtual T? Value { get; set; } = default;
 
         public virtual List<object?> ConvertTo() { return new List<object?>() { Value }; }

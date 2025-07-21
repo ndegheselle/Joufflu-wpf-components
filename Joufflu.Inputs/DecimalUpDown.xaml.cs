@@ -15,5 +15,10 @@ namespace Joufflu.Inputs
             get { return (decimal)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
         }
+
+        public DecimalUpDown()
+        {
+            Format = "{decimal|noGlobalSelection}";
+        }
     }
 }

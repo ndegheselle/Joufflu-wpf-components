@@ -14,7 +14,15 @@ namespace Joufflu.Inputs.Format
             { "decimal", (parent, options) => new DecimalGroup(parent, options) },
         };
 
-        public BaseGroup CreateParams(FormatTextBox parent, string stringParams, string? globalStringParams)
+        /// <summary>
+        /// Create a group from the given params
+        /// </summary>
+        /// <param name="parent">Parent UI element</param>
+        /// <param name="stringParams">String that describe the parameters (separated by |)</param>
+        /// <param name="globalStringParams">Global string that describe the parameters (separated by |)</param>
+        /// <returns>A base group based on the parameters</returns>
+        /// <exception cref="ArgumentException">If the string parameters are empty</exception>
+        public BaseGroup CreateGroupFromParams(FormatTextBox parent, string stringParams, string? globalStringParams)
         {
             IEnumerable<string> splitParams = stringParams.Split("|");
             if (splitParams.Count() <= 0)
@@ -37,8 +45,6 @@ namespace Joufflu.Inputs.Format
             }
 
             throw new ArgumentException("Unknow type key.");
-            // May use a StringGroup
-            // return new StringGroup(parent, splitParams);
         }
     }
 

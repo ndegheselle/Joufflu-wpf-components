@@ -26,6 +26,12 @@ namespace Joufflu.Layouts
                 List<GridLength> list = [];
                 foreach (string str in stringValue.Split(','))
                 {
+                    if (string.IsNullOrEmpty(str))
+                    {
+                        list.Add(new GridLength(1, GridUnitType.Star));
+                        continue;
+                    }
+
                     object? converted = _gridLengthConverter.ConvertFromString(context, culture, str.Trim());
                     if (converted is GridLength gridLength)
                         list.Add(gridLength);
@@ -361,6 +367,9 @@ namespace Joufflu.Layouts
             int col = 0;
             foreach (UIElement child in Children)
             {
+                if (child == null)
+                    continue;
+
                 SetRow(child, row * 2);
                 SetColumn(child, col * 2);
 

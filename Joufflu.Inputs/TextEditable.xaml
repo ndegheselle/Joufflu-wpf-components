@@ -25,9 +25,13 @@
                                 </Style>
                             </Grid.Style>
 
-                            <TextBlock VerticalAlignment="Center" Text="{Binding Text}" ToolTip="Double click to edit" Cursor="Hand">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Cursor="Hand"
+                                Text="{Binding Text}"
+                                ToolTip="Double click to edit">
                                 <TextBlock.InputBindings>
-                                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding EditCommand}" />
+                                    <MouseBinding Command="{Binding EditCommand}" Gesture="LeftDoubleClick" />
                                 </TextBlock.InputBindings>
                                 <TextBlock.TextDecorations>
                                     <TextDecoration Location="Underline">
@@ -46,18 +50,14 @@
                                 Grid.Column="1"
                                 Margin="1,0,0,0"
                                 Padding="6,5,7,5"
-                                Command="{Binding EditCommand}">
+                                Background="Transparent"
+                                Command="{Binding EditCommand}"
+                                Style="{StaticResource IconButton}">
                                 <fonts:Icon Text="{x:Static fonts:IconFont.Pen}" />
                             </Button>
                         </Grid>
 
                         <Grid x:Name="EditContainer">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition Width="auto" />
-                            </Grid.ColumnDefinitions>
-
                             <Grid.Style>
                                 <Style TargetType="Grid">
                                     <Style.Triggers>
@@ -74,18 +74,24 @@
                                     <KeyBinding Key="Esc" Command="{Binding CancelCommand}" />
                                 </TextBox.InputBindings>
                             </TextBox>
-                            <Button
-                                Grid.Column="1"
-                                Margin="1,0,0,0"
-                                Command="{Binding CancelCommand}">
-                                <fonts:Icon Text="{x:Static fonts:IconFont.Xmark}" />
-                            </Button>
-                            <Button
-                                Grid.Column="2"
-                                Margin="1,0,0,0"
-                                Command="{Binding ValidateCommand}">
-                                <fonts:Icon Text="{x:Static fonts:IconFont.Check}" />
-                            </Button>
+
+                            <StackPanel
+                                Margin="2,1"
+                                HorizontalAlignment="Right"
+                                Orientation="Horizontal">
+                                <Button
+                                    Padding="6,5"
+                                    Command="{Binding CancelCommand}"
+                                    Style="{StaticResource IconButton}">
+                                    <fonts:Icon Text="{x:Static fonts:IconFont.Xmark}" />
+                                </Button>
+                                <Button
+                                    Padding="6,5"
+                                    Command="{Binding ValidateCommand}"
+                                    Style="{StaticResource IconButton}">
+                                    <fonts:Icon Text="{x:Static fonts:IconFont.Check}" />
+                                </Button>
+                            </StackPanel>
                         </Grid>
                     </Grid>
                 </ControlTemplate>

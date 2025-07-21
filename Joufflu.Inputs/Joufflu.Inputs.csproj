@@ -13,7 +13,6 @@
     <None Remove="DecimalUpDown.xaml" />
     <None Remove="Format\FormatTextBox.xaml" />
     <None Remove="NumericUpDown.xaml" />
-    <None Remove="TimeSpanPicker.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,10 +39,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="NumericUpDown.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="TimeSpanPicker.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

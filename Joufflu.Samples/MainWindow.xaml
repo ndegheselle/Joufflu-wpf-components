@@ -4,12 +4,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
     xmlns:local="clr-namespace:Joufflu.Samples"
-    xmlns:inputs="clr-namespace:Joufflu.Inputs;assembly=Joufflu.Inputs"
     xmlns:popups="clr-namespace:Joufflu.Popups;assembly=Joufflu.Popups"
     xmlns:layouts="clr-namespace:Joufflu.Layouts;assembly=Joufflu.Layouts"
     xmlns:data="clr-namespace:Joufflu.Data;assembly=Joufflu.Data"
-    xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
-    xmlns:format="clr-namespace:Joufflu.Inputs.Format;assembly=Joufflu.Inputs">
+    xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared">
     <adonisControls:AdonisWindow.Resources>
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Popups;component/Resources.xaml" />
     </adonisControls:AdonisWindow.Resources>
@@ -24,109 +22,7 @@
 
             <TabControl x:Name="MainContainer" Grid.Column="1">
                 <TabItem Visibility="Collapsed" Header="Inputs">
-                    <StackPanel>
-                        <StackPanel.Resources>
-                            <Style TargetType="UniformGrid">
-                                <Setter Property="Margin" Value="0,0,0,2" />
-                            </Style>
-                        </StackPanel.Resources>
-
-                        <UniformGrid Columns="3">
-                            <TextBlock>TimeSpan input</TextBlock>
-                            <inputs:TimeSpanPicker x:Name="TimePickerInput" ValueChanged="TimePickerInput_ValueChanged" />
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                Margin="4,0,0,0"
-                                Grid.Column="1"
-                                Text="{Binding Value, StringFormat=dd\\:hh\\:mm\\:ss, ElementName=TimePickerInput}" />
-                        </UniformGrid>
-
-
-                        <UniformGrid Columns="3">
-                            <TextBlock>Numeric up down</TextBlock>
-                            <inputs:NumericUpDown
-                                Value="50"
-                                x:Name="NumericUpDownInput"
-                                ValueChanged="NumericUpDownInput_ValueChanged" />
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                Margin="4,0,0,0"
-                                Grid.Column="1"
-                                Text="{Binding Value, ElementName=NumericUpDownInput}" />
-                        </UniformGrid>
-
-                        <UniformGrid Columns="3">
-                            <TextBlock>Decimal up down</TextBlock>
-                            <inputs:DecimalUpDown
-                                Value="50.5"
-                                x:Name="DecimalUpDownInput"
-                                ValueChanged="DecimalUpDownInput_ValueChanged" />
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                Margin="4,0,0,0"
-                                Grid.Column="1"
-                                Text="{Binding Value, ElementName=DecimalUpDownInput}" />
-                        </UniformGrid>
-
-                        <UniformGrid Columns="3">
-                            <TextBlock>Phone number input</TextBlock>
-                            <format:FormatTextBox
-                                x:Name="PhoneNumberInput"
-                                ValuesChanged="PhoneNumberInput_ValueChanged"
-                                GlobalFormat="numeric|min:0|padded"
-                                ShowIncrementsButtons="False"
-                                Format="+{max:99} {max:99} {max:9999} {max:9999}" />
-                            <ListBox Grid.Column="1" ItemsSource="{Binding Values, ElementName=PhoneNumberInput}">
-                                <ListBox.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel IsItemsHost="True" />
-                                    </ItemsPanelTemplate>
-                                </ListBox.ItemsPanel>
-                            </ListBox>
-                        </UniformGrid>
-                        <UniformGrid Columns="3">
-                            <TextBlock>ComboBox with search</TextBlock>
-                            <inputs:ComboBoxSearch
-                                x:Name="ComboBoxSearchInput"
-                                ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}"
-                                DisplayMemberPath="Name" />
-                            <inputs:ComboBoxSearch ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" DisplayMemberPath="Name" />
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                Margin="4,0,0,0"
-                                Grid.Column="1"
-                                Text="{Binding SelectedItem, ElementName=ComboBoxSearchInput}" />
-                        </UniformGrid>
-                        <UniformGrid Columns="3">
-                            <TextBlock>ComboBox with tags</TextBlock>
-                            <inputs:ComboBoxTags
-                                x:Name="ComboBoxTagsInput"
-                                ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}"
-                                SelectedItems="{Binding SelectedTestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
-                            <ListBox Grid.Column="1" ItemsSource="{Binding SelectedItems, ElementName=ComboBoxTagsInput}">
-
-                                <ListBox.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel IsItemsHost="True" />
-                                    </ItemsPanelTemplate>
-                                </ListBox.ItemsPanel>
-                            </ListBox>
-                        </UniformGrid>
-
-                        <UniformGrid Columns="3">
-                            <TextBlock>File picker</TextBlock>
-                            <inputs:FilePicker FilePath="{Binding TestValue.FilePath, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
-                            <Button Click="ButtonCheckFile_Click" HorizontalAlignment="Left">
-                                Check
-                            </Button>
-                        </UniformGrid>
-
-                        <UniformGrid Columns="3">
-                            <TextBlock>Text editable</TextBlock>
-                            <inputs:TextEditable Text="{Binding Text, Mode=TwoWay, ElementName=TestTextBox}" />
-                            <TextBox x:Name="TestTextBox" />
-                        </UniformGrid>
-                    </StackPanel>
+                    <local:InputsSamples VerticalAlignment="Top" />
                 </TabItem>
                 <TabItem Visibility="Collapsed" Header="Data">
                     <StackPanel>
@@ -142,7 +38,6 @@
                     <UniformGrid VerticalAlignment="Top" HorizontalAlignment="Left">
                         <Button Margin="1" Click="ShowAlert_Click">Show alert</Button>
                         <Button Margin="1" Click="ShowModal_Click">Show modal</Button>
-                        <Button Margin="1" Click="ShowModalValidation_Click">Show modal Validation</Button>
                         <Button Margin="1" Click="ShowMultiple_Click">Show multiple modal</Button>
                     </UniformGrid>
                 </TabItem>

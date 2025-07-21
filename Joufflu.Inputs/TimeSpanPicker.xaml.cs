@@ -19,6 +19,12 @@ namespace Joufflu.Inputs
             set { SetValue(ValueProperty, value); }
         }
 
+        public TimeSpanPicker()
+        {
+            GlobalFormat = "numeric|min:0|padded|nullable";
+            Format = "{max:365}d {max:23}h {max:59}m {max:59}s";
+        }
+
         public override TimeSpan? ConvertFrom()
         {
             if (Values.Count() < 4)

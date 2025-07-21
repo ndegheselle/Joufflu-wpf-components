@@ -15,5 +15,10 @@ namespace Joufflu.Inputs
             get { return (int)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
         }
+
+        public NumericUpDown()
+        {
+            Format = "{numeric|noGlobalSelection}";
+        }
     }
 }

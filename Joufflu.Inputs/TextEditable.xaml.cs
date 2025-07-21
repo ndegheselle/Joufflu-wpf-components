@@ -7,6 +7,9 @@ using Usuel.Shared;
 
 namespace Joufflu.Inputs
 {
+    /// <summary>
+    /// Text that can be edited, can be used outside a form to indicate clearly that a value can be edited
+    /// </summary>
     [TemplatePart(Name = ElementTextBox, Type = typeof(FrameworkElement))]
     public class TextEditable : ContentControl, INotifyPropertyChanged
     {
