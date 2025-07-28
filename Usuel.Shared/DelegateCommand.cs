@@ -46,8 +46,7 @@ namespace Usuel.Shared
             {
                 return _condition?.Invoke(value) ?? true;
             }
-
-            return _condition?.Invoke(default!) ?? true;
+            return false;
         }
 
         public void Execute(object? parameter)
@@ -58,7 +57,7 @@ namespace Usuel.Shared
             }
             else
             {
-                _action(default!);
+                throw new ArgumentException($"Type '{parameter?.GetType()}' of parameter is not assignable to type '{typeof(T)}'.");
             }
         }
 
