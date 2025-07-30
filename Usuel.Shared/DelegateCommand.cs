@@ -16,13 +16,13 @@ namespace Usuel.Shared
 
         public DelegateCommand(Action action, Func<bool>? executeCondition = default)
         {
-            _action = action ?? throw new ArgumentNullException(nameof(action));
+            _action = action;
             _condition = executeCondition;
         }
 
         public bool CanExecute(object? parameter) => _condition?.Invoke() ?? true;
 
-        public void Execute(object? parameter) => _action();
+        public virtual void Execute(object? parameter) => _action();
 
         public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, new EventArgs());
     }
@@ -36,7 +36,7 @@ namespace Usuel.Shared
 
         public DelegateCommand(Action<T> action, Func<T, bool>? executeCondition = default)
         {
-            _action = action ?? throw new ArgumentNullException(nameof(action));
+            _action = action;
             _condition = executeCondition;
         }
 
@@ -49,7 +49,7 @@ namespace Usuel.Shared
             return false;
         }
 
-        public void Execute(object? parameter)
+        public virtual void Execute(object? parameter)
         {
             if (parameter is T value)
             {
