@@ -10,6 +10,8 @@ namespace Joufflu.Popups
 {
     public interface IModal : ILayout
     {
+        public ICustomCommand HideCommand { get; }
+
         public Task<bool> Show(IModalContent page);
         public void Hide(bool result = false);
     }

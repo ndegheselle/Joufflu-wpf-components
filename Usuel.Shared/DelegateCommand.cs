@@ -34,7 +34,7 @@ namespace Usuel.Shared
 
         public event EventHandler? CanExecuteChanged;
 
-        public DelegateCommand(Action<T> action, Func<T, bool>? executeCondition = default)
+        public DelegateCommand(Action<T> action, Func<T, bool>? executeCondition = null)
         {
             _action = action;
             _condition = executeCondition;
@@ -46,7 +46,7 @@ namespace Usuel.Shared
             {
                 return _condition?.Invoke(value) ?? true;
             }
-            return false;
+            return _condition?.Invoke(default!) ?? true;
         }
 
         public virtual void Execute(object? parameter)
@@ -57,7 +57,7 @@ namespace Usuel.Shared
             }
             else
             {
-                throw new ArgumentException($"Type '{parameter?.GetType()}' of parameter is not assignable to type '{typeof(T)}'.");
+                _action(default!);
             }
         }
 
