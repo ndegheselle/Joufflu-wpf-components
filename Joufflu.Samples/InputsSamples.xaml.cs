@@ -72,5 +72,10 @@ namespace Joufflu.Samples
             if (string.IsNullOrEmpty(TestValue.FilePath))
                 TestValue.AddError("No file selected", nameof(TestClass.FilePath));
         }
+
+        private void SearchInput_SearchChanged(string text)
+        {
+            SearchValue.Text = text;
+        }
     }
 }

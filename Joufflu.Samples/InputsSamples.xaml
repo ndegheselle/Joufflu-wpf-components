@@ -83,5 +83,11 @@
         <TextBlock
                 VerticalAlignment="Center"
                 Text="{Binding Text, ElementName=TextEditableInput}" />
+
+        <TextBlock>Search</TextBlock>
+        <inputs:Search x:Name="SearchInput" SearchChanged="SearchInput_SearchChanged" />
+        <TextBlock
+            x:Name="SearchValue"
+                VerticalAlignment="Center"/>
     </layouts:FlexibleGrid>
 </UserControl>
