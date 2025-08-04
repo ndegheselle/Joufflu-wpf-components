@@ -16,7 +16,7 @@ namespace Joufflu.Inputs
         public Search()
         {
             _searchTimer = InitSearchTimer();
-            ClearCommand = new DelegateCommand(Clear);
+            ClearCommand = new DelegateCommand(ClearSearch);
             this.KeyUp += OnKeyUp;
         }
 
@@ -31,7 +31,7 @@ namespace Joufflu.Inputs
         {
             if (e.Key == System.Windows.Input.Key.Escape)
             {
-                Clear();
+                ClearSearch();
                 return;
             }
 
@@ -45,9 +45,9 @@ namespace Joufflu.Inputs
             SearchChanged?.Invoke(this.Text);
         }
 
-        public void Clear()
+        public void ClearSearch()
         {
-            this.Text = "";
+            Clear();
             SearchChanged?.Invoke(this.Text);
         }
     }
