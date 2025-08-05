@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +18,10 @@ namespace Joufflu.Inputs
     {
         private TextBox? _editableTextBox;
         private ICollectionView? _collectionView;
+        /// <summary>
+        /// Previous text used to filter the items.
+        /// </summary>
+        private string? _previousRefreshText;
 
         public ComboBoxSearch()
         {
@@ -37,16 +42,14 @@ namespace Joufflu.Inputs
 
         protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
         {
-            if (newValue is not IList)
-                return;
-
-            // Create a new ICollectionView for this ComboBoxSearch instance
-            // Allow multiple ComboBoxSearch on the same list
-            _collectionView = new ListCollectionView((IList)newValue);
-            _collectionView.Filter += DoesItemPassFilter;
-
-            // Will call OnItemsSourceChanged again
-            ItemsSource = _collectionView;
+            if (newValue != _collectionView)
+            {
+                // Create a new ICollectionView for this ComboBoxSearch instance
+                // Allow multiple ComboBoxSearch on the same list
+                _collectionView = new ListCollectionView((IList)newValue);
+                _collectionView.Filter += DoesItemPassFilter;
+                ItemsSource = _collectionView;
+            }
 
             base.OnItemsSourceChanged(oldValue, newValue);
         }
@@ -96,20 +99,11 @@ namespace Joufflu.Inputs
         {
             // Prevent having a value that doesn't match any item (could be misleading)
             if (SelectedItem == null)
-                ClearFilter();
+                Text = string.Empty;
             else if (_editableTextBox != null)
                 _editableTextBox.FontStyle = FontStyles.Normal;
 
             base.OnPreviewLostKeyboardFocus(e);
-        }
-
-        protected override void OnDropDownClosed(EventArgs e)
-        {
-            if (SelectedItem == null)
-            {
-                ClearFilter();
-            }
-            base.OnDropDownClosed(e);
         }
 
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
@@ -137,12 +131,20 @@ namespace Joufflu.Inputs
             if (ItemsSource == null)
                 return;
 
+            // Prevent unnecessary refresh if the text has not changed
+            if (_previousRefreshText == Text)
+                return;
+            _previousRefreshText = Text;
+
             _collectionView?.Refresh();
             SelectFromFilter();
         }
 
         private void SelectFromFilter()
         {
+            if (Text == string.Empty)
+                return;
+
             // Select item that matches user input exactly
             for (int i = 0; i < Items.Count; i++)
             {
@@ -152,12 +154,6 @@ namespace Joufflu.Inputs
                     return;
                 }
             }
-        }
-
-        private void ClearFilter()
-        {
-            Text = string.Empty;
-            RefreshFilter();
         }
 
         protected virtual bool DoesItemPassFilter(object value)

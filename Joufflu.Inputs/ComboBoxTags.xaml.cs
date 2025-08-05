@@ -1,4 +1,5 @@
 ﻿using Joufflu.Shared;
+using Microsoft.VisualBasic;
 using PropertyChanged;
 using System.Collections;
 using System.Collections.ObjectModel;
@@ -51,7 +52,7 @@ namespace Joufflu.Inputs
         #region Dependency Properties
         public static readonly DependencyProperty SelectedItemsProperty =
             DependencyProperty.Register(
-            "SelectedItems",
+            nameof(SelectedItems),
             typeof(IList),
             typeof(ComboBoxTags),
             new FrameworkPropertyMetadata(null, (o, e) => ((ComboBoxTags)o).OnSelectedItemsChanged()));
@@ -61,25 +62,10 @@ namespace Joufflu.Inputs
             get => (IList)GetValue(SelectedItemsProperty);
             set => SetValue(SelectedItemsProperty, value);
         }
-
-        void OnSelectedItemsChanged()
-        {
-            if (SelectedItems == null || InternalSelectedItems == SelectedItems)
-                return;
-
-            InternalSelectedItems = new ObservableCollection<object>();
-            foreach (var item in SelectedItems)
-            {
-                if (Items.Contains(item))
-                    InternalSelectedItems.Add(item);
-            }
-
-            InternalSelectedItems.CollectionChanged += InternalSelectedItems_CollectionChanged;
-        }
         #endregion
 
         #region Properties
-        public ObservableCollection<object> InternalSelectedItems { get; set; } = new ObservableCollection<object>();
+        public IList InternalSelectedItems { get; set; } = new ObservableCollection<object>();
 
         public bool AllowAdd { get; set; } = false;
 
@@ -94,7 +80,6 @@ namespace Joufflu.Inputs
         public ComboBoxTags()
         {
             RemoveSelectedCmd = new DelegateCommand<object>((parameter) => InternalSelectedItems.Remove(parameter));
-            InternalSelectedItems.CollectionChanged += InternalSelectedItems_CollectionChanged;
 
             SizeChanged += (s, e) =>
             {
@@ -111,18 +96,32 @@ namespace Joufflu.Inputs
         public override void OnApplyTemplate()
         {
             _popup = (Popup)GetTemplateChild("PART_Popup");
-
             base.OnApplyTemplate();
         }
 
-        /// <summary>
-        /// Handle update the SelectedItems property when the internal list is modified
-        /// </summary>
-        private void InternalSelectedItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        void OnSelectedItemsChanged()
         {
-            var bindingExpression = GetBindingExpression(SelectedItemsProperty);
-            // TwoWay or OneWayToSource : update the source directly to avoid losing the reference
-            if (bindingExpression?.ParentBinding.Mode == BindingMode.TwoWay ||
+            if (SelectedItems == null || InternalSelectedItems == SelectedItems)
+                return;
+
+            if (SelectedItems.GetType().IsGenericType &&
+                SelectedItems.GetType().GetGenericTypeDefinition() == typeof(ObservableCollection<>))
+            {
+
+                InternalSelectedItems = SelectedItems;
+            }
+            else
+            {
+                InternalSelectedItems = new ObservableCollection<object>();
+                foreach (var item in SelectedItems)
+                {
+                    if (Items.Contains(item))
+                        InternalSelectedItems.Add(item);
+                }
+            }
+
+            /* XXX : may want to handle binding two way with simple list with something like this : 
+             if (bindingExpression?.ParentBinding.Mode == BindingMode.TwoWay ||
                 bindingExpression?.ParentBinding.Mode == BindingMode.OneWayToSource)
             {
                 SelectedItems.Clear();
@@ -131,11 +130,7 @@ namespace Joufflu.Inputs
                 // For non ObservableCollection
                 bindingExpression.UpdateSource();
             }
-            // Else copy the internal list so that other controls can bind to it
-            else
-            {
-                SelectedItems = InternalSelectedItems;
-            }
+             */
         }
 
         [SuppressPropertyChangedWarnings]
