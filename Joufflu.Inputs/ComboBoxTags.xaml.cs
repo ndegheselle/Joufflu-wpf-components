@@ -92,7 +92,6 @@ namespace Joufflu.Inputs
             };
         }
 
-
         public override void OnApplyTemplate()
         {
             _popup = (Popup)GetTemplateChild("PART_Popup");
@@ -146,6 +145,7 @@ namespace Joufflu.Inputs
             AddSelectedItem();
         }
 
+        #region UI events
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             if (e.Key == Key.Up || e.Key == Key.Down)
@@ -163,16 +163,25 @@ namespace Joufflu.Inputs
             {
                 InternalSelectedItems.RemoveAt(InternalSelectedItems.Count - 1);
             }
-            else if (e.Key == Key.Enter && SelectedItem != null)
+            else if (e.Key == Key.Enter)
             {
-                AddSelectedItem();
+                if (SelectedItem != null)
+                {
+                    AddSelectedItem();
+                }
+                else if (AllowAdd && !string.IsNullOrEmpty(Text))
+                {
+                    InternalSelectedItems.Add(Text);
+                    Text = string.Empty;
+                }
             }
 
             base.OnKeyDown(e);
         }
 
-        protected override void OnKeyUp(KeyEventArgs e) { base.OnKeyUp(e); }
+        #endregion
 
+        #region Methods
         protected override bool DoesItemPassFilter(object value)
         {
             // If the item is already selected, don't show it in the list
@@ -189,5 +198,6 @@ namespace Joufflu.Inputs
             InternalSelectedItems.Add(SelectedItem);
             Text = string.Empty;
         }
+        #endregion
     }
 }

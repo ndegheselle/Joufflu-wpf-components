@@ -119,14 +119,12 @@
                                 SnapsToDevicePixels="True"
                                 MinWidth="{TemplateBinding FrameworkElement.ActualWidth}"
                                 MaxHeight="{TemplateBinding ComboBox.MaxDropDownHeight}">
-
                                 <Border
                                     x:Name="DropDownBorder"
                                     Background="{TemplateBinding Background}"
                                     Margin="0,1,0,0"
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     BorderBrush="{TemplateBinding BorderBrush}">
-
                                     <ScrollViewer SnapsToDevicePixels="True">
                                         <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
                                     </ScrollViewer>
@@ -135,7 +133,6 @@
                         </Popup>
                     </Grid>
                     <ControlTemplate.Triggers>
-
                         <Trigger Property="HasItems" Value="False">
                             <Setter Property="FrameworkElement.MinHeight" TargetName="DropDownBorder" Value="95" />
                         </Trigger>

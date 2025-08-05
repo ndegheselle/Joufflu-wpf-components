@@ -39,6 +39,34 @@ namespace Joufflu.Samples
             };
         }
 
+        public List<string> TestStringValues
+        {
+            get => new List<string>
+            {
+                "One",
+                "Two",
+                "Three",
+                "Four",
+                "Five",
+                "Six",
+                "Seven",
+                "Eight",
+                "Nine",
+                "Ten",
+                "Eleven",
+                "Twelve",
+                "Thirteen",
+                "Fourteen",
+                "Fifteen",
+                "Sixteen",
+                "Seventeen",
+                "Eighteen",
+                "Nineteen",
+                "Twenty",
+                "Twenty-One"
+            };
+        }
+
         public TestClass TestValue { get; set; } = new TestClass("Minus", -1);
 
         public ObservableCollection<TestClass> SelectedTestValues

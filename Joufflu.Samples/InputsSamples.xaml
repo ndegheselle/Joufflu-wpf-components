@@ -10,38 +10,35 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <layouts:FlexibleGrid Gap="2" Columns="3" ColumnsWidth="200,*,*">
+    <layouts:FlexibleGrid
+        Gap="2"
+        Columns="3"
+        ColumnsWidth="200,*,*">
         <TextBlock>TimeSpan input</TextBlock>
         <inputs:TimeSpanPicker x:Name="TimePickerInput" ValueChanged="TimePickerInput_ValueChanged" />
-        <TextBlock
-                VerticalAlignment="Center"
-                Text="{Binding Value, StringFormat=dd\\:hh\\:mm\\:ss, ElementName=TimePickerInput}" />
+        <TextBlock VerticalAlignment="Center" Text="{Binding Value, StringFormat=dd\\:hh\\:mm\\:ss, ElementName=TimePickerInput}" />
 
         <TextBlock>Numeric up down</TextBlock>
         <inputs:NumericUpDown
-                x:Name="NumericUpDownInput"
-                ValueChanged="NumericUpDownInput_ValueChanged"
-                Value="50" />
-        <TextBlock
-                VerticalAlignment="Center"
-                Text="{Binding Value, ElementName=NumericUpDownInput}" />
+            x:Name="NumericUpDownInput"
+            ValueChanged="NumericUpDownInput_ValueChanged"
+            Value="50" />
+        <TextBlock VerticalAlignment="Center" Text="{Binding Value, ElementName=NumericUpDownInput}" />
 
         <TextBlock>Decimal up down</TextBlock>
         <inputs:DecimalUpDown
-                x:Name="DecimalUpDownInput"
-                ValueChanged="DecimalUpDownInput_ValueChanged"
-                Value="50.5" />
-        <TextBlock
-                VerticalAlignment="Center"
-                Text="{Binding Value, ElementName=DecimalUpDownInput}" />
+            x:Name="DecimalUpDownInput"
+            ValueChanged="DecimalUpDownInput_ValueChanged"
+            Value="50.5" />
+        <TextBlock VerticalAlignment="Center" Text="{Binding Value, ElementName=DecimalUpDownInput}" />
 
         <TextBlock>Phone number input</TextBlock>
         <format:FormatTextBox
-                x:Name="PhoneNumberInput"
-                GlobalFormat="numeric|min:0|padded"
-                Format="+{max:99} {max:99} {max:9999} {max:9999}"
-                ShowIncrementsButtons="False"
-                ValuesChanged="PhoneNumberInput_ValueChanged" />
+            x:Name="PhoneNumberInput"
+            GlobalFormat="numeric|min:0|padded"
+            Format="+{max:99} {max:99} {max:9999} {max:9999}"
+            ShowIncrementsButtons="False"
+            ValuesChanged="PhoneNumberInput_ValueChanged" />
         <ListBox Grid.Column="1" ItemsSource="{Binding Values, ElementName=PhoneNumberInput}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -52,19 +49,30 @@
 
         <TextBlock>ComboBox with search</TextBlock>
         <inputs:ComboBoxSearch
-                x:Name="ComboBoxSearchInput"
-                DisplayMemberPath="Name"
-                ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
-        <TextBlock
-                VerticalAlignment="Center"
-                Text="{Binding SelectedItem, ElementName=ComboBoxSearchInput}" />
+            x:Name="ComboBoxSearchInput"
+            DisplayMemberPath="Name"
+            ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+        <TextBlock VerticalAlignment="Center" Text="{Binding SelectedItem, ElementName=ComboBoxSearchInput}" />
 
         <TextBlock>ComboBox with tags</TextBlock>
         <inputs:ComboBoxTags
-                x:Name="ComboBoxTagsInput"
-                ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}"
-                SelectedItems="{Binding SelectedTestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+            x:Name="ComboBoxTagsInput"
+            ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}"
+            SelectedItems="{Binding SelectedTestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
         <ListBox ItemsSource="{Binding SelectedItems, ElementName=ComboBoxTagsInput}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel IsItemsHost="True" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
+
+        <TextBlock>ComboBox with tags (allow add)</TextBlock>
+        <inputs:ComboBoxTags
+            AllowAdd="True"
+            x:Name="ComboBoxTagsTextInput"
+            ItemsSource="{Binding TestStringValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+        <ListBox ItemsSource="{Binding SelectedItems, ElementName=ComboBoxTagsTextInput}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel IsItemsHost="True" />
@@ -79,15 +87,11 @@
         </Button>
 
         <TextBlock>Text editable</TextBlock>
-        <inputs:TextEditable x:Name="TextEditableInput"/>
-        <TextBlock
-                VerticalAlignment="Center"
-                Text="{Binding Text, ElementName=TextEditableInput}" />
+        <inputs:TextEditable x:Name="TextEditableInput" />
+        <TextBlock VerticalAlignment="Center" Text="{Binding Text, ElementName=TextEditableInput}" />
 
         <TextBlock>Search</TextBlock>
         <inputs:Search x:Name="SearchInput" SearchChanged="SearchInput_SearchChanged" />
-        <TextBlock
-            x:Name="SearchValue"
-                VerticalAlignment="Center"/>
+        <TextBlock x:Name="SearchValue" VerticalAlignment="Center" />
     </layouts:FlexibleGrid>
 </UserControl>
