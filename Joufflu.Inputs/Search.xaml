@@ -35,7 +35,7 @@
                                     Padding="6,5"
                                     Name="ClearButton"
                                     Style="{StaticResource IconButton}">
-                                    <fonts:Icon Text="{x:Static fonts:IconFont.CircleXmark}" />
+                                    <fonts:Icon Text="{x:Static fonts:IconFont.Xmark}" />
                                 </Button>
                             </StackPanel>
                         </Grid>

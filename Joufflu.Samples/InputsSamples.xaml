@@ -47,18 +47,24 @@
             </ListBox.ItemsPanel>
         </ListBox>
 
+        <TextBlock>Combobox (classic)</TextBlock>
+        <ComboBox
+            x:Name="ComboBoxClassic"
+            DisplayMemberPath="Name"
+            ItemsSource="{Binding ComboBoxSearchValues, RelativeSource={RelativeSource AncestorType=local:InputsSamples}}"/>
+        <TextBlock VerticalAlignment="Center" Text="{Binding SelectedItem, ElementName=ComboBoxClassic}" />
+
         <TextBlock>ComboBox with search</TextBlock>
         <inputs:ComboBoxSearch
             x:Name="ComboBoxSearchInput"
             DisplayMemberPath="Name"
-            ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+            ItemsSource="{Binding ComboBoxSearchValues, RelativeSource={RelativeSource AncestorType=local:InputsSamples}}"/>
         <TextBlock VerticalAlignment="Center" Text="{Binding SelectedItem, ElementName=ComboBoxSearchInput}" />
 
         <TextBlock>ComboBox with tags</TextBlock>
         <inputs:ComboBoxTags
             x:Name="ComboBoxTagsInput"
-            ItemsSource="{Binding TestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}"
-            SelectedItems="{Binding SelectedTestValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+            SelectedItems="{Binding SelectedTestValues, RelativeSource={RelativeSource AncestorType=local:InputsSamples}}" />
         <ListBox ItemsSource="{Binding SelectedItems, ElementName=ComboBoxTagsInput}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -70,8 +76,7 @@
         <TextBlock>ComboBox with tags (allow add)</TextBlock>
         <inputs:ComboBoxTags
             AllowAdd="True"
-            x:Name="ComboBoxTagsTextInput"
-            ItemsSource="{Binding TestStringValues, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+            x:Name="ComboBoxTagsTextInput" />
         <ListBox ItemsSource="{Binding SelectedItems, ElementName=ComboBoxTagsTextInput}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -81,7 +86,7 @@
         </ListBox>
 
         <TextBlock>File picker</TextBlock>
-        <inputs:FilePicker FilePath="{Binding TestValue.FilePath, RelativeSource={RelativeSource AncestorType=local:MainWindow}}" />
+        <inputs:FilePicker />
         <Button HorizontalAlignment="Left" Click="ButtonCheckFile_Click">
             Check
         </Button>

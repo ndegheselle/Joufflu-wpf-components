@@ -1,23 +1,31 @@
 ﻿using System.Collections;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using Usuel.Shared;
 
 namespace Joufflu.Inputs
 {
     /// <summary>
     /// Inspired from : https://stackoverflow.com/a/41986141/10404482 
     /// </summary>
-
-    public class ComboBoxSearch : ComboBox
+    public class ComboBoxSearch : ComboBox, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public ICollectionView? SourceView { get; private set; }
+        public DelegateCommand ClearCommand { get; set; }
+
         private TextBox? _editableTextBox;
-        private ICollectionView? _collectionView;
         /// <summary>
         /// Previous text used to filter the items.
         /// </summary>
@@ -25,6 +33,7 @@ namespace Joufflu.Inputs
 
         public ComboBoxSearch()
         {
+            ClearCommand = new DelegateCommand(() => Text = null);
             // Set default options
             IsEditable = true;
             StaysOpenOnEdit = true;
@@ -42,15 +51,17 @@ namespace Joufflu.Inputs
 
         protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
         {
-            if (newValue != _collectionView)
+            if (newValue != oldValue)
             {
-                // Create a new ICollectionView for this ComboBoxSearch instance
-                // Allow multiple ComboBoxSearch on the same list
-                _collectionView = new ListCollectionView((IList)newValue);
-                _collectionView.Filter += DoesItemPassFilter;
-                ItemsSource = _collectionView;
-            }
+                // XXX : could use new ListCollectionView((IList)newValue) to avoid conflicts on the DefaultView
+                // XXX : actualy if the same list is used on two ComboBoxSearch there will be conflicts
+                SourceView = CollectionViewSource.GetDefaultView(newValue);
+                SourceView.Filter += DoesItemPassFilter;
 
+                // Clean events
+                if (oldValue != null)
+                    CollectionViewSource.GetDefaultView(oldValue).Filter -= DoesItemPassFilter;
+            }
             base.OnItemsSourceChanged(oldValue, newValue);
         }
 
@@ -99,7 +110,7 @@ namespace Joufflu.Inputs
         {
             // Prevent having a value that doesn't match any item (could be misleading)
             if (SelectedItem == null)
-                Text = string.Empty;
+                Text = null;
             else if (_editableTextBox != null)
                 _editableTextBox.FontStyle = FontStyles.Normal;
 
@@ -136,7 +147,7 @@ namespace Joufflu.Inputs
                 return;
             _previousRefreshText = Text;
 
-            _collectionView?.Refresh();
+            SourceView?.Refresh();
             SelectFromFilter();
         }
 
