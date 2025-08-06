@@ -63,7 +63,7 @@
                                                             </TextBlock.Text>
                                                         </TextBlock>
                                                         <Button
-                                                            Padding="6,4"
+                                                            Padding="6,0"
                                                             Background="Transparent"
                                                             Style="{StaticResource IconButton}"
                                                             Command="{Binding RemoveSelectedCmd, RelativeSource={RelativeSource AncestorType=local:ComboBoxTags}}"
