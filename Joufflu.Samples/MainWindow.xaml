@@ -3,10 +3,11 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
+    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
     xmlns:local="clr-namespace:Joufflu.Samples"
+    xmlns:views="clr-namespace:Joufflu.Samples.Views"
     xmlns:popups="clr-namespace:Joufflu.Popups;assembly=Joufflu.Popups"
     xmlns:layouts="clr-namespace:Joufflu.Layouts;assembly=Joufflu.Layouts"
-    xmlns:data="clr-namespace:Joufflu.Data;assembly=Joufflu.Data"
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared">
     <adonisControls:AdonisWindow.Resources>
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Popups;component/Resources.xaml" />
@@ -22,24 +23,13 @@
 
             <TabControl x:Name="MainContainer" Grid.Column="1">
                 <TabItem Visibility="Collapsed" Header="Inputs">
-                    <local:InputsSamples VerticalAlignment="Top" />
+                    <views:InputsSamples VerticalAlignment="Top" />
                 </TabItem>
                 <TabItem Visibility="Collapsed" Header="Data">
-                    <StackPanel>
-                        <DataGrid x:Name="PagingDataGrid" />
-                        <data:Paging
-                            Capacity="5"
-                            Margin="0,2,0,0"
-                            Total="{Binding TestValues.Count, RelativeSource={RelativeSource AncestorType=local:MainWindow}}"
-                            PagingChange="Paging_PagingChange" />
-                    </StackPanel>
+                    <views:DataSamples />
                 </TabItem>
                 <TabItem Visibility="Collapsed" Header="Popups">
-                    <UniformGrid VerticalAlignment="Top" HorizontalAlignment="Left">
-                        <Button Margin="1" Click="ShowAlert_Click">Show alert</Button>
-                        <Button Margin="1" Click="ShowModal_Click">Show modal</Button>
-                        <Button Margin="1" Click="ShowMultiple_Click">Show multiple modal</Button>
-                    </UniformGrid>
+                    <views:PopupsSamples />
                 </TabItem>
 
                 <TabItem Visibility="Collapsed" Header="Layouts">
@@ -66,6 +56,7 @@
         </Grid>
 
         <popups:Modal x:Name="Modal" />
+        <popups:Loading x:Name="Loading" />
         <popups:Alert x:Name="Alert" />
     </Grid>
 </adonisControls:AdonisWindow>

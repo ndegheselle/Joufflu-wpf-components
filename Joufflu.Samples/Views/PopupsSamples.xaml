@@ -1,0 +1,15 @@
+﻿<UserControl
+    x:Class="Joufflu.Samples.Views.PopupsSamples"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Joufflu.Samples.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <UniformGrid HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Button Margin="1" Click="ShowAlert_Click">Show alert</Button>
+        <Button Margin="1" Click="ShowModal_Click">Show modal</Button>
+        <Button Margin="1" Click="ShowMultiple_Click">Show multiple modal</Button>
+        <Button Margin="1" Click="ShowLoading_Click">Loading</Button>
+    </UniformGrid>
+</UserControl>

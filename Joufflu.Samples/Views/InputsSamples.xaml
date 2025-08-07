@@ -1,19 +1,19 @@
 ﻿<UserControl
-    x:Class="Joufflu.Samples.InputsSamples"
+    x:Class="Joufflu.Samples.Views.InputsSamples"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:format="clr-namespace:Joufflu.Inputs.Format;assembly=Joufflu.Inputs"
     xmlns:inputs="clr-namespace:Joufflu.Inputs;assembly=Joufflu.Inputs"
     xmlns:layouts="clr-namespace:Joufflu.Layouts;assembly=Joufflu.Layouts"
-    xmlns:local="clr-namespace:Joufflu.Samples"
+    xmlns:local="clr-namespace:Joufflu.Samples.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignWidth="800"
     mc:Ignorable="d">
     <layouts:FlexibleGrid
-        Gap="2"
         Columns="3"
-        ColumnsWidth="200,*,*">
+        ColumnsWidth="200,*,*"
+        Gap="2">
         <TextBlock>TimeSpan input</TextBlock>
         <inputs:TimeSpanPicker x:Name="TimePickerInput" ValueChanged="TimePickerInput_ValueChanged" />
         <TextBlock VerticalAlignment="Center" Text="{Binding Value, StringFormat=dd\\:hh\\:mm\\:ss, ElementName=TimePickerInput}" />
@@ -35,8 +35,8 @@
         <TextBlock>Phone number input</TextBlock>
         <format:FormatTextBox
             x:Name="PhoneNumberInput"
-            GlobalFormat="numeric|min:0|padded"
             Format="+{max:99} {max:99} {max:9999} {max:9999}"
+            GlobalFormat="numeric|min:0|padded"
             ShowIncrementsButtons="False"
             ValuesChanged="PhoneNumberInput_ValueChanged" />
         <ListBox Grid.Column="1" ItemsSource="{Binding Values, ElementName=PhoneNumberInput}">
@@ -51,19 +51,20 @@
         <ComboBox
             x:Name="ComboBoxClassic"
             DisplayMemberPath="Name"
-            ItemsSource="{Binding ComboBoxSearchValues, RelativeSource={RelativeSource AncestorType=local:InputsSamples}}"/>
+            ItemsSource="{Binding ComboBoxSearchValues, RelativeSource={RelativeSource AncestorType=local:InputsSamples}}" />
         <TextBlock VerticalAlignment="Center" Text="{Binding SelectedItem, ElementName=ComboBoxClassic}" />
 
         <TextBlock>ComboBox with search</TextBlock>
         <inputs:ComboBoxSearch
             x:Name="ComboBoxSearchInput"
             DisplayMemberPath="Name"
-            ItemsSource="{Binding ComboBoxSearchValues, RelativeSource={RelativeSource AncestorType=local:InputsSamples}}"/>
+            ItemsSource="{Binding ComboBoxSearchValues, RelativeSource={RelativeSource AncestorType=local:InputsSamples}}" />
         <TextBlock VerticalAlignment="Center" Text="{Binding SelectedItem, ElementName=ComboBoxSearchInput}" />
 
         <TextBlock>ComboBox with tags</TextBlock>
         <inputs:ComboBoxTags
             x:Name="ComboBoxTagsInput"
+            ItemsSource="{Binding ComboBoxTagsValues, RelativeSource={RelativeSource AncestorType=local:InputsSamples}}"
             SelectedItems="{Binding SelectedTestValues, RelativeSource={RelativeSource AncestorType=local:InputsSamples}}" />
         <ListBox ItemsSource="{Binding SelectedItems, ElementName=ComboBoxTagsInput}">
             <ListBox.ItemsPanel>
@@ -74,9 +75,7 @@
         </ListBox>
 
         <TextBlock>ComboBox with tags (allow add)</TextBlock>
-        <inputs:ComboBoxTags
-            AllowAdd="True"
-            x:Name="ComboBoxTagsTextInput" />
+        <inputs:ComboBoxTags x:Name="ComboBoxTagsTextInput" AllowAdd="True" />
         <ListBox ItemsSource="{Binding SelectedItems, ElementName=ComboBoxTagsTextInput}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
