@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Joufflu.Samples
+namespace Joufflu.Samples.Views
 {
     /// <summary>
     /// Logique d'interaction pour InputsSamples.xaml
@@ -11,6 +11,7 @@ namespace Joufflu.Samples
     public partial class InputsSamples : UserControl
     {
         public List<TestClass> ComboBoxSearchValues { get; private set; } = Tests.Values;
+        public List<TestClass> ComboBoxTagsValues { get; private set; } = Tests.Values;
 
         public ObservableCollection<TestClass> SelectedTestValues
         {
