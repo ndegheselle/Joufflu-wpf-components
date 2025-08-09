@@ -63,7 +63,7 @@ Tried to find the best way to do this since there is several way to acheive this
 
 ### Executing program
 
-- Start the project `WpfComponents.App`
+- Start the project `Joufflu.Samples`
 
 ## Acknowledgments
 
