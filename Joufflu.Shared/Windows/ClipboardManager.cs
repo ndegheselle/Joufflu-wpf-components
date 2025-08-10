@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Interop;
 using System.Windows;
+using System.Windows.Interop;
 
 namespace Joufflu.Shared.Windows
 {
-    internal static class NativeMethods
+    internal static class ClipboardNative
     {
         // See http://msdn.microsoft.com/en-us/library/ms649021%28v=vs.85%29.aspx
         public const int WM_CLIPBOARDUPDATE = 0x031D;
@@ -46,7 +41,7 @@ namespace Joufflu.Shared.Windows
             IntPtr windowHandle = new WindowInteropHelper(windowSource).Handle;
 
             // register for clipboard events
-            NativeMethods.AddClipboardFormatListener(windowHandle);
+            ClipboardNative.AddClipboardFormatListener(windowHandle);
         }
 
         private void OnClipboardChanged()
@@ -58,7 +53,7 @@ namespace Joufflu.Shared.Windows
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if (msg == NativeMethods.WM_CLIPBOARDUPDATE)
+            if (msg == ClipboardNative.WM_CLIPBOARDUPDATE)
             {
                 OnClipboardChanged();
                 handled = true;

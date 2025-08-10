@@ -1,5 +1,6 @@
 ﻿using AdonisUI.Controls;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows.Controls;
 
 namespace Joufflu.Samples

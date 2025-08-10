@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Joufflu.Shared.Windows;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -10,23 +11,21 @@ using System.Windows.Media;
 namespace Joufflu.Data.DnD
 {
     /// <summary>
-    /// Simplify the usage of the handler : data:DragBehavior.Handler="{Binding DragHandler}"
-    /// Instead of registering and bubbling the event. 
+    /// Simplify the usage of the handler : data:DragBehavior.Handler="{Binding DragHandler}" Instead of registering and
+    /// bubbling the event.
     /// </summary>
     public static class DragBehavior
     {
         public static readonly DependencyProperty HandlerProperty =
             DependencyProperty.RegisterAttached(
-                "Handler",
-                typeof(DragHandler),
-                typeof(DragBehavior),
-                new PropertyMetadata(null, OnHandlerChanged));
+            "Handler",
+            typeof(DragHandler),
+            typeof(DragBehavior),
+            new PropertyMetadata(null, OnHandlerChanged));
 
-        public static DragHandler GetHandler(DependencyObject obj)
-            => (DragHandler)obj.GetValue(HandlerProperty);  
+        public static DragHandler GetHandler(DependencyObject obj) => (DragHandler)obj.GetValue(HandlerProperty);
 
-        public static void SetHandler(DependencyObject obj, DragHandler value)
-            => obj.SetValue(HandlerProperty, value);
+        public static void SetHandler(DependencyObject obj, DragHandler value) => obj.SetValue(HandlerProperty, value);
 
         private static void OnHandlerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -41,58 +40,15 @@ namespace Joufflu.Data.DnD
         }
     }
 
-    public class DragAdorner : Adorner
-    {
-        private readonly FrameworkElement _child;
-        private Point _position;
-
-        public DragAdorner(UIElement adornedElement, FrameworkElement child, Point position)
-            : base(adornedElement)
-        {
-            _child = child ?? throw new ArgumentNullException(nameof(child));
-            _position = position;
-
-            // Make the adorner semi-transparent
-            _child.Opacity = 0.7;
-            IsHitTestVisible = false; // Don't interfere with drag operations
-        }
-
-        public void UpdatePosition(Point position)
-        {
-            _position = position;
-            InvalidateVisual();
-        }
-
-        protected override int VisualChildrenCount => 1;
-
-        protected override Visual GetVisualChild(int index)
-        {
-            if (index != 0) throw new ArgumentOutOfRangeException(nameof(index));
-            return _child;
-        }
-
-        protected override Size MeasureOverride(Size constraint)
-        {
-            _child.Measure(constraint);
-            return _child.DesiredSize;
-        }
-
-        protected override Size ArrangeOverride(Size finalSize)
-        {
-            var rect = new Rect(_position, _child.DesiredSize);
-            _child.Arrange(rect);
-            return finalSize;
-        }
-    }
-
     /// <summary>
     /// Handle object draging.
     /// </summary>
     public class DragHandler : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string? name = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        protected void OnPropertyChanged([CallerMemberName] string? name = null) => PropertyChanged?.Invoke(
+            this,
+            new PropertyChangedEventArgs(name));
 
         public bool WithMinimumDistance { get; set; } = true;
 
@@ -101,16 +57,11 @@ namespace Joufflu.Data.DnD
         private bool _hasValidClick;
         protected readonly FrameworkElement _parentUI;
 
-        public DragHandler(FrameworkElement parent)
-        {
-            _parentUI = parent;
-        }
+        public DragHandler(FrameworkElement parent) { _parentUI = parent; }
 
         public virtual void HandleDragMouseDown(object sender, MouseButtonEventArgs e)
         {
-            _hasValidClick = e.LeftButton == MouseButtonState.Pressed &&
-                           e.ClickCount == 1 &&
-                           _parentUI.IsLoaded;
+            _hasValidClick = e.LeftButton == MouseButtonState.Pressed && e.ClickCount == 1 && _parentUI.IsLoaded;
 
             if (_hasValidClick)
                 _clickPosition = e.GetPosition(_parentUI);
@@ -141,7 +92,7 @@ namespace Joufflu.Data.DnD
             var deltaY = Math.Abs(currentPosition.Y - _clickPosition.Y);
 
             return deltaX >= SystemParameters.MinimumHorizontalDragDistance ||
-                   deltaY >= SystemParameters.MinimumVerticalDragDistance;
+                deltaY >= SystemParameters.MinimumVerticalDragDistance;
         }
 
         protected virtual void StartDragDrop(object sender, object data)
@@ -152,8 +103,7 @@ namespace Joufflu.Data.DnD
             try
             {
                 DragDrop.DoDragDrop((DependencyObject)sender, data, DragDropEffects.Copy);
-            }
-            catch (ExternalException)
+            } catch (ExternalException)
             {
                 // DragDrop resource may be occupied by another process
             }
@@ -168,16 +118,27 @@ namespace Joufflu.Data.DnD
         /// Extracts data from the drag source element
         /// </summary>
         protected virtual object? GetSourceData(FrameworkElement? source) => source?.DataContext;
-
     }
 
     public abstract class AdornerDragHandler : DragHandler
     {
         private DragAdorner? _adorner;
-        private AdornerLayer? _adornerLayer => AdornerLayer.GetAdornerLayer(_parentUI);
+        private readonly Lazy<AdornerLayer> _adornerLayer;
+        private readonly MouseTracker _mouseTracker;
 
         public AdornerDragHandler(FrameworkElement parent) : base(parent)
         {
+            _adornerLayer = new Lazy<AdornerLayer>(() => AdornerLayer.GetAdornerLayer(_parentUI));
+            _mouseTracker = new MouseTracker(
+                screenPosition =>
+                {
+                    if (_adornerLayer != null)
+                    {
+                        // Proper screen-to-adorner coordinate transform
+                        _position = Window.GetWindow(_parentUI).PointFromScreen(screenPosition);
+                        _adorner?.UpdatePosition(_position);
+                    }
+                });
         }
 
         protected override void StartDragDrop(object sender, object data)
@@ -185,17 +146,19 @@ namespace Joufflu.Data.DnD
             try
             {
                 ShowAdorner(_position, data);
+                _mouseTracker.SetHook();
                 base.StartDragDrop(sender, data);
-            }
-            finally
+            } finally
             {
+                _mouseTracker.UnsetHook();
                 HideAdorner();
             }
         }
 
         private void ShowAdorner(Point position, object data)
         {
-            if (_adornerLayer == null) return;
+            if (_adornerLayer == null)
+                return;
 
             HideAdorner(); // Ensure no duplicate adorners
 
@@ -203,7 +166,7 @@ namespace Joufflu.Data.DnD
             if (adornerContent != null)
             {
                 _adorner = new DragAdorner(_parentUI, adornerContent, position);
-                _adornerLayer.Add(_adorner);
+                _adornerLayer.Value.Add(_adorner);
             }
         }
 
@@ -212,7 +175,7 @@ namespace Joufflu.Data.DnD
             if (_adorner == null || _adornerLayer == null)
                 return;
 
-            _adornerLayer.Remove(_adorner);
+            _adornerLayer.Value.Remove(_adorner);
             _adorner = null;
         }
 
@@ -221,4 +184,61 @@ namespace Joufflu.Data.DnD
         /// </summary>
         protected abstract FrameworkElement? CreateAdornerContent(object data);
     }
+
+    public class DragAdorner : Adorner
+    {
+        private readonly FrameworkElement _child;
+        private Point _position;
+
+        public DragAdorner(UIElement adornedElement, FrameworkElement child, Point position) : base(adornedElement)
+        {
+            _child = child ?? throw new ArgumentNullException(nameof(child));
+            _position = position;
+            AddVisualChild(_child);
+            // Make the adorner semi-transparent
+            _child.Opacity = 0.7;
+            IsHitTestVisible = false; // Don't interfere with drag operations
+        }
+
+        public void UpdatePosition(Point position)
+        {
+            // Check if the new position is significantly different from the current position
+            if (Math.Abs(_position.X - position.X) < 1 && Math.Abs(_position.Y - position.Y) < 1)
+                return; // No significant change in position, no need to update
+
+            _position = position;
+            InvalidateVisual();
+        }
+
+        protected override int VisualChildrenCount => 1;
+
+        protected override Visual GetVisualChild(int index)
+        {
+            if (index != 0 || _child == null)
+                throw new ArgumentOutOfRangeException();
+            return _child;
+        }
+
+        protected override Size MeasureOverride(Size constraint)
+        {
+            if (_child != null)
+            {
+                _child.Measure(constraint);
+                return _child.DesiredSize;
+            }
+            return new Size(0, 0);
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            if (_child != null)
+            {
+                // Arrange the child at the current moving position
+                _child.Arrange(new Rect(_position, _child.DesiredSize));
+                return finalSize;
+            }
+            return new Size(0, 0);
+        }
+    }
+
 }
