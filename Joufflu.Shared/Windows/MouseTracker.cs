@@ -53,12 +53,18 @@ namespace Joufflu.Shared.Windows
         public static extern IntPtr GetModuleHandle(string lpModuleName);
     }
 
+    /// <summary>
+    /// Track the mouse movement
+    /// </summary>
     public class MouseTracker : IDisposable
     {
         private IntPtr _hookID;
         private readonly Action<Point> _mouseMoveCallback;
         private readonly LowLevelMouseProc _proc;
 
+        /// <summary>
+        /// </summary>
+        /// <param name="mouseMoveCallback">Callback called everytime the mouse move. The origin (0, 0) is at the top-left corner of the primary monitor.</param>
         public MouseTracker(Action<Point> mouseMoveCallback) { 
             _mouseMoveCallback = mouseMoveCallback;
             _proc = HookCallback;
@@ -88,10 +94,9 @@ namespace Joufflu.Shared.Windows
             if (nCode >= 0 && wParam == (IntPtr)WM_MOUSEMOVE)
             {
                 var hookStruct = Marshal.PtrToStructure<MOUSEHOOKSTRUCT>(lParam);
-
-                // Convert screen coordinates to adorner layer coordinates
                 Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
+                    // The origin (0, 0) is at the top-left corner of the primary monitor.
                     var screenPoint = new Point(hookStruct.Position.X, hookStruct.Position.Y);
                     _mouseMoveCallback.Invoke(screenPoint);
                 }));

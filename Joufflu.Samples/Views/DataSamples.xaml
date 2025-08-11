@@ -15,7 +15,6 @@
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition />
-            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <Grid>
@@ -95,9 +94,5 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-
-        <Button Grid.Row="2" Click="Button_Click">
-            Adorner
-        </Button>
     </Grid>
 </UserControl>

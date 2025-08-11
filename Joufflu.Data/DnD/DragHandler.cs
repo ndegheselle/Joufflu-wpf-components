@@ -135,7 +135,7 @@ namespace Joufflu.Data.DnD
                     if (_adornerLayer != null)
                     {
                         // Proper screen-to-adorner coordinate transform
-                        _position = Window.GetWindow(_parentUI).PointFromScreen(screenPosition);
+                        _position = _parentUI.PointFromScreen(screenPosition);
                         _adorner?.UpdatePosition(_position);
                     }
                 });
@@ -233,12 +233,13 @@ namespace Joufflu.Data.DnD
         {
             if (_child != null)
             {
+                Point centeredPosition = new Point(_position.X - _child.DesiredSize.Width / 2, _position.Y - _child.DesiredSize.Height / 2);
+
                 // Arrange the child at the current moving position
-                _child.Arrange(new Rect(_position, _child.DesiredSize));
+                _child.Arrange(new Rect(centeredPosition, _child.DesiredSize));
                 return finalSize;
             }
             return new Size(0, 0);
         }
     }
-
 }

@@ -29,7 +29,22 @@ namespace Joufflu.Samples.Views
         }
 
         protected override FrameworkElement? CreateAdornerContent(object data)
-        { return data is TestClass testClass ? new TextBlock { Text = testClass.Name, Background= new SolidColorBrush(Colors.Red) } : null; }
+        {
+            if (data is not TestClass testClass)
+                return null;
+
+            Border border = new Border()
+            {
+                CornerRadius = new CornerRadius(2),
+                BorderThickness = new Thickness(1),
+                BorderBrush = new SolidColorBrush(Colors.Gray),
+                Height = 64,
+                Width = 64
+            };
+            border.Child = new TextBlock() { Text = testClass.Name, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center };
+
+            return border; 
+        }
     }
 
     /// <summary>
@@ -62,23 +77,5 @@ namespace Joufflu.Samples.Views
             Debug.WriteLine(e.GetPosition(this));
         }
         #endregion
-
-        private DragAdorner? _adorner;
-        private int _adornerCount = 1;
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
-            if (_adorner == null)
-            {
-                _adorner = new DragAdorner(this, new TextBlock() { Text="Test", Background=new SolidColorBrush(Colors.Red)}, new Point(50,50));
-                AdornerLayer.GetAdornerLayer(this).Add(_adorner);
-            }
-            else
-            {
-                _adorner.UpdatePosition(new Point(50*_adornerCount, 50));
-            }
-
-            _adornerCount++;
-        }
     }
 }
