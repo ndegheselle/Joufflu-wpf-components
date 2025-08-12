@@ -64,7 +64,7 @@ namespace Joufflu.Data.DnD
             if (e.Handled)
                 return;
 
-            ApplyDrop(e.Data);
+            ApplyDrop(e);
         }
 
         /// <summary>
@@ -75,17 +75,35 @@ namespace Joufflu.Data.DnD
         /// <summary>
         /// Executes the drop operation
         /// </summary>
-        protected abstract void ApplyDrop(IDataObject data);
+        protected abstract void ApplyDrop(DragEventArgs e);
 
+        /// <summary>
+        /// Retrieves the data from the drop operation, if it is of the expected type.
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
+        /// <param name="data"></param>
+        /// <returns></returns>
         protected static TData? GetDropData<TData>(IDataObject data) where TData : class =>
-            data.GetDataPresent(typeof(TData)) ? data.GetData(typeof(TData)) as TData : null;
+            IsDropDataOfType<TData>(data) ? data.GetData(data.GetFormats()[0]) as TData : null;
+
+        /// <summary>
+        /// Checks if the data is of the expected type (or a derived type) for the drop operation.
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        protected static bool IsDropDataOfType<TData>(IDataObject data) where TData : class
+        {
+            var obj = data.GetData(data.GetFormats()[0]);
+            return typeof(TData).IsAssignableFrom(obj.GetType());
+        }
     }
 
     public abstract class DropHandler<T> : DropHandler where T : class
     {
-        protected override bool IsDropAuthorized(IDataObject data) => GetDropData<T>(data) != null;
-        protected override void ApplyDrop(IDataObject data) => ApplyDrop(GetDropData<T>(data));
+        protected override bool IsDropAuthorized(IDataObject data) => IsDropDataOfType<T>(data);
+        protected override void ApplyDrop(DragEventArgs e) => ApplyDrop(GetDropData<T>(e.Data), e);
 
-        protected abstract void ApplyDrop(T? data);
+        protected abstract void ApplyDrop(T? data, DragEventArgs e);
     }
 }

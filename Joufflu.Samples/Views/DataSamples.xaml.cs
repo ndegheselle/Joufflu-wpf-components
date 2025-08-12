@@ -3,10 +3,8 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace Joufflu.Samples.Views
 {
@@ -14,7 +12,7 @@ namespace Joufflu.Samples.Views
     {
         public ObservableCollection<TestClass> Dropped { get; private set; } = [];
 
-        protected override void ApplyDrop(TestClass? data)
+        protected override void ApplyDrop(TestClass? data, DragEventArgs e)
         {
             if (data == null)
                 return;
