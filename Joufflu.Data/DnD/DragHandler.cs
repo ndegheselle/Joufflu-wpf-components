@@ -1,6 +1,5 @@
 ﻿using Joufflu.Shared.Windows;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -233,7 +232,7 @@ namespace Joufflu.Data.DnD
         {
             if (_child != null)
             {
-                Point centeredPosition = new Point(_position.X - _child.DesiredSize.Width / 2, _position.Y - _child.DesiredSize.Height / 2);
+                Point centeredPosition = new Point(_position.X - _child.DesiredSize.Width / 2, _position.Y);
 
                 // Arrange the child at the current moving position
                 _child.Arrange(new Rect(centeredPosition, _child.DesiredSize));

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 
 namespace Joufflu.Shared.Helpers
@@ -16,7 +14,6 @@ namespace Joufflu.Shared.Helpers
             T? parent = parentObject as T;
             return parent ?? FindParent<T>(parentObject);
         }
-
 
         public static IEnumerable<DependencyObject> GetChildren(DependencyObject pElement, bool pRecursif)
         {
