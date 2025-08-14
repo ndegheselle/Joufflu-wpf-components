@@ -1,10 +1,12 @@
 ﻿using Joufflu.Data.DnD;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Usuel.Shared.Data;
 
 namespace Joufflu.Samples.Views
 {
@@ -58,8 +60,20 @@ namespace Joufflu.Samples.Views
 
         public CustomDropHandler DropHandler { get; private set; }
 
+        public DataProxyObject DataRoot { get; private set; }
+
         public DataSamples()
         {
+            DataProxyObject obj = new DataProxyObject();
+            obj.AddValue("af", new DataProxyValue() { Value = "fglmm^^p"});
+
+            DataRoot = new DataProxyObject();
+            DataRoot
+                .AddValue("atata", new DataProxyValue() { Value = "aflkaflkdf" })
+                .AddValue("fdfg", new DataProxyValue() { Value = "aflkaflkdf" })
+                .AddObject("pafmdsf", obj)
+                .AddValue("pmldf", new DataProxyValue() { Value = "aflkaflkdf" });
+
             DropHandler = new CustomDropHandler();
             DragHandler = new CustomDragHandler(this);
             InitializeComponent();

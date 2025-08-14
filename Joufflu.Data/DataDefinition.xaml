@@ -1,0 +1,57 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:data="clr-namespace:Usuel.Shared.Data;assembly=Usuel.Shared"
+    xmlns:font="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
+    xmlns:local="clr-namespace:Joufflu.Data"
+    xmlns:s="clr-namespace:System;assembly=mscorlib">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/NamedStyles/IconButton.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <Style TargetType="{x:Type local:DataDefinition}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:DataDefinition}">
+                    <TreeView DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" ItemsSource="{Binding Root.Properties}"
+            ItemContainerStyle="{StaticResource StretchTreeViewItemStyle}">
+                        <TreeView.Resources>
+                            <HierarchicalDataTemplate DataType="{x:Type data:DataProxyObject}" ItemsSource="{Binding Properties}">
+                            </HierarchicalDataTemplate>
+                            <HierarchicalDataTemplate DataType="{x:Type data:DataProxyPropertyObject}" ItemsSource="{Binding Properties}">
+                                <TextBlock Text="{Binding Name}" />
+                            </HierarchicalDataTemplate>
+                        </TreeView.Resources>
+                    </TreeView>
+
+                    <ItemsControl >
+                        <ItemsControl.Resources>
+                            <DataTemplate DataType="{x:Type data:DataProxyPropertyValue}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" SharedSizeGroup="Name" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Name}" />
+                                    <TextBlock Margin="4,0,0,0" Grid.Column="1" Text="{Binding Value.Value}" />
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type data:DataProxyPropertyObject}">
+                                <StackPanel Margin="16,0,0,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto" SharedSizeGroup="Name" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Name}" />
+                                    </Grid>
+                                    <local:DataDefinition Root="{Binding Value}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </Ite>
+                    </ItemsControl>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
