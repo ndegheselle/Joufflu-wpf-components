@@ -30,17 +30,17 @@
         }
     }
 
-    public class DataObject : DataNode
-    {
-        public Dictionary<string, DataNode> Properties { get; set; } = [];
-        public DataObject() : base(EnumDataType.Object)
-        {}
-    }
-
     public class DataList : DataNode
     {
         public List<DataNode> Values { get; set; } = [];
         public DataList() : base(EnumDataType.List)
+        { }
+    }
+
+    public class DataObject : DataNode
+    {
+        public Dictionary<string, DataNode> Properties { get; set; } = [];
+        public DataObject() : base(EnumDataType.Object)
         {}
     }
 }
