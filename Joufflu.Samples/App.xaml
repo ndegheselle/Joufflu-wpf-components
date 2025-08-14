@@ -12,6 +12,7 @@
                 <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/Resources.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/Resources.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Joufflu.Popups;component/Resources.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Joufflu.Data;component/Resources.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

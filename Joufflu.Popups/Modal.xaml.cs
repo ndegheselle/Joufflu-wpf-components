@@ -47,7 +47,7 @@ namespace Joufflu.Popups
         }
     }
 
-    public class Modal : UserControl, IModal, INotifyPropertyChanged
+    public class Modal : ContentControl, IModal, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string? propertyName = "")

@@ -1,5 +1,4 @@
-﻿using Joufflu.Shared;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -43,7 +42,7 @@ namespace Joufflu.Popups
     /// <summary>
     /// Logique d'interaction pour Alert.xaml
     /// </summary>
-    public partial class Alert : UserControl, IAlert
+    public partial class Alert : Control, IAlert
     {
         public AlertOptions Options { get; set; } = new AlertOptions();
 
