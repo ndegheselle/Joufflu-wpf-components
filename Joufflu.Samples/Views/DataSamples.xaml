@@ -17,6 +17,8 @@
             <RowDefinition />
             <RowDefinition Height="auto" />
             <RowDefinition />
+            <RowDefinition Height="auto" />
+            <RowDefinition />
         </Grid.RowDefinitions>
 
         <TextBlock FontWeight="Bold" Margin="0,6,0,2">Pagging</TextBlock>
@@ -34,7 +36,12 @@
                 Total="{Binding Total}" />
         </Grid>
 
-        <TextBlock Grid.Row="2" FontWeight="Bold" Margin="0,6,0,2">Drag and drop</TextBlock>
+        <TextBlock
+            Grid.Row="2"
+            FontWeight="Bold"
+            Margin="0,6,0,2">
+            Drag and drop
+        </TextBlock>
         <Grid Grid.Row="3" Margin="0,2,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
@@ -98,5 +105,13 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
+
+        <TextBlock
+            Grid.Row="4"
+            FontWeight="Bold"
+            Margin="0,6,0,2">
+            Data
+        </TextBlock>
+        <data:DataVisualization Grid.Row="5" Root="{Binding DataRoot}" />
     </Grid>
 </UserControl>
