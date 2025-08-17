@@ -60,19 +60,19 @@ namespace Joufflu.Samples.Views
 
         public CustomDropHandler DropHandler { get; private set; }
 
-        public ProxyObject DataRoot { get; private set; }
+        public SchemaObject DataRoot { get; private set; }
 
         public DataSamples()
         {
-            ProxyObject obj = new ProxyObject("afdsfg");
-            DataRoot = new ProxyObject(null);
+            SchemaObject obj = new SchemaObject("afdsfg");
+            DataRoot = new SchemaObject("root");
             DataRoot
-                .AddValue("fdsfdsf", "value")
-                .AddValue("bvcbvc", "value")
-                .AddObject(obj)
-                .AddValue("liuluil", "value");
+                .AddValue("fdsfdsf")
+                .AddValue("bvcbvc")
+                .Add(obj)
+                .AddValue("liuluil");
 
-            obj.AddValue("tataqds", "pouet");
+            obj.AddValue("tataqds");
 
             DropHandler = new CustomDropHandler();
             DragHandler = new CustomDragHandler(this);

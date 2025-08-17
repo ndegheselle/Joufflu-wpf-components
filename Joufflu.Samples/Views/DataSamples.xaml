@@ -112,6 +112,6 @@
             Margin="0,6,0,2">
             Data
         </TextBlock>
-        <data:DataVisualization Grid.Row="5" Root="{Binding DataRoot}" />
+        <data:DataSchema Grid.Row="5" Root="{Binding DataRoot}" />
     </Grid>
 </UserControl>

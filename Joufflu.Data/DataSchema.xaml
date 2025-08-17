@@ -12,13 +12,13 @@
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/NamedStyles/IconButton.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <Style TargetType="{x:Type local:DataVisualization}">
+    <Style TargetType="{x:Type local:DataSchema}">
         <Style.Resources>
             <local:DepthToMarginConverter x:Key="DepthToMarginConverter" />
         </Style.Resources>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:DataVisualization}">
+                <ControlTemplate TargetType="{x:Type local:DataSchema}">
                     <TreeView
                         DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                         ItemsSource="{Binding Root.Properties}"
@@ -44,7 +44,6 @@
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="*" />
                                                 </Grid.ColumnDefinitions>
                                                 <Grid.RowDefinitions>
@@ -56,7 +55,7 @@
                                                     x:Name="Border"
                                                     Grid.Row="0"
                                                     Grid.Column="0"
-                                                    Grid.ColumnSpan="3"
+                                                    Grid.ColumnSpan="2"
                                                     Background="{TemplateBinding Background}"
                                                     BorderBrush="{TemplateBinding BorderBrush}"
                                                     BorderThickness="{TemplateBinding BorderThickness}"
@@ -66,7 +65,7 @@
                                                     x:Name="SpotlightLayer"
                                                     Grid.Row="0"
                                                     Grid.Column="0"
-                                                    Grid.ColumnSpan="3"
+                                                    Grid.ColumnSpan="2"
                                                     Background="{TemplateBinding adonisExtensions:CursorSpotlightExtension.BackgroundBrush}"
                                                     BorderBrush="{TemplateBinding adonisExtensions:CursorSpotlightExtension.BorderBrush}"
                                                     BorderThickness="{TemplateBinding BorderThickness}"
@@ -112,16 +111,7 @@
                                                     Grid.Row="0"
                                                     Grid.Column="1"
                                                     ContentSource="Header"
-                                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
-                                                    <ContentPresenter.Margin>
-                                                        <MultiBinding Converter="{x:Static adonisConverters:ValuesToThicknessConverter.Instance}">
-                                                            <Binding Source="0" />
-                                                            <Binding Path="Padding.Top" RelativeSource="{RelativeSource TemplatedParent}" />
-                                                            <Binding Path="Padding.Right" RelativeSource="{RelativeSource TemplatedParent}" />
-                                                            <Binding Path="Padding.Bottom" RelativeSource="{RelativeSource TemplatedParent}" />
-                                                        </MultiBinding>
-                                                    </ContentPresenter.Margin>
-                                                </ContentPresenter>
+                                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
 
                                                 <ItemsPresenter
                                                     x:Name="ItemsHost"
@@ -257,38 +247,61 @@
                             </Style>
                         </TreeView.ItemContainerStyle>
                         <TreeView.Resources>
-                            <HierarchicalDataTemplate DataType="{x:Type data:ProxyObject}" ItemsSource="{Binding Properties}">
+                            <HierarchicalDataTemplate DataType="{x:Type data:SchemaObject}" ItemsSource="{Binding Properties}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition SharedSizeGroup="Name" Width="auto" />
-                                        <ColumnDefinition SharedSizeGroup="Type" Width="auto" />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding Name}" Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        Text="{Binding Name}"
+                                        Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}" />
                                     <local:ValueTypeIcon
                                         Opacity="0.7"
                                         Type="{Binding Type}"
                                         Margin="4,0,0,0"
                                         Grid.Column="1" />
+
+
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                        <Button Style="{StaticResource IconButton}" Padding="6">
+                                            <font:Icon Text="{x:Static font:IconFont.Plus}" FontSize="10" />
+                                        </Button>
+                                        <Button
+                                            Style="{StaticResource IconButton}"
+                                            Padding="6"
+                                            Margin="1,0,0,0">
+                                            <font:Icon Text="{x:Static font:IconFont.Trash}" FontSize="10" />
+                                        </Button>
+                                    </StackPanel>
                                 </Grid>
                             </HierarchicalDataTemplate>
-                            <DataTemplate DataType="{x:Type data:ProxyValue}">
+                            <DataTemplate DataType="{x:Type data:SchemaValue}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition SharedSizeGroup="Name" Width="auto" />
-                                        <ColumnDefinition SharedSizeGroup="Type" Width="auto" />
+                                        <ColumnDefinition Width="auto" />
                                         <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding Name}" Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        Text="{Binding Name}"
+                                        Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}" />
                                     <local:ValueTypeIcon
                                         Opacity="0.7"
                                         Type="{Binding Type}"
                                         Margin="4,0,0,0"
                                         Grid.Column="1" />
-                                    <TextBlock
-                                        Background="Red"
-                                        Text="{Binding Value}"
-                                        Margin="4,0,0,0"
-                                        Grid.Column="2" />
+
+                                    <Button
+                                        Grid.Column="3"
+                                        Style="{StaticResource IconButton}"
+                                        Padding="6">
+                                        <font:Icon Text="{x:Static font:IconFont.Trash}" FontSize="10" />
+                                    </Button>
                                 </Grid>
                             </DataTemplate>
                         </TreeView.Resources>
@@ -302,7 +315,13 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ValueTypeIcon}">
-                    <font:Icon ToolTip="{Binding Type, RelativeSource={RelativeSource TemplatedParent}}" Text="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" />
+                    <StackPanel Orientation="Horizontal" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
+                        <font:Icon ToolTip="{Binding Type}" Text="{Binding Icon}" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Margin="4,0,0,0"
+                            Text="{Binding Type}" />
+                    </StackPanel>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

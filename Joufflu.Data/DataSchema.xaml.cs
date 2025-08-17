@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Usuel.Shared;
 using Usuel.Shared.Data;
 
 namespace Joufflu.Data
@@ -80,18 +81,18 @@ namespace Joufflu.Data
     /// <summary>
     /// TODO : Use command and a control template
     /// </summary>
-    public partial class DataVisualization : Control
+    public partial class DataSchema : Control
     {
         public static readonly DependencyProperty RootProperty =
             DependencyProperty.Register(
             nameof(Root),
-            typeof(ProxyObject),
-            typeof(DataVisualization),
+            typeof(SchemaObject),
+            typeof(DataSchema),
             new PropertyMetadata(null));
 
-        public ProxyObject Root
+        public SchemaObject Root
         {
-            get { return (ProxyObject)GetValue(RootProperty); }
+            get { return (SchemaObject)GetValue(RootProperty); }
             set { SetValue(RootProperty, value); }
         }
     }
