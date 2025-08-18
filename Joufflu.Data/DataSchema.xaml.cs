@@ -51,10 +51,9 @@ namespace Joufflu.Data
         }
 
         public string Icon { get; set; } = IconFont.QuoteLeft;
-
         private void OnTypeChanged()
         {
-            switch(Type)
+            switch (Type)
             {
                 case EnumValueType.Object:
                     Icon = IconFont.List;
