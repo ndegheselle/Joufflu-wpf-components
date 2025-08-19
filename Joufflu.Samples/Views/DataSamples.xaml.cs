@@ -1,6 +1,5 @@
 ﻿using Joufflu.Data.DnD;
 using System.Collections.ObjectModel;
-using System.Data;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;

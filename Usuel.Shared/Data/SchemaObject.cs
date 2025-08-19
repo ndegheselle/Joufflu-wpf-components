@@ -14,6 +14,8 @@ namespace Usuel.Shared.Data
 
     public class SchemaProperty
     {
+        public ICustomCommand RemoveCommand { get; set; }
+
         public SchemaObject? Parent { get; set; } = null;
         public uint Depth { get; set; } = 0;
         public string Name { get; set; } = string.Empty;
@@ -34,8 +36,21 @@ namespace Usuel.Shared.Data
 
         public SchemaProperty(string name, EnumValueType type)
         {
+            RemoveCommand = new DelegateCommand(Remove);
             Name = name;
             Type = type;
+        }
+
+        /// <summary>
+        /// Removes this property from its parent schema object.
+        /// </summary>
+        /// <exception cref="Exception"></exception>
+        public void Remove()
+        {
+            if (Parent == null)
+                throw new Exception("Can't remove a property that doesn't have a parent.");
+
+            Parent.Remove(this);
         }
     }
 
@@ -53,13 +68,19 @@ namespace Usuel.Shared.Data
     {
         public ObservableCollection<SchemaProperty> Properties { get; set; } = [];
 
-        public ICustomCommand AddProperty { get; set; }
+        public ICustomCommand AddPropertyCommand { get; set; }
 
         public SchemaObject(string name) : base(name, EnumValueType.Object) 
         {
-            AddProperty = new DelegateCommand(() => AddValue("default"));
+            AddPropertyCommand = new DelegateCommand(() => AddValue("default"));
         }
 
+        /// <summary>
+        /// Adds a property to the schema object.
+        /// </summary>
+        /// <param name="property">Property</param>
+        /// <param name="index">Index of the property to add</param>
+        /// <returns>This</returns>
         public SchemaObject Add(SchemaProperty property, int index = -1)
         {
             property.Depth = Depth + 1;
@@ -75,16 +96,33 @@ namespace Usuel.Shared.Data
             return this;
         }
 
+        /// <summary>
+        /// Adds a new object to the schema with the specified name.
+        /// </summary>
+        /// <param name="name">Property name</param>
+        /// <returns>This</returns>
         public SchemaObject AddObject(string name)
         {
             return Add(new SchemaObject(name));
         }
 
+        /// <summary>
+        /// Adds a new value to the schema with the specified name and type.
+        /// </summary>
+        /// <param name="name">Property name</param>
+        /// <param name="type">Type of the value</param>
+        /// <param name="value">Value</param>
+        /// <returns>This</returns>
         public SchemaObject AddValue(string name, EnumValueType type = EnumValueType.String, dynamic? value = null)
         {
             return Add(new SchemaValue(name, type, value));
         }
 
+        /// <summary>
+        /// Updates the type of a property in the schema object.
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="newType"></param>
         public void UpdatePropertyType(SchemaProperty property, EnumValueType newType)
         {
             int index = Properties.IndexOf(property);
@@ -100,5 +138,21 @@ namespace Usuel.Shared.Data
             Add(newProperty, index);
         }
 
+        /// <summary>
+        /// Removes a property from the schema object.
+        /// </summary>
+        /// <param name="property"></param>
+        /// <exception cref="Exception"></exception>
+        public void Remove(SchemaProperty property)
+        {
+            if (Properties.Remove(property))
+            {
+                property.Parent = null; // Clear parent reference
+            }
+            else
+            {
+                throw new Exception("Property not found in the collection.");
+            }
+        }
     }
 }

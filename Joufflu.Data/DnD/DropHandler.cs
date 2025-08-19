@@ -49,7 +49,7 @@ namespace Joufflu.Data.DnD
 
         public void HandleDragOver(object sender, DragEventArgs e)
         {
-            if (!IsDropAuthorized(e.Data))
+            if (!IsDropAuthorized(e))
             {
                 e.Effects = DragDropEffects.None;
                 e.Handled = true;
@@ -70,7 +70,7 @@ namespace Joufflu.Data.DnD
         /// <summary>
         /// Validates if drop operation is allowed at the target
         /// </summary>
-        protected abstract bool IsDropAuthorized(IDataObject data);
+        protected abstract bool IsDropAuthorized(DragEventArgs e);
 
         /// <summary>
         /// Executes the drop operation
@@ -101,7 +101,7 @@ namespace Joufflu.Data.DnD
 
     public abstract class DropHandler<T> : DropHandler where T : class
     {
-        protected override bool IsDropAuthorized(IDataObject data) => IsDropDataOfType<T>(data);
+        protected override bool IsDropAuthorized(DragEventArgs e) => IsDropDataOfType<T>(e.Data);
         protected override void ApplyDrop(DragEventArgs e) => ApplyDrop(GetDropData<T>(e.Data), e);
 
         protected abstract void ApplyDrop(T? data, DragEventArgs e);

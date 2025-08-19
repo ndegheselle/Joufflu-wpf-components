@@ -2,38 +2,10 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using Usuel.Shared;
 using Usuel.Shared.Data;
 
-namespace Joufflu.Data
+namespace Joufflu.Data.Schema
 {
-    public class DepthToMarginConverter : IValueConverter
-    {
-        /// <param name="value"></param>
-        /// <param name="targetType"></param>
-        /// <param name="parameter">bool, indicate wheter the result should be true or false</param>
-        /// <param name="culture"></param>
-        /// <returns></returns>
-        public object? Convert(
-            object value,
-            Type targetType,
-            object parameter,
-            System.Globalization.CultureInfo culture)
-        {
-            if (value is not uint depth)
-                return null;
-            return new Thickness((depth - 1) * 16, 0, 0, 0);
-        }
-
-        public object ConvertBack(
-            object value,
-            Type targetType,
-            object parameter,
-            System.Globalization.CultureInfo culture)
-        { throw new NotImplementedException(); }
-    }
-
     public class ValueTypeIcon : Control, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -44,6 +16,9 @@ namespace Joufflu.Data
             typeof(ValueTypeIcon),
             new PropertyMetadata(EnumValueType.String, (d, e) => ((ValueTypeIcon)d).OnTypeChanged()));
 
+        /// <summary>
+        /// Type of the value represented by this icon.
+        /// </summary>
         public EnumValueType Type
         {
             get { return (EnumValueType)GetValue(TypeProperty); }
@@ -51,6 +26,10 @@ namespace Joufflu.Data
         }
 
         public string Icon { get; set; } = IconFont.QuoteLeft;
+
+        /// <summary>
+        /// Change the icon based on the type of value.
+        /// </summary>
         private void OnTypeChanged()
         {
             switch (Type)
@@ -74,25 +53,6 @@ namespace Joufflu.Data
                     Icon = IconFont.Clock;
                     break;
             }
-        }
-    }
-
-    /// <summary>
-    /// TODO : Use command and a control template
-    /// </summary>
-    public partial class DataSchema : Control
-    {
-        public static readonly DependencyProperty RootProperty =
-            DependencyProperty.Register(
-            nameof(Root),
-            typeof(SchemaObject),
-            typeof(DataSchema),
-            new PropertyMetadata(null));
-
-        public SchemaObject Root
-        {
-            get { return (SchemaObject)GetValue(RootProperty); }
-            set { SetValue(RootProperty, value); }
         }
     }
 }

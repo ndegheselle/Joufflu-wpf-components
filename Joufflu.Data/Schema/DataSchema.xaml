@@ -1,0 +1,197 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:adonisConverters="clr-namespace:AdonisUI.Converters;assembly=AdonisUI"
+    xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+    xmlns:data="clr-namespace:Usuel.Shared.Data;assembly=Usuel.Shared"
+    xmlns:font="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
+    xmlns:extensions="clr-namespace:Joufflu.Shared.Extensions;assembly=Joufflu.Shared"
+    xmlns:local="clr-namespace:Joufflu.Data"
+    xmlns:dnd="clr-namespace:Joufflu.Data.DnD"
+    xmlns:s="clr-namespace:System;assembly=mscorlib">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/NamedStyles/IconButton.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Data;component/Schema/SchemaTreeViewItem.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    <Style TargetType="{x:Type local:DataSchema}">
+        <Style.Resources>
+            <local:DepthToMarginConverter x:Key="DepthToMarginConverter" />
+        </Style.Resources>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:DataSchema}">
+                    <TreeView
+                        DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                        Grid.IsSharedSizeScope="True"
+                        ItemsSource="{Binding Root.Properties}"
+                        ItemContainerStyle="{StaticResource SchemaTreeViewItem}">
+                        <TreeView.Resources>
+                            <HierarchicalDataTemplate DataType="{x:Type data:SchemaObject}" ItemsSource="{Binding Properties}">
+                                <Grid Height="24">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" SharedSizeGroup="Name" />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Text="{Binding Name}"
+                                            Margin="4,0" />
+                                        <TextBox
+                                            Margin="0,1"
+                                            Padding="4,0"
+                                            Visibility="Collapsed"
+                                            Name="TextBoxName"
+                                            Text="{Binding Name, Mode=TwoWay}" />
+                                    </Grid>
+
+                                    <Grid Margin="2,0,0,0" Grid.Column="1">
+                                        <local:ValueTypeIcon Margin="8,0,0,0" Type="{Binding Type}" />
+                                        <ComboBox
+                                            Margin="0,1"
+                                            Width="100"
+                                            HorizontalAlignment="Left"
+                                            Visibility="Collapsed"
+                                            Name="ComboBoxType"
+                                            SelectedItem="{Binding Type, Mode=TwoWay}"
+                                            ItemsSource="{extensions:EnumValuesExtension {x:Type data:EnumValueType}}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <local:ValueTypeIcon Type="{Binding}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </Grid>
+
+
+                                    <StackPanel
+                                        Margin="1"
+                                        Name="ContainerActions"
+                                        Grid.Column="2"
+                                        Orientation="Horizontal"
+                                        Visibility="Collapsed">
+                                        <Button
+                                            Command="{Binding AddPropertyCommand}"
+                                            Background="Transparent"
+                                            Padding="6"
+                                            Margin="1,0,0,0"
+                                            Style="{StaticResource IconButton}">
+                                            <font:Icon FontSize="10" Text="{x:Static font:IconFont.Plus}" />
+                                        </Button>
+                                        <Button
+                                            Command="{Binding RemoveCommand}"
+                                            Background="Transparent"
+                                            Margin="1,0,0,0"
+                                            Padding="6"
+                                            Style="{StaticResource IconButton}">
+                                            <font:Icon FontSize="10" Text="{x:Static font:IconFont.Trash}" />
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+
+                                <HierarchicalDataTemplate.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
+                                        </MultiDataTrigger.Conditions>
+                                        <MultiDataTrigger.Setters>
+                                            <Setter TargetName="ContainerActions" Property="Visibility" Value="Visible" />
+                                        </MultiDataTrigger.Setters>
+                                    </MultiDataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
+                                        </MultiDataTrigger.Conditions>
+                                        <MultiDataTrigger.Setters>
+                                            <Setter TargetName="ContainerActions" Property="Visibility" Value="Visible" />
+                                            <Setter TargetName="TextBoxName" Property="Visibility" Value="Visible" />
+                                            <Setter TargetName="ComboBoxType" Property="Visibility" Value="Visible" />
+                                        </MultiDataTrigger.Setters>
+                                    </MultiDataTrigger>
+                                </HierarchicalDataTemplate.Triggers>
+                            </HierarchicalDataTemplate>
+                            <DataTemplate DataType="{x:Type data:SchemaValue}">
+                                <Grid Height="24">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" SharedSizeGroup="Name" />
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Text="{Binding Name}"
+                                            Margin="4,0" />
+                                        <TextBox
+                                            Margin="0,1"
+                                            Padding="4,0"
+                                            Visibility="Collapsed"
+                                            Name="TextBoxName"
+                                            Text="{Binding Name, Mode=TwoWay}" />
+                                    </Grid>
+
+                                    <Grid Grid.Column="1" Margin="2,0,0,0">
+                                        <local:ValueTypeIcon Margin="8,0,0,0" Type="{Binding Type}" />
+                                        <ComboBox
+                                            Margin="0,1"
+                                            Width="100"
+                                            HorizontalAlignment="Left"
+                                            Visibility="Collapsed"
+                                            Name="ComboBoxType"
+                                            SelectedItem="{Binding Type, Mode=TwoWay}"
+                                            ItemsSource="{extensions:EnumValuesExtension {x:Type data:EnumValueType}}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <local:ValueTypeIcon Type="{Binding}" />
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </Grid>
+
+                                    <Button
+                                        Command="{Binding RemoveCommand}"
+                                        Background="Transparent"
+                                        Margin="1"
+                                        Name="BtnRemove"
+                                        Grid.Column="3"
+                                        Padding="6"
+                                        Style="{StaticResource IconButton}"
+                                        Visibility="Collapsed">
+                                        <font:Icon FontSize="10" Text="{x:Static font:IconFont.Trash}" />
+                                    </Button>
+                                </Grid>
+
+                                <DataTemplate.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding IsLoaded, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="False" />
+                                            <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
+                                        </MultiDataTrigger.Conditions>
+                                        <MultiDataTrigger.Setters>
+                                            <Setter TargetName="BtnRemove" Property="Visibility" Value="Visible" />
+                                        </MultiDataTrigger.Setters>
+                                    </MultiDataTrigger>
+
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
+                                        </MultiDataTrigger.Conditions>
+                                        <MultiDataTrigger.Setters>
+                                            <Setter TargetName="BtnRemove" Property="Visibility" Value="Visible" />
+                                            <Setter TargetName="TextBoxName" Property="Visibility" Value="Visible" />
+                                            <Setter TargetName="ComboBoxType" Property="Visibility" Value="Visible" />
+                                        </MultiDataTrigger.Setters>
+                                    </MultiDataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </TreeView.Resources>
+                    </TreeView>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

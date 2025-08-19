@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="DataSchema.xaml.cs">
+    <Compile Update="Schema\DataSchema.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
