@@ -4,15 +4,15 @@
     xmlns:adonisConverters="clr-namespace:AdonisUI.Converters;assembly=AdonisUI"
     xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
-    xmlns:data="clr-namespace:Usuel.Shared.Data;assembly=Usuel.Shared"
     xmlns:font="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:extensions="clr-namespace:Joufflu.Shared.Extensions;assembly=Joufflu.Shared"
-    xmlns:local="clr-namespace:Joufflu.Data"
+    xmlns:local="clr-namespace:Joufflu.Data.Schema"
     xmlns:dnd="clr-namespace:Joufflu.Data.DnD"
     xmlns:s="clr-namespace:System;assembly=mscorlib">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/NamedStyles/IconButton.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Data;component/Schema/SchemaTreeViewItem.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Data;component/Schema/ValueTypeIcon.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <Style TargetType="{x:Type local:DataSchema}">
         <Style.Resources>
@@ -22,17 +22,21 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:DataSchema}">
                     <TreeView
+                        dnd:DropBehavior.Handler="{Binding DropHandler, Mode=OneTime}"
                         DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                         Grid.IsSharedSizeScope="True"
                         ItemsSource="{Binding Root.Properties}"
                         ItemContainerStyle="{StaticResource SchemaTreeViewItem}">
                         <TreeView.Resources>
-                            <HierarchicalDataTemplate DataType="{x:Type data:SchemaObject}" ItemsSource="{Binding Properties}">
-                                <Grid Height="24">
+                            <HierarchicalDataTemplate DataType="{x:Type local:SchemaObject}" ItemsSource="{Binding Properties}">
+                                <Grid
+                                    Background="Transparent"
+                                    Height="24"
+                                    dnd:DragBehavior.Handler="{Binding DataContext.DragHandler, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}, Mode=OneTime}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="auto" SharedSizeGroup="Name" />
-                                        <ColumnDefinition />
                                         <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
                                     <Grid Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}">
@@ -57,7 +61,7 @@
                                             Visibility="Collapsed"
                                             Name="ComboBoxType"
                                             SelectedItem="{Binding Type, Mode=TwoWay}"
-                                            ItemsSource="{extensions:EnumValuesExtension {x:Type data:EnumValueType}}">
+                                            ItemsSource="{extensions:EnumValuesExtension {x:Type local:EnumValueType}}">
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
                                                     <local:ValueTypeIcon Type="{Binding}" />
@@ -66,8 +70,8 @@
                                         </ComboBox>
                                     </Grid>
 
-
                                     <StackPanel
+                                        HorizontalAlignment="Right"
                                         Margin="1"
                                         Name="ContainerActions"
                                         Grid.Column="2"
@@ -90,9 +94,16 @@
                                             <font:Icon FontSize="10" Text="{x:Static font:IconFont.Trash}" />
                                         </Button>
                                     </StackPanel>
+                                    <Border
+                                        Grid.ColumnSpan="2"
+                                        Name="DropPreview"
+                                        BorderBrush="{StaticResource {x:Static adonisUi:Brushes.AccentIntenseHighlightBorderBrush}}" />
                                 </Grid>
 
                                 <HierarchicalDataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsHovered}" Value="True">
+                                        <Setter TargetName="DropPreview" Property="BorderThickness" Value="0,4,0,0" />
+                                    </DataTrigger>
                                     <MultiDataTrigger>
                                         <MultiDataTrigger.Conditions>
                                             <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
@@ -113,13 +124,15 @@
                                     </MultiDataTrigger>
                                 </HierarchicalDataTemplate.Triggers>
                             </HierarchicalDataTemplate>
-                            <DataTemplate DataType="{x:Type data:SchemaValue}">
-                                <Grid Height="24">
+                            <DataTemplate DataType="{x:Type local:SchemaValue}">
+                                <Grid
+                                    Background="Transparent"
+                                    Height="24"
+                                    dnd:DragBehavior.Handler="{Binding DataContext.DragHandler, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}, Mode=OneTime}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="auto" SharedSizeGroup="Name" />
                                         <ColumnDefinition Width="auto" />
-                                        <ColumnDefinition />
-                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <Grid Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}">
                                         <TextBlock
@@ -143,7 +156,7 @@
                                             Visibility="Collapsed"
                                             Name="ComboBoxType"
                                             SelectedItem="{Binding Type, Mode=TwoWay}"
-                                            ItemsSource="{extensions:EnumValuesExtension {x:Type data:EnumValueType}}">
+                                            ItemsSource="{extensions:EnumValuesExtension {x:Type local:EnumValueType}}">
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
                                                     <local:ValueTypeIcon Type="{Binding}" />
@@ -153,6 +166,7 @@
                                     </Grid>
 
                                     <Button
+                                        HorizontalAlignment="Right"
                                         Command="{Binding RemoveCommand}"
                                         Background="Transparent"
                                         Margin="1"
@@ -163,9 +177,18 @@
                                         Visibility="Collapsed">
                                         <font:Icon FontSize="10" Text="{x:Static font:IconFont.Trash}" />
                                     </Button>
+
+                                    <Border
+                                        Grid.ColumnSpan="2"
+                                        Name="DropPreview"
+                                        BorderBrush="{StaticResource {x:Static adonisUi:Brushes.AccentIntenseHighlightBorderBrush}}" />
                                 </Grid>
 
                                 <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsHovered}" Value="True">
+                                        <Setter TargetName="DropPreview" Property="BorderThickness" Value="0,4,0,0" />
+                                    </DataTrigger>
+
                                     <MultiDataTrigger>
                                         <MultiDataTrigger.Conditions>
                                             <Condition Binding="{Binding IsLoaded, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="False" />

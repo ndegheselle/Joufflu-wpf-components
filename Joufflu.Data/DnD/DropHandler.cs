@@ -56,6 +56,7 @@ namespace Joufflu.Data.DnD
                 return;
             }
             e.Effects = DragDropEffects.Copy;
+            OnPassingOver(e);
         }
 
         public void HandleDrop(object sender, DragEventArgs e)
@@ -63,17 +64,23 @@ namespace Joufflu.Data.DnD
             HandleDragOver(sender, e);
             if (e.Handled)
                 return;
-
             ApplyDrop(e);
         }
 
         /// <summary>
-        /// Validates if drop operation is allowed at the target
+        /// Used to apply effect the the drop is passing over a valid element.
+        /// </summary>
+        /// <param name="e"></param>
+        protected virtual void OnPassingOver(DragEventArgs e)
+        { }
+
+        /// <summary>
+        /// Validates if drop operation is allowed at the target.
         /// </summary>
         protected abstract bool IsDropAuthorized(DragEventArgs e);
 
         /// <summary>
-        /// Executes the drop operation
+        /// Executes the drop operation.
         /// </summary>
         protected abstract void ApplyDrop(DragEventArgs e);
 
@@ -103,7 +110,6 @@ namespace Joufflu.Data.DnD
     {
         protected override bool IsDropAuthorized(DragEventArgs e) => IsDropDataOfType<T>(e.Data);
         protected override void ApplyDrop(DragEventArgs e) => ApplyDrop(GetDropData<T>(e.Data), e);
-
         protected abstract void ApplyDrop(T? data, DragEventArgs e);
     }
 }

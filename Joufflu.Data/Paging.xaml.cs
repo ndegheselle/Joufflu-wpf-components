@@ -13,7 +13,7 @@ namespace Joufflu.Data
     public partial class Paging : Control, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string? name = null)
+        protected void NotifyPropertyChanged([CallerMemberName] string? name = null)
         { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)); }
 
         public delegate void HandlePagingChange(int pageNumber, int capacity);
@@ -105,9 +105,9 @@ namespace Joufflu.Data
         #region Change Events
         private void OnTotalChanged()
         {
-            OnPropertyChanged(nameof(PageMax));
-            OnPropertyChanged(nameof(IntervalMin));
-            OnPropertyChanged(nameof(IntervalMax));
+            NotifyPropertyChanged(nameof(PageMax));
+            NotifyPropertyChanged(nameof(IntervalMin));
+            NotifyPropertyChanged(nameof(IntervalMax));
             RaiseCommandsChanged();
         }
 
@@ -122,8 +122,8 @@ namespace Joufflu.Data
             SetValue(PageNumberProperty, value);
 
             PagingChange?.Invoke(PageNumber, Capacity);
-            OnPropertyChanged(nameof(IntervalMin));
-            OnPropertyChanged(nameof(IntervalMax));
+            NotifyPropertyChanged(nameof(IntervalMin));
+            NotifyPropertyChanged(nameof(IntervalMax));
             RaiseCommandsChanged();
         }
 
@@ -133,10 +133,10 @@ namespace Joufflu.Data
                 PageNumber = PageMax;
 
             PagingChange?.Invoke(PageNumber, Capacity);
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(PageMax));
-            OnPropertyChanged(nameof(IntervalMin));
-            OnPropertyChanged(nameof(IntervalMax));
+            NotifyPropertyChanged();
+            NotifyPropertyChanged(nameof(PageMax));
+            NotifyPropertyChanged(nameof(IntervalMin));
+            NotifyPropertyChanged(nameof(IntervalMax));
             RaiseCommandsChanged();
         }
 

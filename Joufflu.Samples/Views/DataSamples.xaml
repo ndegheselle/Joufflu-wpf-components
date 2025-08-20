@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:schema="clr-namespace:Joufflu.Data.Schema;assembly=Joufflu.Data"
     xmlns:data="clr-namespace:Joufflu.Data;assembly=Joufflu.Data"
     xmlns:dnd="clr-namespace:Joufflu.Data.DnD;assembly=Joufflu.Data"
     xmlns:local="clr-namespace:Joufflu.Samples.Views"
@@ -112,6 +113,6 @@
             Margin="0,6,0,2">
             Data
         </TextBlock>
-        <data:DataSchema Grid.Row="5" Root="{Binding DataRoot}" />
+        <schema:DataSchema Grid.Row="5" Root="{Binding DataRoot}" />
     </Grid>
 </UserControl>

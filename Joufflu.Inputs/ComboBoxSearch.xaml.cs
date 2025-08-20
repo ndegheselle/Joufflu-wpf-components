@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using PropertyChanged;
+using System.Collections;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -89,6 +90,7 @@ namespace Joufflu.Inputs
             base.OnPreviewKeyDown(e);
         }
 
+        [SuppressPropertyChangedWarnings]
         void OnTextChanged(object sender, TextChangedEventArgs e)
         {
             if (SelectedItem != null && Text == GetTextFromItem(SelectedItem))
@@ -117,6 +119,7 @@ namespace Joufflu.Inputs
             base.OnPreviewLostKeyboardFocus(e);
         }
 
+        [SuppressPropertyChangedWarnings]
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
             if (_editableTextBox == null)

@@ -1,6 +1,13 @@
-﻿using System.Collections.ObjectModel;
+﻿using Joufflu.Shared.Windows;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Data;
+using System.Runtime.CompilerServices;
+using System.Windows.Data;
+using System.Xml.Linq;
+using Usuel.Shared;
 
-namespace Usuel.Shared.Data
+namespace Joufflu.Data.Schema
 {
     public enum EnumValueType
     {
@@ -12,15 +19,18 @@ namespace Usuel.Shared.Data
         TimeSpan
     }
 
-    public class SchemaProperty
+    public class SchemaProperty : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void NotifyPropertyChanged([CallerMemberName] string? name = null)
+        { PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)); }
+
         public ICustomCommand RemoveCommand { get; set; }
 
-        public SchemaObject? Parent { get; set; } = null;
-        public uint Depth { get; set; } = 0;
         public string Name { get; set; } = string.Empty;
 
         private EnumValueType _type = EnumValueType.String;
+
         public EnumValueType Type
         {
             get => _type;
@@ -33,6 +43,10 @@ namespace Usuel.Shared.Data
                 Parent?.UpdatePropertyType(this, value);
             }
         }
+
+        public SchemaObject? Parent { get; set; } = null;
+        public uint Depth { get; set; } = 0;
+        public bool IsHovered { get; set; }
 
         public SchemaProperty(string name, EnumValueType type)
         {
@@ -52,6 +66,8 @@ namespace Usuel.Shared.Data
 
             Parent.Remove(this);
         }
+
+        public override string ToString() => Name;
     }
 
     public class SchemaValue : SchemaProperty
@@ -66,7 +82,7 @@ namespace Usuel.Shared.Data
 
     public class SchemaObject : SchemaProperty
     {
-        public ObservableCollection<SchemaProperty> Properties { get; set; } = [];
+        public ObservableCollection<SchemaProperty> Properties { get; private set; } = [];
 
         public ICustomCommand AddPropertyCommand { get; set; }
 
@@ -83,6 +99,7 @@ namespace Usuel.Shared.Data
         /// <returns>This</returns>
         public SchemaObject Add(SchemaProperty property, int index = -1)
         {
+            property.Name = GetUniquePropertyName(property.Name);
             property.Depth = Depth + 1;
             property.Parent = this;
             if (index >= 0 && index < Properties.Count)
@@ -153,6 +170,30 @@ namespace Usuel.Shared.Data
             {
                 throw new Exception("Property not found in the collection.");
             }
+        }
+
+        /// <summary>
+        /// Gets a unique property name by appending a numeric extension if the name already exists.
+        /// </summary>
+        /// <param name="baseName">The base name to make unique</param>
+        /// <returns>A unique property name</returns>
+        private string GetUniquePropertyName(string baseName)
+        {
+            if (!Properties.Any(p => p.Name.Equals(baseName, StringComparison.OrdinalIgnoreCase)))
+            {
+                return baseName;
+            }
+
+            int counter = 1;
+            string uniqueName;
+            do
+            {
+                uniqueName = $"{baseName} {counter}";
+                counter++;
+            }
+            while (Properties.Any(p => p.Name.Equals(uniqueName, StringComparison.OrdinalIgnoreCase)));
+
+            return uniqueName;
         }
     }
 }

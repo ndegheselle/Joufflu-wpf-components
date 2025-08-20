@@ -1,11 +1,11 @@
 ﻿using Joufflu.Data.DnD;
+using Joufflu.Data.Schema;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Usuel.Shared.Data;
 
 namespace Joufflu.Samples.Views
 {

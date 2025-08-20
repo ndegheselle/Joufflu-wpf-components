@@ -1,14 +1,19 @@
 ﻿using Joufflu.Shared.Resources.Fonts;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using Usuel.Shared.Data;
 
 namespace Joufflu.Data.Schema
 {
     public class ValueTypeIcon : Control, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
+        protected void NotifyPropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
         public static readonly DependencyProperty TypeProperty =
             DependencyProperty.Register(
             nameof(Type),

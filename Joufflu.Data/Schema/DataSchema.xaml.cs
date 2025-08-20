@@ -1,11 +1,10 @@
 ﻿using Joufflu.Data.DnD;
-using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Usuel.Shared.Data;
 
-namespace Joufflu.Data
+namespace Joufflu.Data.Schema
 {
     public class DepthToMarginConverter : IValueConverter
     {
@@ -35,24 +34,67 @@ namespace Joufflu.Data
 
     public class SchemaDropHandler : DropHandler<SchemaProperty>
     {
+        private SchemaProperty? _hoveredProperty = null;
+
+        public void StopHovering()
+        {
+            if (_hoveredProperty == null)
+                return;
+            _hoveredProperty.IsHovered = false;
+            _hoveredProperty = null;
+        }
+
+        protected override bool IsDropAuthorized(DragEventArgs e)
+        {
+            var source = GetDropData<SchemaProperty>(e.Data);
+            var target = ((FrameworkElement)e.OriginalSource).DataContext as SchemaProperty;
+            return base.IsDropAuthorized(e) && source != target;
+        }
+
+        protected override void OnPassingOver(DragEventArgs e)
+        {
+            if (((FrameworkElement)e.OriginalSource).DataContext is not SchemaProperty property)
+                return;
+
+            if (_hoveredProperty != null)
+                _hoveredProperty.IsHovered = false;
+
+            _hoveredProperty = property;
+            _hoveredProperty.IsHovered = true;
+        }
+
+        /// <summary>
+        /// Move the property to the target property position.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="e"></param>
         protected override void ApplyDrop(SchemaProperty? data, DragEventArgs e)
         {
             if (data == null)
                 return;
             if (e.OriginalSource is not FrameworkElement target)
                 return;
-
             if (target.DataContext is not SchemaProperty property)
                 return;
 
-            if (property is SchemaObject schemaObject)
-            {
-                schemaObject.Add(data, 0);
-            }
-            else
-            {
-                property.Parent.Add(data, 0);
-            }
+            StopHovering();
+
+            data.Parent?.Remove(data);
+            property.Parent?.Add(data, property.Parent?.Properties.IndexOf(property) ?? 0);
+        }
+    }
+
+    public class SchemaDragHandler : DragHandler
+    {
+        private readonly SchemaDropHandler _dropHandler;
+        public SchemaDragHandler(FrameworkElement parent, SchemaDropHandler dropHandler) : base(parent)
+        {
+            _dropHandler = dropHandler;
+        }
+
+        protected override void OnDragFinished()
+        {
+            _dropHandler.StopHovering();
         }
     }
 
@@ -69,6 +111,15 @@ namespace Joufflu.Data
         {
             get { return (SchemaObject)GetValue(RootProperty); }
             set { SetValue(RootProperty, value); }
+        }
+
+        public SchemaDragHandler DragHandler { get; }
+        public SchemaDropHandler DropHandler { get; }
+
+        public DataSchema()
+        {
+            DropHandler = new SchemaDropHandler();
+            DragHandler = new SchemaDragHandler(this, DropHandler);
         }
     }
 }

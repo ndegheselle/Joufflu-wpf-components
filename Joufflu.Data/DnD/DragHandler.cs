@@ -106,7 +106,14 @@ namespace Joufflu.Data.DnD
             {
                 // DragDrop resource may be occupied by another process
             }
+            finally
+            {
+                OnDragFinished();
+            }
         }
+
+        protected virtual void OnDragFinished()
+        { }
 
         /// <summary>
         /// Determines if drag operation is authorized for the current state
