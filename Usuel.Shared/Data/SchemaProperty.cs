@@ -14,7 +14,7 @@ namespace Usuel.Shared.Data
         TimeSpan
     }
 
-    public class SchemaProperty : INotifyPropertyChanged
+    public class SchemaProperty : ErrorValidationModel, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void NotifyPropertyChanged([CallerMemberName] string? name = null)
@@ -30,6 +30,11 @@ namespace Usuel.Shared.Data
             {
                 if (_name == value)
                     return;
+                ClearErrors();
+                if (_name != value && Parent?.IsPropertyNameUnique(value) == false)
+                {
+                    AddError($"The property name '{value}' is already used.");
+                }
                 _name = value;
                 NotifyPropertyChanged();
             }
@@ -111,7 +116,6 @@ namespace Usuel.Shared.Data
     public class SchemaObject : SchemaProperty
     {
         public ObservableCollection<SchemaProperty> Properties { get; private set; } = [];
-
         public ICustomCommand AddPropertyCommand { get; set; }
 
         public SchemaObject(string name) : base(name, EnumValueType.Object)
@@ -119,6 +123,7 @@ namespace Usuel.Shared.Data
             AddPropertyCommand = new DelegateCommand(() => AddValue("default"));
         }
 
+        #region Add & Remove properties
         /// <summary>
         /// Adds a property to the schema object.
         /// </summary>
@@ -164,6 +169,24 @@ namespace Usuel.Shared.Data
         }
 
         /// <summary>
+        /// Removes a property from the schema object.
+        /// </summary>
+        /// <param name="property"></param>
+        /// <exception cref="Exception"></exception>
+        public void Remove(SchemaProperty property)
+        {
+            if (Properties.Remove(property))
+            {
+                property.Parent = null; // Clear parent reference
+            }
+            else
+            {
+                throw new Exception("Property not found in the collection.");
+            }
+        }
+        #endregion
+
+        /// <summary>
         /// Updates the type of a property in the schema object.
         /// </summary>
         /// <param name="property"></param>
@@ -183,21 +206,9 @@ namespace Usuel.Shared.Data
             Add(newProperty, index);
         }
 
-        /// <summary>
-        /// Removes a property from the schema object.
-        /// </summary>
-        /// <param name="property"></param>
-        /// <exception cref="Exception"></exception>
-        public void Remove(SchemaProperty property)
+        public bool IsPropertyNameUnique(string name)
         {
-            if (Properties.Remove(property))
-            {
-                property.Parent = null; // Clear parent reference
-            }
-            else
-            {
-                throw new Exception("Property not found in the collection.");
-            }
+            return !Properties.Any(p => p.Name.ToLowerInvariant().Equals(name.ToLowerInvariant(), StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -207,10 +218,8 @@ namespace Usuel.Shared.Data
         /// <returns>A unique property name</returns>
         private string GetUniquePropertyName(string baseName)
         {
-            if (!Properties.Any(p => p.Name.Equals(baseName, StringComparison.OrdinalIgnoreCase)))
-            {
+            if (IsPropertyNameUnique(baseName))
                 return baseName;
-            }
 
             int counter = 1;
             string uniqueName;

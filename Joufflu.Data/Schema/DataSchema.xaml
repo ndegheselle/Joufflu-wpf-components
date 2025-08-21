@@ -4,17 +4,47 @@
     xmlns:adonisConverters="clr-namespace:AdonisUI.Converters;assembly=AdonisUI"
     xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+    xmlns:dnd="clr-namespace:Joufflu.Data.DnD"
     xmlns:font="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:extensions="clr-namespace:Joufflu.Shared.Extensions;assembly=Joufflu.Shared"
     xmlns:data="clr-namespace:Usuel.Shared.Data;assembly=Usuel.Shared"
     xmlns:local="clr-namespace:Joufflu.Data.Schema"
-    xmlns:dnd="clr-namespace:Joufflu.Data.DnD"
     xmlns:s="clr-namespace:System;assembly=mscorlib">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/NamedStyles/IconButton.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Data;component/Schema/SchemaTreeViewItem.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Data;component/Schema/ValueTypeIcon.xaml" />
     </ResourceDictionary.MergedDictionaries>
+
+    <Style
+        x:Key="TextBlockValidation"
+        BasedOn="{StaticResource {x:Type TextBlock}}"
+        TargetType="TextBlock">
+        <Style.Triggers>
+            <Trigger Property="Validation.HasError" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource {x:Static adonisUi:Brushes.ErrorBrush}}" />
+                <Setter Property="Validation.ErrorTemplate" Value="{x:Null}" />
+                <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}" />
+                <Setter Property="TextDecorations">
+                    <Setter.Value>
+                        <TextDecorationCollection>
+                            <TextDecoration Location="Underline">
+                                <TextDecoration.Pen>
+                                    <Pen Brush="{DynamicResource {x:Static adonisUi:Brushes.ErrorBrush}}" Thickness="1">
+                                        <Pen.DashStyle>
+                                            <DashStyle Dashes="0,3" />
+                                        </Pen.DashStyle>
+                                    </Pen>
+                                </TextDecoration.Pen>
+                                <TextDecoration.PenOffset>1</TextDecoration.PenOffset>
+                            </TextDecoration>
+                        </TextDecorationCollection>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <Style TargetType="{x:Type local:DataSchema}">
         <Style.Resources>
             <local:DepthToMarginConverter x:Key="DepthToMarginConverter" />
@@ -26,14 +56,14 @@
                         dnd:DropBehavior.Handler="{Binding DropHandler, Mode=OneTime}"
                         DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                         Grid.IsSharedSizeScope="True"
-                        ItemsSource="{Binding Root.Properties}"
-                        ItemContainerStyle="{StaticResource SchemaTreeViewItem}">
+                        ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
+                        ItemsSource="{Binding Root.Properties}">
                         <TreeView.Resources>
                             <HierarchicalDataTemplate DataType="{x:Type data:SchemaObject}" ItemsSource="{Binding Properties}">
                                 <Grid
-                                    Background="Transparent"
                                     Height="24"
-                                    dnd:DragBehavior.Handler="{Binding DataContext.DragHandler, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}, Mode=OneTime}">
+                                    dnd:DragBehavior.Handler="{Binding DataContext.DragHandler, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}, Mode=OneTime}"
+                                    Background="Transparent">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="auto" SharedSizeGroup="Name" />
                                         <ColumnDefinition Width="auto" />
@@ -42,26 +72,27 @@
 
                                     <Grid Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}">
                                         <TextBlock
+                                            Margin="4,0"
                                             VerticalAlignment="Center"
-                                            Text="{Binding Name}"
-                                            Margin="4,0" />
+                                            Style="{StaticResource TextBlockValidation}"
+                                            Text="{Binding Name}" />
                                         <TextBox
+                                            Name="TextBoxName"
                                             Margin="0,1"
                                             Padding="4,0"
-                                            Visibility="Collapsed"
-                                            Name="TextBoxName"
-                                            Text="{Binding Name, Mode=TwoWay}" />
+                                            Text="{Binding Name, Mode=TwoWay}"
+                                            Visibility="Collapsed" />
                                     </Grid>
 
-                                    <Grid Margin="2,0,0,0" Grid.Column="1">
+                                    <Grid Grid.Column="1" Margin="2,0,0,0">
                                         <local:ValueTypeIcon Margin="8,0,0,0" Type="{Binding Type}" />
                                         <ComboBox
-                                            Margin="0,1"
-                                            Width="100"
-                                            HorizontalAlignment="Left"
-                                            Visibility="Collapsed"
                                             Name="ComboBoxType"
+                                            Width="100"
+                                            Margin="0,1"
+                                            HorizontalAlignment="Left"
                                             SelectedItem="{Binding Type, Mode=TwoWay}"
+                                            Visibility="Collapsed">
                                             ItemsSource="{extensions:EnumValuesExtension {x:Type data:EnumValueType}}">
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
@@ -72,32 +103,32 @@
                                     </Grid>
 
                                     <StackPanel
-                                        HorizontalAlignment="Right"
-                                        Margin="1"
                                         Name="ContainerActions"
                                         Grid.Column="2"
+                                        Margin="1"
+                                        HorizontalAlignment="Right"
                                         Orientation="Horizontal"
                                         Visibility="Collapsed">
                                         <Button
-                                            Command="{Binding AddPropertyCommand}"
-                                            Background="Transparent"
-                                            Padding="6"
                                             Margin="1,0,0,0"
+                                            Padding="6"
+                                            Background="Transparent"
+                                            Command="{Binding AddPropertyCommand}"
                                             Style="{StaticResource IconButton}">
                                             <font:Icon FontSize="10" Text="{x:Static font:IconFont.Plus}" />
                                         </Button>
                                         <Button
-                                            Command="{Binding RemoveCommand}"
-                                            Background="Transparent"
                                             Margin="1,0,0,0"
                                             Padding="6"
+                                            Background="Transparent"
+                                            Command="{Binding RemoveCommand}"
                                             Style="{StaticResource IconButton}">
                                             <font:Icon FontSize="10" Text="{x:Static font:IconFont.Trash}" />
                                         </Button>
                                     </StackPanel>
                                     <Border
-                                        Grid.ColumnSpan="2"
                                         Name="DropPreview"
+                                        Grid.ColumnSpan="2"
                                         BorderBrush="{StaticResource {x:Static adonisUi:Brushes.AccentIntenseHighlightBorderBrush}}" />
                                 </Grid>
 
@@ -129,9 +160,9 @@
                             </HierarchicalDataTemplate>
                             <DataTemplate DataType="{x:Type data:SchemaValue}">
                                 <Grid
-                                    Background="Transparent"
                                     Height="24"
-                                    dnd:DragBehavior.Handler="{Binding DataContext.DragHandler, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}, Mode=OneTime}">
+                                    dnd:DragBehavior.Handler="{Binding DataContext.DragHandler, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}, Mode=OneTime}"
+                                    Background="Transparent">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="auto" SharedSizeGroup="Name" />
                                         <ColumnDefinition Width="auto" />
@@ -139,26 +170,27 @@
                                     </Grid.ColumnDefinitions>
                                     <Grid Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}">
                                         <TextBlock
+                                            Margin="4,0"
                                             VerticalAlignment="Center"
-                                            Text="{Binding Name}"
-                                            Margin="4,0" />
+                                            Style="{StaticResource TextBlockValidation}"
+                                            Text="{Binding Name}" />
                                         <TextBox
+                                            Name="TextBoxName"
                                             Margin="0,1"
                                             Padding="4,0"
-                                            Visibility="Collapsed"
-                                            Name="TextBoxName"
-                                            Text="{Binding Name, Mode=TwoWay}" />
+                                            Text="{Binding Name, Mode=TwoWay}"
+                                            Visibility="Collapsed" />
                                     </Grid>
 
                                     <Grid Grid.Column="1" Margin="2,0,0,0">
                                         <local:ValueTypeIcon Margin="8,0,0,0" Type="{Binding Type}" />
                                         <ComboBox
-                                            Margin="0,1"
-                                            Width="100"
-                                            HorizontalAlignment="Left"
-                                            Visibility="Collapsed"
                                             Name="ComboBoxType"
+                                            Width="100"
+                                            Margin="0,1"
+                                            HorizontalAlignment="Left"
                                             SelectedItem="{Binding Type, Mode=TwoWay}"
+                                            Visibility="Collapsed">
                                             ItemsSource="{extensions:EnumValuesExtension {x:Type data:EnumValueType}}">
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
@@ -169,21 +201,21 @@
                                     </Grid>
 
                                     <Button
-                                        HorizontalAlignment="Right"
-                                        Command="{Binding RemoveCommand}"
-                                        Background="Transparent"
-                                        Margin="1"
                                         Name="BtnRemove"
                                         Grid.Column="3"
+                                        Margin="1"
                                         Padding="6"
+                                        HorizontalAlignment="Right"
+                                        Background="Transparent"
+                                        Command="{Binding RemoveCommand}"
                                         Style="{StaticResource IconButton}"
                                         Visibility="Collapsed">
                                         <font:Icon FontSize="10" Text="{x:Static font:IconFont.Trash}" />
                                     </Button>
 
                                     <Border
-                                        Grid.ColumnSpan="2"
                                         Name="DropPreview"
+                                        Grid.ColumnSpan="2"
                                         BorderBrush="{StaticResource {x:Static adonisUi:Brushes.AccentIntenseHighlightBorderBrush}}" />
                                 </Grid>
 

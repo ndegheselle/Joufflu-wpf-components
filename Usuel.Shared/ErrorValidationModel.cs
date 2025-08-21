@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace Usuel.Shared
 {
-    public class ErrorValidationModel : INotifyDataErrorInfo
+    public abstract class ErrorValidationModel : INotifyDataErrorInfo
     {
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
