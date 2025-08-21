@@ -19,7 +19,7 @@ namespace Joufflu.Data.Schema
         TimeSpan
     }
 
-    public class SchemaProperty : INotifyPropertyChanged
+    public class SchemaProperty : ErrorValidationModel, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void NotifyPropertyChanged([CallerMemberName] string? name = null)
@@ -27,7 +27,21 @@ namespace Joufflu.Data.Schema
 
         public ICustomCommand RemoveCommand { get; set; }
 
-        public string Name { get; set; } = string.Empty;
+        public string _name = "";
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                ClearErrors();
+                if (_name != value && Parent?.IsPropertyNameUnique(value) == false)
+                {
+                    AddError($"The property name '{value}' is already used.");
+                }
+                _name = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private EnumValueType _type = EnumValueType.String;
 
@@ -83,7 +97,6 @@ namespace Joufflu.Data.Schema
     public class SchemaObject : SchemaProperty
     {
         public ObservableCollection<SchemaProperty> Properties { get; private set; } = [];
-
         public ICustomCommand AddPropertyCommand { get; set; }
 
         public SchemaObject(string name) : base(name, EnumValueType.Object) 
@@ -91,6 +104,7 @@ namespace Joufflu.Data.Schema
             AddPropertyCommand = new DelegateCommand(() => AddValue("default"));
         }
 
+        #region Add & Remove properties
         /// <summary>
         /// Adds a property to the schema object.
         /// </summary>
@@ -136,6 +150,24 @@ namespace Joufflu.Data.Schema
         }
 
         /// <summary>
+        /// Removes a property from the schema object.
+        /// </summary>
+        /// <param name="property"></param>
+        /// <exception cref="Exception"></exception>
+        public void Remove(SchemaProperty property)
+        {
+            if (Properties.Remove(property))
+            {
+                property.Parent = null; // Clear parent reference
+            }
+            else
+            {
+                throw new Exception("Property not found in the collection.");
+            }
+        }
+        #endregion
+
+        /// <summary>
         /// Updates the type of a property in the schema object.
         /// </summary>
         /// <param name="property"></param>
@@ -155,21 +187,9 @@ namespace Joufflu.Data.Schema
             Add(newProperty, index);
         }
 
-        /// <summary>
-        /// Removes a property from the schema object.
-        /// </summary>
-        /// <param name="property"></param>
-        /// <exception cref="Exception"></exception>
-        public void Remove(SchemaProperty property)
+        public bool IsPropertyNameUnique(string name)
         {
-            if (Properties.Remove(property))
-            {
-                property.Parent = null; // Clear parent reference
-            }
-            else
-            {
-                throw new Exception("Property not found in the collection.");
-            }
+            return !Properties.Any(p => p.Name.ToLowerInvariant().Equals(name.ToLowerInvariant(), StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
@@ -179,10 +199,8 @@ namespace Joufflu.Data.Schema
         /// <returns>A unique property name</returns>
         private string GetUniquePropertyName(string baseName)
         {
-            if (!Properties.Any(p => p.Name.Equals(baseName, StringComparison.OrdinalIgnoreCase)))
-            {
+            if (IsPropertyNameUnique(baseName))
                 return baseName;
-            }
 
             int counter = 1;
             string uniqueName;
