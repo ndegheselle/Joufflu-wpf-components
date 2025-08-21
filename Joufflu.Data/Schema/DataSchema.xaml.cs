@@ -1,8 +1,8 @@
 ﻿using Joufflu.Data.DnD;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Usuel.Shared.Data;
 
 namespace Joufflu.Data.Schema
 {
@@ -35,6 +35,11 @@ namespace Joufflu.Data.Schema
     public class SchemaDropHandler : DropHandler<SchemaProperty>
     {
         private SchemaProperty? _hoveredProperty = null;
+        private readonly DataSchema _schema;
+        public SchemaDropHandler(DataSchema schema)
+        {
+            _schema = schema;
+        }
 
         public void StopHovering()
         {
@@ -46,6 +51,9 @@ namespace Joufflu.Data.Schema
 
         protected override bool IsDropAuthorized(DragEventArgs e)
         {
+            if (_schema.IsReadOnly)
+                return false;
+
             var source = GetDropData<SchemaProperty>(e.Data);
             var target = ((FrameworkElement)e.OriginalSource).DataContext as SchemaProperty;
             return base.IsDropAuthorized(e) && source != target;
@@ -113,12 +121,25 @@ namespace Joufflu.Data.Schema
             set { SetValue(RootProperty, value); }
         }
 
+        public static readonly DependencyProperty IsReadOnlyProperty =
+            DependencyProperty.Register(
+            nameof(IsReadOnly),
+            typeof(bool),
+            typeof(DataSchema),
+            new PropertyMetadata(false));
+
+        public bool IsReadOnly
+        {
+            get { return (bool)GetValue(IsReadOnlyProperty); }
+            set { SetValue(IsReadOnlyProperty, value); }
+        }
+
         public SchemaDragHandler DragHandler { get; }
         public SchemaDropHandler DropHandler { get; }
 
         public DataSchema()
         {
-            DropHandler = new SchemaDropHandler();
+            DropHandler = new SchemaDropHandler(this);
             DragHandler = new SchemaDragHandler(this, DropHandler);
         }
     }

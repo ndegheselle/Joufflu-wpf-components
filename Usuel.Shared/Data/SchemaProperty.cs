@@ -1,13 +1,8 @@
-﻿using Joufflu.Shared.Windows;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.Runtime.CompilerServices;
-using System.Windows.Data;
-using System.Xml.Linq;
-using Usuel.Shared;
 
-namespace Joufflu.Data.Schema
+namespace Usuel.Shared.Data
 {
     public enum EnumValueType
     {
@@ -27,10 +22,20 @@ namespace Joufflu.Data.Schema
 
         public ICustomCommand RemoveCommand { get; set; }
 
-        public string Name { get; set; } = string.Empty;
+        private string _name = "";
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (_name == value)
+                    return;
+                _name = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private EnumValueType _type = EnumValueType.String;
-
         public EnumValueType Type
         {
             get => _type;
@@ -41,12 +46,35 @@ namespace Joufflu.Data.Schema
                 _type = value;
                 // If we have a parent, notify it to update its collection
                 Parent?.UpdatePropertyType(this, value);
+                NotifyPropertyChanged();
+            }
+        }
+
+        private uint _depth = 0;
+        public uint Depth
+        {
+            get => _depth;
+            set
+            {
+                if (_depth == value) return;
+                _depth = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private bool _isHovered = false;
+        public bool IsHovered
+        {
+            get => _isHovered;
+            set
+            {
+                if (_isHovered == value) return;
+                _isHovered = value;
+                NotifyPropertyChanged();
             }
         }
 
         public SchemaObject? Parent { get; set; } = null;
-        public uint Depth { get; set; } = 0;
-        public bool IsHovered { get; set; }
 
         public SchemaProperty(string name, EnumValueType type)
         {
@@ -86,7 +114,7 @@ namespace Joufflu.Data.Schema
 
         public ICustomCommand AddPropertyCommand { get; set; }
 
-        public SchemaObject(string name) : base(name, EnumValueType.Object) 
+        public SchemaObject(string name) : base(name, EnumValueType.Object)
         {
             AddPropertyCommand = new DelegateCommand(() => AddValue("default"));
         }
