@@ -106,6 +106,10 @@ namespace Joufflu.Data.DnD
             {
                 // DragDrop resource may be occupied by another process
             }
+            catch(InvalidOperationException)
+            {
+                // FIXME : check why this exception can happend (TextBox in dnd:drag element ?)
+            }
             finally
             {
                 OnDragFinished();

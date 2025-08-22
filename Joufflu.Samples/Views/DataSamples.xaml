@@ -113,8 +113,7 @@
             Margin="0,6,0,2">
             Data
         </TextBlock>
-        <schema:DataSchema
-            IsReadOnly="True"
+        <schema:SchemaEdit
             Grid.Row="5"
             Root="{Binding DataRoot}" />
     </Grid>

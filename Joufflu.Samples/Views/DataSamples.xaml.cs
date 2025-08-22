@@ -60,12 +60,12 @@ namespace Joufflu.Samples.Views
 
         public CustomDropHandler DropHandler { get; private set; }
 
-        public SchemaObject DataRoot { get; private set; }
+        public SchemaObjectUi DataRoot { get; private set; }
 
         public DataSamples()
         {
-            SchemaObject obj = new SchemaObject("afdsfg");
-            DataRoot = new SchemaObject("root");
+            SchemaObjectUi obj = new SchemaObjectUi("afdsfg");
+            DataRoot = new SchemaObjectUi("Root schema");
             DataRoot
                 .AddValue("fdsfdsf")
                 .AddValue("bvcbvc")
