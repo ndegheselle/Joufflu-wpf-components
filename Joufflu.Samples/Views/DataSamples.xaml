@@ -113,8 +113,12 @@
             Margin="0,6,0,2">
             Data
         </TextBlock>
-        <schema:SchemaEdit
-            Grid.Row="5"
-            Root="{Binding DataRoot}" />
+        <Grid Grid.Row="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <schema:SchemaEdit Root="{Binding DataRoot}" />
+        </Grid>
     </Grid>
 </UserControl>

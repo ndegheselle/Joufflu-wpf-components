@@ -64,15 +64,15 @@ namespace Joufflu.Samples.Views
 
         public DataSamples()
         {
-            SchemaObjectUi obj = new SchemaObjectUi("afdsfg");
+            SchemaObjectUi obj = new SchemaObjectUi("Folder");
             DataRoot = new SchemaObjectUi("Root schema");
             DataRoot
-                .AddValue("fdsfdsf")
-                .AddValue("bvcbvc")
+                .AddProperty("Mail")
+                .AddProperty("Number")
                 .Add(obj)
-                .AddValue("liuluil");
+                .AddProperty("AcceptThis");
 
-            obj.AddValue("tataqds");
+            obj.AddProperty("Temp");
 
             DropHandler = new CustomDropHandler();
             DragHandler = new CustomDragHandler(this);

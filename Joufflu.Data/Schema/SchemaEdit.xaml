@@ -96,14 +96,21 @@
                             </ComboBox>
                         </Grid>
 
-                        <CheckBox
-                            Name="CheckBoxIsAnArray"
-                            Grid.Column="2"
-                            Margin="2,0,0,0"
-                            IsChecked="{Binding IsArray}"
-                            Visibility="Collapsed">
-                            Is an array
-                        </CheckBox>
+                        <Grid Grid.Column="2" Margin="2,0,0,0">
+                            <font:Icon
+                                Name="IconIsAnArray"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                FontSize="10"
+                                Visibility="Collapsed"
+                                Text="{x:Static font:IconFont.LayerGroup}" />
+                            <CheckBox
+                                Name="CheckBoxIsAnArray"
+                                IsChecked="{Binding IsArray}"
+                                Visibility="Collapsed">
+                                Is an array
+                            </CheckBox>
+                        </Grid>
 
                         <ContentPresenter
                             Name="ContainerActions"
@@ -158,6 +165,9 @@
                             BorderBrush="{StaticResource {x:Static adonisUi:Brushes.AccentIntenseHighlightBorderBrush}}" />
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Property.IsArray, RelativeSource={RelativeSource Self}}" Value="True">
+                            <Setter TargetName="IconIsAnArray" Property="Visibility" Value="Visible" />
+                        </DataTrigger>
                         <DataTrigger Binding="{Binding Property.IsHovered, RelativeSource={RelativeSource Self}}" Value="True">
                             <Setter TargetName="DropPreview" Property="BorderThickness" Value="0,4,0,0" />
                         </DataTrigger>
@@ -186,7 +196,10 @@
                                     <ColumnDefinition />
                                     <ColumnDefinition Width="auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock FontWeight="Bold" Text="{Binding Root.Name}" VerticalAlignment="Center" />
+                                <TextBlock
+                                    FontWeight="Bold"
+                                    Text="{Binding Root.Name}"
+                                    VerticalAlignment="Center" />
 
                                 <Button
                                     Grid.Column="1"
@@ -232,7 +245,7 @@
                                         </MultiDataTrigger>
                                     </HierarchicalDataTemplate.Triggers>
                                 </HierarchicalDataTemplate>
-                                <DataTemplate DataType="{x:Type local:SchemaValueUi}">
+                                <DataTemplate DataType="{x:Type local:SchemaPropertyUi}">
                                     <local:SchemaItem
                                         x:Name="Item"
                                         dnd:DragBehavior.Handler="{Binding DataContext.DragHandler, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}, Mode=OneTime}"

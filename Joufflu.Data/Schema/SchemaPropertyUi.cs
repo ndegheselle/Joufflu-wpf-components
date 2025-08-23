@@ -74,7 +74,7 @@ namespace Joufflu.Data.Schema
         private bool _isSelected = false;
         public bool IsSelected
         {
-            get => _isHovered;
+            get => _isSelected;
             set
             {
                 if (_isSelected == value) return;
@@ -115,21 +115,6 @@ namespace Joufflu.Data.Schema
         public override string ToString() => Name;
     }
 
-    public class SchemaValueUi : SchemaPropertyUi, ISchemaValue
-    {
-        public dynamic? Value { get; set; }
-
-        public SchemaValueUi(string name, EnumValueType type, dynamic? value = null) : base(name, type)
-        {
-            Value = value;
-        }
-
-        public SchemaValueUi(ISchemaValue schemaValue) : base(schemaValue)
-        {
-            Value = schemaValue.Value;
-        }
-    }
-
     public class SchemaObjectUi : SchemaPropertyUi, ISchemaObject
     {
         public ObservableCollection<SchemaPropertyUi> Properties { get; private set; } = [];
@@ -139,18 +124,18 @@ namespace Joufflu.Data.Schema
 
         public SchemaObjectUi(string name) : base(name, EnumValueType.Object)
         {
-            AddPropertyCommand = new DelegateCommand(() => AddValue("default"));
+            AddPropertyCommand = new DelegateCommand(() => AddProperty("default"));
         }
 
         public SchemaObjectUi(ISchemaObject schemaObject) : base(schemaObject)
         {
-            AddPropertyCommand = new DelegateCommand(() => AddValue("default"));
+            AddPropertyCommand = new DelegateCommand(() => AddProperty("default"));
             foreach (var property in schemaObject.Properties)
             {
                 Add(property switch
                 {
-                    ISchemaValue subValue => new SchemaValueUi(subValue),
                     ISchemaObject subObject => new SchemaObjectUi(subObject),
+                    ISchemaProperty subValue => new SchemaPropertyUi(subValue),
                     _ => throw new NotSupportedException($"Property type {property.GetType()} is not supported.")
                 });
             }
@@ -196,9 +181,9 @@ namespace Joufflu.Data.Schema
         /// <param name="type">Type of the value</param>
         /// <param name="value">Value</param>
         /// <returns>This</returns>
-        public SchemaObjectUi AddValue(string name, EnumValueType type = EnumValueType.String, dynamic? value = null)
+        public SchemaObjectUi AddProperty(string name, EnumValueType type = EnumValueType.String)
         {
-            return Add(new SchemaValueUi(name, type, value));
+            return Add(new SchemaPropertyUi(name, type));
         }
 
         /// <summary>
@@ -235,7 +220,7 @@ namespace Joufflu.Data.Schema
             // Create new property of correct type at same position
             SchemaPropertyUi newProperty = newType == EnumValueType.Object
                 ? new SchemaObjectUi(property.Name)
-                : new SchemaValueUi(property.Name, newType);
+                : new SchemaPropertyUi(property.Name, newType);
             Add(newProperty, index);
         }
 
