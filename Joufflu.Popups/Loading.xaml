@@ -19,7 +19,7 @@
             Padding="10,6">
             <StackPanel Orientation="Horizontal">
                 <fonts:Icon
-                    FontSize="16"
+                    FontSize="18"
                     x:Name="SpinnerElement"
                     Text="{x:Static fonts:IconFont.CircleNotch}"
                     RenderTransformOrigin="0.5,0.5">
