@@ -61,13 +61,13 @@
                                     </Style>
                                 </Button.Style>
                                 <TextBlock
-                                    Text="{x:Static font:IconFont.BackwardStep}"
+                                    Text="{x:Static font:IconFont.SkipBack}"
                                     FontFamily="{DynamicResource FontAwesomeSolid}"
                                     FontSize="10" />
                             </Button>
                             <Button Command="{Binding PreviousCommand}" Margin="1,0,6,0">
                                 <TextBlock
-                                    Text="{x:Static font:IconFont.ChevronLeft}"
+                                    Text="{x:Static font:IconFont.CaretLeft}"
                                     FontFamily="{DynamicResource FontAwesomeSolid}"
                                     FontSize="10" />
                             </Button>
@@ -99,7 +99,7 @@
 
                             <Button Command="{Binding NextCommand}" Margin="6,0,0,0">
                                 <TextBlock
-                                    Text="{x:Static font:IconFont.ChevronRight}"
+                                    Text="{x:Static font:IconFont.CaretRight}"
                                     FontFamily="{DynamicResource FontAwesomeSolid}"
                                     FontSize="10" />
                             </Button>
@@ -114,7 +114,7 @@
                                     </Style>
                                 </Button.Style>
                                 <TextBlock
-                                    Text="{x:Static font:IconFont.ForwardStep}"
+                                    Text="{x:Static font:IconFont.SkipForward}"
                                     FontFamily="{DynamicResource FontAwesomeSolid}"
                                     FontSize="10" />
                             </Button>

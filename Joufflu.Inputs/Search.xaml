@@ -28,14 +28,14 @@
                                 <fonts:Icon
                                     Margin="0,0,4,0"
                                     Opacity="0.5"
-                                    Text="{x:Static fonts:IconFont.MagnifyingGlass}" />
+                                    Text="{x:Static fonts:IconFont.MagnifyingGlassPlus}" />
                                 <!--  Clear button  -->
                                 <Button
                                     Command="{Binding ClearCommand}"
                                     Padding="6,5"
                                     Name="ClearButton"
                                     Style="{StaticResource IconButton}">
-                                    <fonts:Icon Text="{x:Static fonts:IconFont.Xmark}" />
+                                    <fonts:Icon Text="{x:Static fonts:IconFont.X}" />
                                 </Button>
                             </StackPanel>
                         </Grid>
@@ -53,7 +53,7 @@
                                 <Condition Property="Text" Value="" />
                             </MultiTrigger.Conditions>
                             <MultiTrigger.Setters>
-                                <Setter TargetName="PlaceholderText"  Property="Visibility" Value="Visible" />
+                                <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible" />
                             </MultiTrigger.Setters>
                         </MultiTrigger>
                     </ControlTemplate.Triggers>

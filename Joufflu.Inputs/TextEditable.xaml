@@ -53,7 +53,7 @@
                                 Background="Transparent"
                                 Command="{Binding EditCommand}"
                                 Style="{StaticResource IconButton}">
-                                <fonts:Icon Text="{x:Static fonts:IconFont.Pen}" />
+                                <fonts:Icon Text="{x:Static fonts:IconFont.PencilSimple}" />
                             </Button>
                         </Grid>
 
@@ -83,7 +83,7 @@
                                     Padding="6,5"
                                     Command="{Binding CancelCommand}"
                                     Style="{StaticResource IconButton}">
-                                    <fonts:Icon Text="{x:Static fonts:IconFont.Xmark}" />
+                                    <fonts:Icon Text="{x:Static fonts:IconFont.X}" />
                                 </Button>
                                 <Button
                                     Padding="6,5"

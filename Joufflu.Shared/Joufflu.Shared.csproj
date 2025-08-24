@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <None Remove="Resources\Fonts\FontAwesomeSolid.otf" />
+    <None Remove="Resources\Fonts\Phosphor.ttf" />
     <None Remove="Styles\NamedStyles\IconButton.xaml" />
   </ItemGroup>
 
@@ -18,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Fonts\FontAwesomeSolid.otf">
+    <Resource Include="Resources\Fonts\Phosphor.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

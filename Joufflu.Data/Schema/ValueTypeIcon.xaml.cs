@@ -31,7 +31,7 @@ namespace Joufflu.Data.Schema
             set { SetValue(TypeProperty, value); }
         }
 
-        public string Icon { get; set; } = IconFont.QuoteLeft;
+        public string Icon { get; set; } = IconFont.Quotes;
 
         /// <summary>
         /// Change the icon based on the type of value.
@@ -41,19 +41,19 @@ namespace Joufflu.Data.Schema
             switch (Type)
             {
                 case EnumValueType.Object:
-                    Icon = IconFont.List;
+                    Icon = IconFont.BracketsCurly;
                     break;
                 case EnumValueType.String:
-                    Icon = IconFont.QuoteLeft;
+                    Icon = IconFont.Quotes;
                     break;
                 case EnumValueType.Decimal:
-                    Icon = IconFont.Hashtag;
+                    Icon = IconFont.Hash;
                     break;
                 case EnumValueType.Boolean:
                     Icon = IconFont.Check;
                     break;
                 case EnumValueType.DateTime:
-                    Icon = IconFont.CalendarDay;
+                    Icon = IconFont.Calendar;
                     break;
                 case EnumValueType.TimeSpan:
                     Icon = IconFont.Clock;

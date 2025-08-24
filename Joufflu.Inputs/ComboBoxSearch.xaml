@@ -37,58 +37,58 @@
                                 <ColumnDefinition Width="auto" />
                                 <ColumnDefinition Width="auto" />
                             </Grid.ColumnDefinitions>
-                            
+
                             <Border Margin="0,0,11,0">
                                 <DockPanel Margin="{TemplateBinding Padding}">
                                     <adonisControls:ValidationErrorIndicator
-                                    x:Name="ErrorAlertHost"
-                                    Margin="0,0,4,0"
-                                    DockPanel.Dock="Left"
-                                    ErrorMessagePlacement="{TemplateBinding adonisExtensions:ValidationExtension.ErrorMessagePlacement}"
-                                    IsErrorMessageDisplayOnFocusEnabled="{TemplateBinding adonisExtensions:ValidationExtension.IsErrorMessageVisibleOnFocus}"
-                                    IsErrorMessageDisplayOnMouseOverEnabled="{TemplateBinding adonisExtensions:ValidationExtension.IsErrorMessageVisibleOnMouseOver}"
-                                    IsValidatedElementFocused="False"
-                                    ValidatedElement="{Binding ., RelativeSource={RelativeSource TemplatedParent}}"
-                                    Visibility="Collapsed" />
+                                        x:Name="ErrorAlertHost"
+                                        Margin="0,0,4,0"
+                                        DockPanel.Dock="Left"
+                                        ErrorMessagePlacement="{TemplateBinding adonisExtensions:ValidationExtension.ErrorMessagePlacement}"
+                                        IsErrorMessageDisplayOnFocusEnabled="{TemplateBinding adonisExtensions:ValidationExtension.IsErrorMessageVisibleOnFocus}"
+                                        IsErrorMessageDisplayOnMouseOverEnabled="{TemplateBinding adonisExtensions:ValidationExtension.IsErrorMessageVisibleOnMouseOver}"
+                                        IsValidatedElementFocused="False"
+                                        ValidatedElement="{Binding ., RelativeSource={RelativeSource TemplatedParent}}"
+                                        Visibility="Collapsed" />
 
                                     <ContentPresenter
-                                    x:Name="ContentSite"
-                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    Content="{TemplateBinding ComboBox.SelectionBoxItem}"
-                                    ContentTemplate="{TemplateBinding ComboBox.SelectionBoxItemTemplate}"
-                                    ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
-                                    IsHitTestVisible="False" />
+                                        x:Name="ContentSite"
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        Content="{TemplateBinding ComboBox.SelectionBoxItem}"
+                                        ContentTemplate="{TemplateBinding ComboBox.SelectionBoxItemTemplate}"
+                                        ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                        IsHitTestVisible="False" />
 
                                     <TextBox
-                                    x:Name="PART_EditableTextBox"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch"
-                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    Background="{TemplateBinding Background}"
-                                    Focusable="True"
-                                    Foreground="{TemplateBinding Foreground}"
-                                    IsReadOnly="{TemplateBinding IsReadOnly}"
-                                    Visibility="Hidden">
+                                        x:Name="PART_EditableTextBox"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        Background="{TemplateBinding Background}"
+                                        Focusable="True"
+                                        Foreground="{TemplateBinding Foreground}"
+                                        IsReadOnly="{TemplateBinding IsReadOnly}"
+                                        Visibility="Hidden">
                                         <TextBox.Template>
                                             <ControlTemplate TargetType="TextBox">
                                                 <Grid>
                                                     <ContentPresenter
-                                                    x:Name="PlaceholderHost"
-                                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                    Content="{Binding Path=(adonisExtensions:WatermarkExtension.Watermark), RelativeSource={RelativeSource FindAncestor, AncestorType=ComboBox}}"
-                                                    IsHitTestVisible="False"
-                                                    Opacity="0.5"
-                                                    Visibility="Collapsed" />
+                                                        x:Name="PlaceholderHost"
+                                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                        Content="{Binding Path=(adonisExtensions:WatermarkExtension.Watermark), RelativeSource={RelativeSource FindAncestor, AncestorType=ComboBox}}"
+                                                        IsHitTestVisible="False"
+                                                        Opacity="0.5"
+                                                        Visibility="Collapsed" />
 
                                                     <ScrollViewer
-                                                    Name="PART_ContentHost"
-                                                    Focusable="False"
-                                                    HorizontalScrollBarVisibility="Hidden"
-                                                    Template="{StaticResource TextBoxScrollViewerTemplate}"
-                                                    VerticalScrollBarVisibility="Hidden" />
+                                                        Name="PART_ContentHost"
+                                                        Focusable="False"
+                                                        HorizontalScrollBarVisibility="Hidden"
+                                                        Template="{StaticResource TextBoxScrollViewerTemplate}"
+                                                        VerticalScrollBarVisibility="Hidden" />
                                                 </Grid>
 
                                                 <ControlTemplate.Triggers>
@@ -101,7 +101,7 @@
                                     </TextBox>
                                 </DockPanel>
                             </Border>
-                            
+
                             <Button
                                 Grid.Column="1"
                                 Name="ClearButton"
@@ -110,7 +110,7 @@
                                 Command="{Binding ClearCommand, RelativeSource={RelativeSource TemplatedParent}}"
                                 Focusable="False"
                                 Style="{StaticResource IconButton}">
-                                <fonts:Icon Text="{x:Static fonts:IconFont.Xmark}" />
+                                <fonts:Icon Text="{x:Static fonts:IconFont.X}" />
                             </Button>
                             <ToggleButton
                                 Grid.Column="2"

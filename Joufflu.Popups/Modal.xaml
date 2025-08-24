@@ -50,7 +50,7 @@
                                                     <fonts:Icon
                                                         Margin="6,0"
                                                         x:Name="separator"
-                                                        Text="{x:Static fonts:IconFont.ChevronRight}">
+                                                        Text="{x:Static fonts:IconFont.CaretRight}">
                                                         <fonts:Icon.Style>
                                                             <Style TargetType="{x:Type fonts:Icon}" BasedOn="{StaticResource {x:Type fonts:Icon}}">
                                                                 <Style.Triggers>

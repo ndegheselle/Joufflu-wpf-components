@@ -103,7 +103,7 @@
                                 VerticalAlignment="Center"
                                 FontSize="10"
                                 Visibility="Collapsed"
-                                Text="{x:Static font:IconFont.LayerGroup}" />
+                                Text="{x:Static font:IconFont.BracketsSquare}" />
                             <CheckBox
                                 Name="CheckBoxIsAnArray"
                                 IsChecked="{Binding IsArray}"

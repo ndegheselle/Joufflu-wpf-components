@@ -8,12 +8,12 @@
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/NamedStyles/IconButton.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <FontFamily x:Key="FontAwesomeSolid">/Joufflu.Shared;Component/Resources/Fonts/FontAwesomeSolid.otf#Font Awesome 6 Free Solid</FontFamily>
+    <FontFamily x:Key="Phosphor">/Joufflu.Shared;Component/Resources/Fonts/Phosphor.ttf#Phosphor</FontFamily>
     <Style
         x:Key="{x:Type fonts:Icon}"
         TargetType="{x:Type fonts:Icon}"
         BasedOn="{StaticResource {x:Type TextBlock}}">
-        <Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}" />
+        <Setter Property="FontFamily" Value="{StaticResource Phosphor}" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>

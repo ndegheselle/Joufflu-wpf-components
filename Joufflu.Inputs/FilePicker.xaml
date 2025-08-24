@@ -51,7 +51,7 @@
                                             </Style.Triggers>
                                         </Style>
                                     </Button.Style>
-                                    <fonts:Icon Text="{x:Static fonts:IconFont.CircleXmark}" />
+                                    <fonts:Icon Text="{x:Static fonts:IconFont.X}" />
                                 </Button>
                                 <Button
                                     Padding="6,5"

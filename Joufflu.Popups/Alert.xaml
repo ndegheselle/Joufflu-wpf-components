@@ -56,19 +56,19 @@
                                     <fonts:Icon.Style>
                                         <Style TargetType="{x:Type fonts:Icon}" BasedOn="{StaticResource {x:Type fonts:Icon}}">
                                             <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}" />
-                                            <Setter Property="Text" Value="{x:Static fonts:IconFont.CircleInfo}" />
+                                            <Setter Property="Text" Value="{x:Static fonts:IconFont.Info}" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding Options.Type, RelativeSource={RelativeSource TemplatedParent}}" Value="Warning">
                                                     <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.AlertBrush}}" />
-                                                    <Setter Property="Text" Value="{x:Static fonts:IconFont.CircleExclamation}" />
+                                                    <Setter Property="Text" Value="{x:Static fonts:IconFont.Warning}" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding Options.Type, RelativeSource={RelativeSource TemplatedParent}}" Value="Error">
                                                     <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ErrorBrush}}" />
-                                                    <Setter Property="Text" Value="{x:Static fonts:IconFont.CircleExclamation}" />
+                                                    <Setter Property="Text" Value="{x:Static fonts:IconFont.Warning}" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding Options.Type, RelativeSource={RelativeSource TemplatedParent}}" Value="Success">
                                                     <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.SuccessBrush}}" />
-                                                    <Setter Property="Text" Value="{x:Static fonts:IconFont.CircleCheck}" />
+                                                    <Setter Property="Text" Value="{x:Static fonts:IconFont.CheckCircle}" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>

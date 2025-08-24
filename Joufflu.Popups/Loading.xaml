@@ -21,7 +21,7 @@
                 <fonts:Icon
                     FontSize="16"
                     x:Name="SpinnerElement"
-                    Text="{x:Static fonts:IconFont.ArrowsRotate}"
+                    Text="{x:Static fonts:IconFont.CircleNotch}"
                     RenderTransformOrigin="0.5,0.5">
                     <fonts:Icon.RenderTransform>
                         <RotateTransform Angle="0" />
