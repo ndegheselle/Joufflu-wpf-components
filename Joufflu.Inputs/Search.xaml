@@ -5,9 +5,10 @@
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:local="clr-namespace:Joufflu.Inputs">
     <Style BasedOn="{StaticResource {x:Type TextBox}}" TargetType="{x:Type local:Search}">
+        <Setter Property="Padding" Value="6,3" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type TextBox}">
+                <ControlTemplate TargetType="{x:Type local:Search}">
                     <Border
                         DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                         Name="border"
@@ -16,7 +17,7 @@
                         BorderThickness="{TemplateBinding BorderThickness}">
                         <Grid>
                             <TextBlock
-                                Margin="4,0,0,0"
+                                Margin="{TemplateBinding Padding}"
                                 VerticalAlignment="Center"
                                 Name="PlaceholderText"
                                 IsHitTestVisible="False"
@@ -26,13 +27,14 @@
                             <ScrollViewer x:Name="PART_ContentHost" />
                             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
                                 <fonts:Icon
+                                    FontSize="12"
                                     Margin="0,0,4,0"
                                     Opacity="0.5"
-                                    Text="{x:Static fonts:IconFont.MagnifyingGlassPlus}" />
+                                    Text="{x:Static fonts:IconFont.MagnifyingGlass}" />
                                 <!--  Clear button  -->
                                 <Button
                                     Command="{Binding ClearCommand}"
-                                    Padding="6,5"
+                                    Padding="6,4"
                                     Name="ClearButton"
                                     Style="{StaticResource IconButton}">
                                     <fonts:Icon Text="{x:Static fonts:IconFont.X}" />
