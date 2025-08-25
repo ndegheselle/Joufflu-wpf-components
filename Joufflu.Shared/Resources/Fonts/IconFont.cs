@@ -543,7 +543,7 @@
         public const string EnvelopeSimple = "\ue218";
         public const string EnvelopeSimpleOpen = "\ue21a";
         public const string Equalizer = "\uebbc";
-        public const string Equals = "\ue21c";
+        public const string EqualsSymbol = "\ue21c";
         public const string Eraser = "\ue21e";
         public const string EscalatorDown = "\uecba";
         public const string EscalatorUp = "\uecbc";
