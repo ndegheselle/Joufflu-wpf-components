@@ -1,4 +1,6 @@
-﻿namespace Usuel.Shared.Data
+﻿using System.Text.Json.Serialization;
+
+namespace Usuel.Shared.Data
 {
     public enum EnumValueType
     {
@@ -23,6 +25,7 @@
         public IEnumerable<ISchemaProperty> Properties { get; }
     }
 
+    [JsonDerivedType(typeof(SchemaObject), "object")]
     public class SchemaProperty : ISchemaProperty
     {
         public bool IsArray { get; set; }
