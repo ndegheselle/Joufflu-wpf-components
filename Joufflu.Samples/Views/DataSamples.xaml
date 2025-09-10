@@ -118,7 +118,7 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <schema:SchemaEdit Root="{Binding DataRoot}" />
+            <schema:SchemaEdit />
         </Grid>
     </Grid>
 </UserControl>

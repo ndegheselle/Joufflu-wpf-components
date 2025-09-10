@@ -1,8 +1,5 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Data;component/Paging.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/Joufflu.Data;component/Schema/SchemaEdit.xaml" />
     </ResourceDictionary.MergedDictionaries>
-
-    <FontFamily x:Key="FontAwesomeSolid">/Joufflu.Shared;Component/Resources/Fonts/FontAwesomeSolid.otf#Font Awesome 6 Free Solid</FontFamily>
 </ResourceDictionary>

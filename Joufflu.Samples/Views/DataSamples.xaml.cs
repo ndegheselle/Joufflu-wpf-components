@@ -1,12 +1,10 @@
 ﻿using Joufflu.Data.DnD;
-using Joufflu.Data.Schema;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Usuel.Shared.Data;
 
 namespace Joufflu.Samples.Views
 {
@@ -60,20 +58,8 @@ namespace Joufflu.Samples.Views
 
         public CustomDropHandler DropHandler { get; private set; }
 
-        public SchemaObjectUi DataRoot { get; private set; }
-
         public DataSamples()
         {
-            SchemaObjectUi obj = new SchemaObjectUi("Folder");
-            DataRoot = new SchemaObjectUi("Root schema");
-            DataRoot
-                .AddProperty("Mail")
-                .AddProperty("Number")
-                .Add(obj)
-                .AddProperty("AcceptThis");
-
-            obj.AddProperty("Temp");
-
             DropHandler = new CustomDropHandler();
             DragHandler = new CustomDragHandler(this);
             InitializeComponent();

@@ -11,8 +11,6 @@
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/Search.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <FontFamily x:Key="FontAwesomeSolid">/Joufflu.Shared;Component/Resources/Fonts/FontAwesomeSolid.otf#Font Awesome 6 Free Solid</FontFamily>
-
     <!--  HACK : fix a binding error  -->
     <Style TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
         <Setter Property="HorizontalContentAlignment" Value="Left" />
