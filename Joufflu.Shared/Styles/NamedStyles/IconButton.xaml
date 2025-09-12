@@ -6,10 +6,29 @@
 
     <Style
         x:Key="IconButton"
-        BasedOn="{StaticResource {x:Type Button}}"
-        TargetType="Button">
-        <Setter Property="Background" Value="Transparent" />
+        TargetType="Button"
+        BasedOn="{StaticResource {x:Type Button}}">
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="8" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Width" Value="28" />
+    </Style>
+
+    <Style
+        x:Key="IconToggleButton"
+        TargetType="ToggleButton"
+        BasedOn="{StaticResource {x:Type ToggleButton}}">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Width" Value="28" />
+    </Style>
+
+    <Style
+        x:Key="IconButtonSmall"
+        TargetType="Button"
+        BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Width" Value="20" />
     </Style>
 </ResourceDictionary>

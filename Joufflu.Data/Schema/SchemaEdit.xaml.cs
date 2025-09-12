@@ -1,8 +1,33 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace Joufflu.Data.Schema
 {
+    /// <summary>
+    /// Convert a depth to a left margin for the schema properties.
+    /// </summary>
+    public class DepthToMarginConverter : IValueConverter
+    {
+        public object? Convert(
+            object value,
+            Type targetType,
+            object parameter,
+            System.Globalization.CultureInfo culture)
+        {
+            if (value is not uint depth)
+                return null;
+            return new Thickness(depth * 16, 0, 0, 0);
+        }
+
+        public object ConvertBack(
+            object value,
+            Type targetType,
+            object parameter,
+            System.Globalization.CultureInfo culture)
+        { throw new NotImplementedException(); }
+    }
+
     public class SchemaTemplateSelector : DataTemplateSelector
     {
         public DataTemplate? ObjectTemplate { get; set; }
@@ -32,17 +57,18 @@ namespace Joufflu.Data.Schema
     public partial class SchemaEdit : UserControl
     {
         public SchemaObject Root { get; set; }
+        public bool IsReadOnly { get; set; }
 
         public SchemaEdit()
         {
             Root = new SchemaObject();
 
             var sub = new SchemaObject();
-            sub.Properties.Add(new SchemaProperty("sub", new SchemaValue() { DataType = EnumDataType.String }));
+            sub.Add("sub", new SchemaValue() { DataType = EnumDataType.String }, 1);
 
-            Root.Properties.Add(new SchemaProperty("tata", new SchemaValue() { DataType = EnumDataType.Boolean}));
-            Root.Properties.Add(new SchemaProperty("toto", new SchemaValue() { DataType = EnumDataType.Decimal, IsArray = true}));
-            Root.Properties.Add(new SchemaProperty("titi", sub));
+            Root.Add("tata", new SchemaValue() { DataType = EnumDataType.Boolean});
+            Root.Add("toto", new SchemaValue() { DataType = EnumDataType.Decimal, IsArray = true});
+            Root.Add("titi", sub);
 
             InitializeComponent();
         }

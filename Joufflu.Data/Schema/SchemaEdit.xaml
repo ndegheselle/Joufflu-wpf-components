@@ -4,12 +4,250 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:adonisConverters="clr-namespace:AdonisUI.Converters;assembly=AdonisUI"
+    xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
+    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+    xmlns:extensions="clr-namespace:Joufflu.Shared.Extensions;assembly=Joufflu.Shared"
+    xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:local="clr-namespace:Joufflu.Data.Schema"
     mc:Ignorable="d"
     d:DesignHeight="450"
     d:DesignWidth="800"
     x:Name="ContainerElement">
     <UserControl.Resources>
+        <Style x:Key="SchemaTreeViewItem" TargetType="TreeViewItem">
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="Transparent" />
+            <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="{DynamicResource {x:Static adonisUi:Dimensions.BorderThickness}}" />
+            <Setter Property="adonisExtensions:CornerRadiusExtension.CornerRadius" Value="{DynamicResource {x:Static adonisUi:Dimensions.CornerRadius}}" />
+            <Setter Property="Padding" Value="2" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="UseLayoutRounding" Value="True" />
+            <Setter Property="IsExpanded" Value="True" />
+            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TreeViewItem">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+
+                            <Border
+                                x:Name="Border"
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding adonisExtensions:CornerRadiusExtension.CornerRadius}" />
+
+                            <Border
+                                x:Name="SpotlightLayer"
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                adonisExtensions:CursorSpotlightExtension.MouseEventSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=TreeViewItem}}"
+                                Background="{TemplateBinding adonisExtensions:CursorSpotlightExtension.BackgroundBrush}"
+                                BorderBrush="{TemplateBinding adonisExtensions:CursorSpotlightExtension.BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding adonisExtensions:CornerRadiusExtension.CornerRadius}"
+                                SnapsToDevicePixels="False" />
+
+                            <ToggleButton
+                                x:Name="Expander"
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Width="12"
+                                Height="12"
+                                ClickMode="Press"
+                                ContentTemplate="{DynamicResource {x:Static adonisUi:Templates.Expander}}"
+                                Focusable="False"
+                                Foreground="{TemplateBinding Foreground}"
+                                IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                RenderTransformOrigin="0.5, 0.5">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <ContentPresenter
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                                <ToggleButton.Margin>
+                                    <MultiBinding Converter="{x:Static adonisConverters:ValuesToThicknessConverter.Instance}">
+                                        <Binding Path="Padding.Left" RelativeSource="{RelativeSource TemplatedParent}" />
+                                        <Binding Source="0" />
+                                        <Binding Source="8" />
+                                        <Binding Source="0" />
+                                    </MultiBinding>
+                                </ToggleButton.Margin>
+                                <ToggleButton.RenderTransform>
+                                    <RotateTransform x:Name="ExpanderRotateTransform" Angle="-90" />
+                                </ToggleButton.RenderTransform>
+                            </ToggleButton>
+
+                            <ContentPresenter
+                                x:Name="PART_Header"
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                ContentSource="Header">
+                                <ContentPresenter.Margin>
+                                    <MultiBinding Converter="{x:Static adonisConverters:ValuesToThicknessConverter.Instance}">
+                                        <Binding Source="0" />
+                                        <Binding Path="Padding.Top" RelativeSource="{RelativeSource TemplatedParent}" />
+                                        <Binding Path="Padding.Right" RelativeSource="{RelativeSource TemplatedParent}" />
+                                        <Binding Path="Padding.Bottom" RelativeSource="{RelativeSource TemplatedParent}" />
+                                    </MultiBinding>
+                                </ContentPresenter.Margin>
+                            </ContentPresenter>
+
+                            <ItemsPresenter
+                                x:Name="ItemsHost"
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="3" />
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="False">
+                                <Setter TargetName="ItemsHost" Property="Visibility" Value="Collapsed" />
+                            </Trigger>
+
+                            <Trigger Property="IsExpanded" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ExpanderRotateTransform"
+                                                Storyboard.TargetProperty="Angle"
+                                                To="-45"
+                                                Duration="00:00:0.2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="ExpanderRotateTransform"
+                                                Storyboard.TargetProperty="Angle"
+                                                From="-45"
+                                                Duration="00:00:0.2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+
+                            <Trigger Property="HasItems" Value="False">
+                                <Setter TargetName="Expander" Property="Visibility" Value="Hidden" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding IsLoaded, RelativeSource={RelativeSource Self}}" Value="True" />
+                        <Condition Binding="{Binding IsExpanded, RelativeSource={RelativeSource Self}}" Value="True" />
+                        <Condition Binding="{Binding Items.Count, RelativeSource={RelativeSource Self}}" Value="1" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter Property="IsExpanded" Value="True" />
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Path=(adonisExtensions:TreeViewItemMouseOverExtension.IsMouseDirectlyOverItem), RelativeSource={RelativeSource Self}}" Value="True" />
+                        <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1HighlightBrush}}" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1HighlightBorderBrush}}" />
+                        <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBrush}}" />
+                        <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer1IntenseHighlightBorderBrush}}" />
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Path=(adonisExtensions:LayerExtension.ComputedLayer), RelativeSource={RelativeSource Self}}" Value="2" />
+                        <Condition Binding="{Binding Path=(adonisExtensions:TreeViewItemMouseOverExtension.IsMouseDirectlyOverItem), RelativeSource={RelativeSource Self}}" Value="True" />
+                        <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer2HighlightBrush}}" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer2HighlightBorderBrush}}" />
+                        <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer2IntenseHighlightBrush}}" />
+                        <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer2IntenseHighlightBorderBrush}}" />
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Path=(adonisExtensions:LayerExtension.ComputedLayer), RelativeSource={RelativeSource Self}}" Value="3" />
+                        <Condition Binding="{Binding Path=(adonisExtensions:TreeViewItemMouseOverExtension.IsMouseDirectlyOverItem), RelativeSource={RelativeSource Self}}" Value="True" />
+                        <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer3HighlightBrush}}" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer3HighlightBorderBrush}}" />
+                        <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer3IntenseHighlightBrush}}" />
+                        <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer3IntenseHighlightBorderBrush}}" />
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Path=(adonisExtensions:LayerExtension.ComputedLayer), RelativeSource={RelativeSource Self}}" Value="4" />
+                        <Condition Binding="{Binding Path=(adonisExtensions:TreeViewItemMouseOverExtension.IsMouseDirectlyOverItem), RelativeSource={RelativeSource Self}}" Value="True" />
+                        <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer4HighlightBrush}}" />
+                        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer4HighlightBorderBrush}}" />
+                        <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer4IntenseHighlightBrush}}" />
+                        <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.Layer4IntenseHighlightBorderBrush}}" />
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static adonisUi:Brushes.AccentBrush}}" />
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.AccentForegroundBrush}}" />
+                </Trigger>
+
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.DisabledForegroundBrush}}" />
+                </Trigger>
+
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsEnabled" Value="False" />
+                        <Condition Property="IsSelected" Value="True" />
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.DisabledAccentForegroundBrush}}" />
+                </MultiTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <local:DepthToMarginConverter x:Key="DepthToMarginConverter" />
+
         <HierarchicalDataTemplate
             x:Key="ObjectTemplate"
             DataType="{x:Type local:SchemaProperty}"
@@ -17,22 +255,80 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition SharedSizeGroup="Name" />
+                    <ColumnDefinition Width="104" />
+                    <ColumnDefinition Width="50" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding Name}" />
-                <TextBlock Grid.Column="1" Text="{Binding Element.IsArray}" />
+                <TextBlock Text="{Binding Name}" Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}" />
+                <fonts:Icon
+                    Grid.Column="1"
+                    Opacity="0.8"
+                    HorizontalAlignment="Left"
+                    Margin="4,0,0,0"
+                    Text="{x:Static fonts:IconFont.BracketsCurly}" />
+                <CheckBox
+                    Margin="2,0,0,0"
+                    Grid.Column="2"
+                    IsChecked="{Binding Element.IsArray}">
+                    array
+                </CheckBox>
+
+                <StackPanel
+                    Grid.Column="3"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
+                    <Button Style="{StaticResource IconButtonSmall}">
+                        <fonts:Icon Text="{x:Static fonts:IconFont.Plus}" />
+                    </Button>
+                    <Button Style="{StaticResource IconButtonSmall}" Margin="1,0,0,0">
+                        <fonts:Icon Text="{x:Static fonts:IconFont.Trash}" />
+                    </Button>
+                </StackPanel>
             </Grid>
         </HierarchicalDataTemplate>
         <DataTemplate x:Key="ValueTemplate" DataType="{x:Type local:SchemaProperty}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition SharedSizeGroup="Name" />
-                    <ColumnDefinition />
+                    <ColumnDefinition Width="104" />
+                    <ColumnDefinition Width="50" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding Name}" />
-                <TextBlock Grid.Column="1" Text="{Binding Element.DataType}" />
-                <TextBlock Grid.Column="2" Text="{Binding Element.IsArray}" />
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Text="{Binding Name}"
+                    Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}" />
+
+                <ComboBox
+                    Padding="4,2"
+                    Width="100"
+                    Margin="4,0,0,0"
+                    Grid.Column="1"
+                    Name="ComboBoxType"
+                    HorizontalAlignment="Left"
+                    ItemsSource="{extensions:EnumValuesExtension {x:Type local:EnumDataType}}"
+                    SelectedItem="{Binding Element.DataType, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <local:IconDataType Type="{Binding}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <CheckBox
+                    Margin="2,0,0,0"
+                    Grid.Column="2"
+                    IsChecked="{Binding Element.IsArray}">
+                    array
+                </CheckBox>
+
+                <StackPanel
+                    Grid.Column="3"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
+                    <Button Style="{StaticResource IconButtonSmall}" Margin="1,0,0,0">
+                        <fonts:Icon Text="{x:Static fonts:IconFont.Trash}" />
+                    </Button>
+                </StackPanel>
             </Grid>
         </DataTemplate>
 
@@ -41,11 +337,11 @@
             ObjectTemplate="{StaticResource ObjectTemplate}"
             ValueTemplate="{StaticResource ValueTemplate}" />
     </UserControl.Resources>
+
     <TreeView
         Grid.IsSharedSizeScope="True"
         DataContext="{Binding ElementName=ContainerElement}"
         ItemsSource="{Binding Root.Properties}"
-        ItemTemplateSelector="{StaticResource TreeViewTemplateSelector}">
-        <TreeView.Resources />
-    </TreeView>
+        ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
+        ItemTemplateSelector="{StaticResource TreeViewTemplateSelector}" />
 </UserControl>
