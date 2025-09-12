@@ -54,10 +54,9 @@
                                     <fonts:Icon Text="{x:Static fonts:IconFont.X}" />
                                 </Button>
                                 <Button
-                                    Padding="6,4"
                                     VerticalAlignment="Center"
                                     Command="{Binding SelectCommand}"
-                                    Style="{StaticResource IconButton}">
+                                    Style="{StaticResource IconButtonSmall}">
                                     <fonts:Icon Text="{x:Static fonts:IconFont.File}" />
                                 </Button>
                             </StackPanel>

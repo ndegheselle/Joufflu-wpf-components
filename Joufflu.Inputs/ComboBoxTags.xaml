@@ -50,11 +50,10 @@
                                                         </TextBlock.Text>
                                                     </TextBlock>
                                                     <Button
-                                                        Padding="6,0"
                                                         Background="Transparent"
                                                         Command="{Binding RemoveSelectedCmd, RelativeSource={RelativeSource AncestorType=local:ComboBoxTags}}"
                                                         CommandParameter="{Binding}"
-                                                        Style="{StaticResource IconButton}">
+                                                        Style="{StaticResource IconButtonSmall}">
                                                         <fonts:Icon FontSize="10" Text="{x:Static fonts:IconFont.X}" />
                                                     </Button>
 
@@ -65,10 +64,9 @@
                                 </ItemsControl>
 
                                 <TextBox
-                                    
-                            Margin="{TemplateBinding Padding}"
                                     x:Name="PART_EditableTextBox"
                                     MinWidth="50"
+                                    Margin="{TemplateBinding Padding}"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"

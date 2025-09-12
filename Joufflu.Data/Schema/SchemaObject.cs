@@ -13,12 +13,19 @@ namespace Joufflu.Data.Schema
     }
 
     public interface ISchemaElement
-    {}
+    {
+        IGenericNode ToValue();
+    }
 
     public class SchemaValue : ISchemaElement
     {
         public EnumDataType DataType { get; set; }
         public bool IsArray { get; set; }
+
+        public IGenericNode ToValue()
+        {
+            return IsArray ? new GenericArray(this) : new GenericValue(this);
+        }
     }
 
     public class SchemaProperty
@@ -33,8 +40,8 @@ namespace Joufflu.Data.Schema
         public SchemaProperty(SchemaObject parent, string name, ISchemaElement element)
         {
             Parent = parent;
-            Name=name;
-            Element=element;
+            Name = name;
+            Element = element;
         }
     }
      
@@ -47,6 +54,15 @@ namespace Joufflu.Data.Schema
         {
             Properties.Add(new SchemaProperty(this, name, element) { Depth = depth });
             return this;
+        }
+
+        public IGenericNode ToValue()
+        {
+            Dictionary<string, IGenericNode> values = Properties.ToDictionary(
+                prop => prop.Name, 
+                prop => prop.Element.ToValue());
+
+            return IsArray ? new GenericArray(this) : new GenericObject(this, values);
         }
     }
 }

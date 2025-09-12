@@ -118,7 +118,7 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <schema:SchemaEdit />
+            <schema:SchemaEdit IsReadOnly="True" />
         </Grid>
     </Grid>
 </UserControl>
