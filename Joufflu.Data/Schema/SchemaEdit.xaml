@@ -19,11 +19,16 @@
                 <ResourceDictionary Source="/Joufflu.Data;component/Schema/SchemaTreeView.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <local:DepthToMarginConverter x:Key="DepthToMarginConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
 
-            <HierarchicalDataTemplate
-                x:Key="ObjectTemplate"
-                DataType="{x:Type local:SchemaProperty}"
-                ItemsSource="{Binding Element.Properties}">
+    <TreeView
+        DataContext="{Binding ElementName=ContainerElement}"
+        Grid.IsSharedSizeScope="True"
+        ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
+        ItemsSource="{Binding Root.Properties}">
+        <TreeView.Resources>
+            <HierarchicalDataTemplate DataType="{x:Type local:SchemaObject}" ItemsSource="{Binding Properties}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
@@ -31,18 +36,15 @@
                         <ColumnDefinition Width="50" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <TextBlock
-                        Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}"
-                        Padding="4,0"
-                        VerticalAlignment="Center"
-                        Text="{Binding Name}" />
-                    <TextBox
-                        Name="NameInput"
-                        Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}"
-                        Padding="4,2"
-                        VerticalAlignment="Center"
-                        Text="{Binding Name}"
-                        Visibility="Collapsed" />
+
+                    <Grid VerticalAlignment="Center" Margin="{Binding Converter={StaticResource DepthToMarginConverter}}">
+                        <TextBlock Padding="4,0" Text="{Binding Name}" />
+                        <TextBox
+                            Name="NameInput"
+                            Padding="4,2"
+                            Text="{Binding Name}"
+                            Visibility="Collapsed" />
+                    </Grid>
 
                     <fonts:Icon
                         Grid.Column="1"
@@ -61,7 +63,7 @@
                         Name="IsArrayInput"
                         Grid.Column="2"
                         Margin="2,0,0,0"
-                        IsChecked="{Binding Element.IsArray}"
+                        IsChecked="{Binding IsArray}"
                         Visibility="Collapsed">
                         array
                     </CheckBox>
@@ -82,7 +84,7 @@
                 </Grid>
 
                 <DataTemplate.Triggers>
-                    <DataTrigger Binding="{Binding Element.IsArray}" Value="False">
+                    <DataTrigger Binding="{Binding IsArray}" Value="False">
                         <Setter TargetName="IsArrayIcon" Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
                     <MultiDataTrigger>
@@ -112,7 +114,7 @@
                 </DataTemplate.Triggers>
 
             </HierarchicalDataTemplate>
-            <DataTemplate x:Key="ValueTemplate" DataType="{x:Type local:SchemaProperty}">
+            <DataTemplate DataType="{x:Type local:SchemaValue}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
@@ -120,23 +122,20 @@
                         <ColumnDefinition Width="50" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <TextBlock
-                        Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}"
-                        Padding="4,0"
-                        VerticalAlignment="Center"
-                        Text="{Binding Name}" />
-                    <TextBox
-                        Name="NameInput"
-                        Margin="{Binding Depth, Converter={StaticResource DepthToMarginConverter}}"
-                        Padding="4,2"
-                        VerticalAlignment="Center"
-                        Text="{Binding Name}"
-                        Visibility="Collapsed" />
+
+                    <Grid VerticalAlignment="Center" Margin="{Binding Converter={StaticResource DepthToMarginConverter}}">
+                        <TextBlock Padding="4,0" Text="{Binding Name}" />
+                        <TextBox
+                            Name="NameInput"
+                            Padding="4,2"
+                            Text="{Binding Name}"
+                            Visibility="Collapsed" />
+                    </Grid>
 
                     <local:IconDataType
                         Grid.Column="1"
                         Margin="6,2,0,2"
-                        Type="{Binding Element.DataType}" />
+                        Type="{Binding DataType}" />
                     <ComboBox
                         Name="TypeInput"
                         Grid.Column="1"
@@ -145,7 +144,7 @@
                         Padding="4,2"
                         HorizontalAlignment="Left"
                         ItemsSource="{extensions:EnumValuesExtension {x:Type local:EnumDataType}}"
-                        SelectedItem="{Binding Element.DataType, Mode=TwoWay}"
+                        SelectedItem="{Binding DataType, Mode=TwoWay}"
                         Visibility="Collapsed">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
@@ -164,7 +163,7 @@
                         Name="IsArrayInput"
                         Grid.Column="2"
                         Margin="2,0,0,0"
-                        IsChecked="{Binding Element.IsArray}"
+                        IsChecked="{Binding IsArray}"
                         Visibility="Collapsed">
                         array
                     </CheckBox>
@@ -182,7 +181,7 @@
                 </Grid>
 
                 <DataTemplate.Triggers>
-                    <DataTrigger Binding="{Binding Element.IsArray}" Value="False">
+                    <DataTrigger Binding="{Binding IsArray}" Value="False">
                         <Setter TargetName="IsArrayIcon" Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
                     <MultiDataTrigger>
@@ -213,18 +212,6 @@
                     </MultiDataTrigger>
                 </DataTemplate.Triggers>
             </DataTemplate>
-
-            <local:SchemaTemplateSelector
-                x:Key="TreeViewTemplateSelector"
-                ObjectTemplate="{StaticResource ObjectTemplate}"
-                ValueTemplate="{StaticResource ValueTemplate}" />
-        </ResourceDictionary>
-    </UserControl.Resources>
-
-    <TreeView
-        DataContext="{Binding ElementName=ContainerElement}"
-        Grid.IsSharedSizeScope="True"
-        ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
-        ItemTemplateSelector="{StaticResource TreeViewTemplateSelector}"
-        ItemsSource="{Binding Root.Properties}" />
+        </TreeView.Resources>
+    </TreeView>
 </UserControl>

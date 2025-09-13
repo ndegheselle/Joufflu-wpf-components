@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
@@ -15,9 +16,16 @@ namespace Joufflu.Data.Schema
             object parameter,
             System.Globalization.CultureInfo culture)
         {
-            if (value is not uint depth)
-                return null;
-            return new Thickness(depth * 16, 0, 0, 0);
+            if (value is not ISchemaElement)
+                throw new InvalidOperationException("Can't get depth without a schema element.");
+            ISubSchemaElement? schema = value as ISubSchemaElement;
+            uint depth = 0;
+            while(schema?.Parent != null)
+            {
+                schema = schema.Parent;
+                depth++;
+            }
+            return new Thickness((depth - 1) * 16, 0, 0, 0);
         }
 
         public object ConvertBack(
@@ -26,29 +34,6 @@ namespace Joufflu.Data.Schema
             object parameter,
             System.Globalization.CultureInfo culture)
         { throw new NotImplementedException(); }
-    }
-
-    public class SchemaTemplateSelector : DataTemplateSelector
-    {
-        public DataTemplate? ObjectTemplate { get; set; }
-        public DataTemplate? ValueTemplate { get; set; }
-
-        public override DataTemplate? SelectTemplate(object item, DependencyObject container)
-        {
-            if (item is not SchemaProperty property)
-                throw new InvalidOperationException($"The item must be of type '{typeof(SchemaProperty)}'.");
-
-            if (property.Element is SchemaValue)
-            {
-                return ValueTemplate;
-            }
-            else if (property.Element is SchemaObject)
-            {
-                return ObjectTemplate;
-            }
-
-            return base.SelectTemplate(item, container);
-        }
     }
 
     /// <summary>
@@ -64,7 +49,7 @@ namespace Joufflu.Data.Schema
             Root = new SchemaObject();
 
             var sub = new SchemaObject();
-            sub.Add("sub", new SchemaValue() { DataType = EnumDataType.String }, 1);
+            sub.Add("sub", new SchemaValue() { DataType = EnumDataType.String });
 
             Root.Add("tata", new SchemaValue() { DataType = EnumDataType.Boolean});
             Root.Add("toto", new SchemaValue() { DataType = EnumDataType.Decimal, IsArray = true});

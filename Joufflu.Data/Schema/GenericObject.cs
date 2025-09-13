@@ -4,41 +4,58 @@ namespace Joufflu.Data.Schema
 {
     public interface IGenericNode
     {
-        public ISchemaElement Schema { get; }
+        ISubSchemaElement? Schema { get; }
+    }
+    public class GenericNode<TSchema> : IGenericNode where TSchema : ISubSchemaElement
+    {
+        ISubSchemaElement? IGenericNode.Schema => Schema;
+        public TSchema? Schema { get; protected set; }
     }
 
-    public class GenericValue : IGenericNode
+    public class GenericValue : GenericNode<SchemaValue>
     {
-        public ISchemaElement Schema { get; } = new SchemaValue();
         public string ContextReference { get; set; } = string.Empty;
         public object? Value { get; set; }
 
-        public GenericValue(ISchemaElement schema)
+        public GenericValue(SchemaValue schema)
         {
             Schema = schema;
+            Value = GetDefault(schema.DataType);
+        }
+
+        public object? GetDefault(EnumDataType dataType)
+        {
+            return dataType switch
+            {
+                EnumDataType.String => "",
+                EnumDataType.Decimal => 0.0,
+                EnumDataType.Boolean => false,
+                EnumDataType.DateTime => DateTime.Now,
+                EnumDataType.TimeSpan => new TimeSpan(),
+                _ => null
+            };
         }
     }
 
     public class GenericArray : IGenericNode
     {
-        public ISchemaElement Schema { get; } = new SchemaValue() { IsArray = true };
+        public ISubSchemaElement Schema { get; } = new SchemaValue() { IsArray = true };
         public ObservableCollection<IGenericNode> Values { get; set; } = [];
 
-        public GenericArray(ISchemaElement schema)
+        public GenericArray(ISubSchemaElement schema)
         {
             Schema = schema;
         }
     }
 
-    public class GenericObject : IGenericNode
+    public class GenericObject : GenericNode<SchemaObject>
     {
-        public ISchemaElement Schema { get; } = new SchemaObject();
-        public Dictionary<string, IGenericNode> Values { get; } = [];
+        public Dictionary<string, IGenericNode> Properties { get; } = [];
 
-        public GenericObject(ISchemaElement schema, Dictionary<string, IGenericNode> values)
+        public GenericObject(SchemaObject schema, Dictionary<string, IGenericNode> properties)
         {
             Schema = schema;
-            Values = values;
+            Properties = properties;
         }
     }
 }

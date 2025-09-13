@@ -119,6 +119,7 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <schema:SchemaEdit IsReadOnly="True" />
+            <schema:GenericEdit Grid.Column="1" />
         </Grid>
     </Grid>
 </UserControl>

@@ -1,6 +1,7 @@
 ﻿using Joufflu.Shared.Resources.Fonts;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -30,7 +31,8 @@ namespace Joufflu.Data.Schema
             set { SetValue(TypeProperty, value); }
         }
 
-        public string Icon { get; set; } = IconFont.Quotes;
+        public string Icon { get; private set; } = IconFont.Quotes;
+        public bool WithText { get; set; } = true;
 
         public IconDataType()
         {

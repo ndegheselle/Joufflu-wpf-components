@@ -13,6 +13,16 @@
         <TextBlock
             Margin="4,0,0,0"
             VerticalAlignment="Center"
-            Text="{Binding Type}" />
+            Text="{Binding Type}">
+            <TextBlock.Style>
+                <Style TargetType="{x:Type TextBlock}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding WithText}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
     </StackPanel>
 </UserControl>

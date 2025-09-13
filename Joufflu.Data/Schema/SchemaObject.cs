@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Text.Json.Serialization;
 
 namespace Joufflu.Data.Schema
 {
@@ -14,53 +15,59 @@ namespace Joufflu.Data.Schema
 
     public interface ISchemaElement
     {
+        bool IsArray { get; }
         IGenericNode ToValue();
     }
 
-    public class SchemaValue : ISchemaElement
+    public interface ISubSchemaElement : ISchemaElement
     {
+        string? Name { get; set; }
+        SchemaObject? Parent { get; set; }
+        bool IsSelected { get; }
+    }
+
+    public class SchemaValue : ISubSchemaElement
+    {
+        public string? Name { get; set; }
         public EnumDataType DataType { get; set; }
         public bool IsArray { get; set; }
+
+        [JsonIgnore]
+        public SchemaObject? Parent { get; set; }
+        [JsonIgnore]
+        public bool IsSelected { get; set; }
 
         public IGenericNode ToValue()
         {
             return IsArray ? new GenericArray(this) : new GenericValue(this);
         }
     }
-
-    public class SchemaProperty
+         
+    public class SchemaObject : ISubSchemaElement
     {
-        public string Name { get; set; }
-        public ISchemaElement Element { get; set; }
-        public uint Depth { get; set; }
-
-        public SchemaObject Parent { get; set; }
-        public bool IsSelected { get; set; }
-
-        public SchemaProperty(SchemaObject parent, string name, ISchemaElement element)
-        {
-            Parent = parent;
-            Name = name;
-            Element = element;
-        }
-    }
-     
-    public class SchemaObject : ISchemaElement
-    {
-        public ObservableCollection<SchemaProperty> Properties { get; set; } = [];
+        public string? Name { get; set; }
         public bool IsArray { get; set; }
 
-        public SchemaObject Add(string name, ISchemaElement element, uint depth = 0)
+        [JsonIgnore]
+        public SchemaObject? Parent { get; set; }
+        [JsonIgnore]
+        public bool IsSelected { get; set; }
+
+        public ObservableCollection<ISubSchemaElement> Properties { get; set; } = [];
+
+        public SchemaObject Add(string name, ISubSchemaElement element)
         {
-            Properties.Add(new SchemaProperty(this, name, element) { Depth = depth });
+            element.Parent = this;
+            element.Name = name;
+            Properties.Add(element);
             return this;
         }
 
         public IGenericNode ToValue()
         {
             Dictionary<string, IGenericNode> values = Properties.ToDictionary(
-                prop => prop.Name, 
-                prop => prop.Element.ToValue());
+                prop => prop.Name ?? "",
+                prop => prop.ToValue());
 
             return IsArray ? new GenericArray(this) : new GenericObject(this, values);
         }
