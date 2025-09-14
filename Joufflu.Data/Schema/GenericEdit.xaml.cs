@@ -30,6 +30,31 @@ namespace Joufflu.Data.Schema
         }
     }
 
+    public class ValueTemplateSelector : DataTemplateSelector
+    {
+        public DataTemplate? StringTemplate { get; set; }
+        public DataTemplate? DecimalTemplate { get; set; }
+        public DataTemplate? BooleanTemplate { get; set; }
+        public DataTemplate? DateTimeTemplate { get; set; }
+        public DataTemplate? TimeSpanTemplate { get; set; }
+
+        public override DataTemplate? SelectTemplate(object item, DependencyObject container)
+        {
+            if (item is not GenericValue value)
+                throw new InvalidOperationException($"The item must be of type '{typeof(SchemaValue)}'.");
+
+            return value.Schema?.DataType switch
+            {
+                EnumDataType.String => StringTemplate,
+                EnumDataType.Decimal => DecimalTemplate,
+                EnumDataType.Boolean => BooleanTemplate,
+                EnumDataType.DateTime => DateTimeTemplate,
+                EnumDataType.TimeSpan => TimeSpanTemplate,
+                _ => base.SelectTemplate(item, container)
+            };
+        }
+    }
+
     /// <summary>
     /// Logique d'interaction pour GenericEdit.xaml
     /// </summary>

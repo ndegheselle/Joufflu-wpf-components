@@ -5,45 +5,155 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Joufflu.Data.Schema"
+    xmlns:inputs="clr-namespace:Joufflu.Inputs;assembly=Joufflu.Inputs"
     xmlns:collections="clr-namespace:System.Collections.Generic;assembly=System.Runtime"
+    xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     mc:Ignorable="d"
     x:Name="ContainerElement">
     <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Joufflu.Data;component/Schema/SchemaTreeView.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <local:DepthToMarginConverter x:Key="DepthToMarginConverter" />
 
-        <HierarchicalDataTemplate
-            x:Key="ObjectTemplate"
-            DataType="{x:Type local:GenericObject}"
-            ItemsSource="{Binding Properties.Values}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding Schema.Name}" />
-                <TextBlock Text=" (Object)" />
-            </StackPanel>
-        </HierarchicalDataTemplate>
-        <HierarchicalDataTemplate
-            x:Key="ArrayTemplate"
-            DataType="{x:Type local:GenericArray}"
-            ItemsSource="{Binding Values}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding Schema.Name}" />
-                <TextBlock Text="(Array)" />
-            </StackPanel>
-        </HierarchicalDataTemplate>
-        <DataTemplate x:Key="ValueTemplate" DataType="{x:Type local:GenericValue}">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding Schema.Name}" />
-                <TextBox />
-            </StackPanel>
-        </DataTemplate>
+            <DataTemplate x:Key="StringTemplate" DataType="{x:Type local:GenericValue}">
+                <TextBox Padding="4,2" Text="{Binding Value, Mode=TwoWay}" />
+            </DataTemplate>
+            <DataTemplate x:Key="BooleanTemplate" DataType="{x:Type local:GenericValue}">
+                <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" />
+            </DataTemplate>
+            <DataTemplate x:Key="DecimalTemplate" DataType="{x:Type local:GenericValue}">
+                <inputs:DecimalUpDown Value="{Binding Value, Mode=TwoWay}" />
+            </DataTemplate>
+            <DataTemplate x:Key="DateTimeTemplate" DataType="{x:Type local:GenericValue}">
+                <Calendar SelectedDate="{Binding Value, Mode=TwoWay}" />
+            </DataTemplate>
+            <DataTemplate x:Key="TimeSpanTemplate" DataType="{x:Type local:GenericValue}">
+                <inputs:TimeSpanPicker Value="{Binding Value, Mode=TwoWay}" />
+            </DataTemplate>
 
-        <local:DepthToMarginConverter x:Key="DepthToMarginConverter" />
-        <local:GenericTemplateSelector
-            x:Key="GenericTemplateSelector"
-            ObjectTemplate="{StaticResource ObjectTemplate}"
-            ArrayTemplate="{StaticResource ArrayTemplate}"
-            ValueTemplate="{StaticResource ValueTemplate}" />
+            <local:ValueTemplateSelector
+                x:Key="ValueTemplateSelector"
+                StringTemplate="{StaticResource StringTemplate}"
+                BooleanTemplate="{StaticResource BooleanTemplate}"
+                DecimalTemplate="{StaticResource DecimalTemplate}"
+                DateTimeTemplate="{StaticResource DateTimeTemplate}"
+                TimeSpanTemplate="{StaticResource TimeSpanTemplate}" />
+
+            <HierarchicalDataTemplate
+                x:Key="ObjectTemplate"
+                DataType="{x:Type local:GenericObject}"
+                ItemsSource="{Binding Properties.Values}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Name" />
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{Binding Schema.Name}"
+                        Margin="{Binding Schema, Converter={StaticResource DepthToMarginConverter}}" />
+                    <fonts:Icon
+                        Opacity="0.8"
+                        Name="IsArrayIcon"
+                        Grid.Column="1"
+                        Margin="4,3,0,3"
+                        HorizontalAlignment="Left"
+                        Text="{x:Static fonts:IconFont.BracketsCurly}" />
+                </Grid>
+            </HierarchicalDataTemplate>
+            <HierarchicalDataTemplate
+                x:Key="ArrayTemplate"
+                DataType="{x:Type local:GenericArray}"
+                ItemsSource="{Binding Values}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Name" />
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="100" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{Binding Schema.Name}"
+                        Margin="{Binding Schema, Converter={StaticResource DepthToMarginConverter}}" />
+
+                    <local:IconDataType
+                        Opacity="0.8"
+                        Margin="4,0"
+                        Grid.Column="1"
+                        WithText="False"
+                        Type="{Binding Schema.DataType}" />
+
+                    <StackPanel
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center"
+                        Margin="2,0,0,0"
+                        Grid.Column="2">
+                        <TextBlock Text="{Binding Values.Count, StringFormat={}{0} elements}" />
+                        <fonts:Icon
+                            Opacity="0.8"
+                            Name="IsArrayIcon"
+                            Grid.Column="1"
+                            Margin="4,0"
+                            HorizontalAlignment="Left"
+                            Text="{x:Static fonts:IconFont.BracketsSquare}" />
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Column="3"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal">
+                        <Button Style="{StaticResource IconButtonSmall}" Command="{Binding AddCommand}">
+                            <fonts:Icon Text="{x:Static fonts:IconFont.Plus}" />
+                        </Button>
+                        <Button
+                            Margin="1,0,0,0"
+                            Style="{StaticResource IconButtonSmall}"
+                            Command="{Binding RemoveCommand}">
+                            <fonts:Icon Text="{x:Static fonts:IconFont.Minus}" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </HierarchicalDataTemplate>
+            <DataTemplate x:Key="ValueTemplate" DataType="{x:Type local:GenericValue}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Name" />
+                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Text="{Binding Schema.Name}"
+                        Margin="{Binding Schema, Converter={StaticResource DepthToMarginConverter}}" />
+                    <local:IconDataType
+                        Opacity="0.8"
+                        Margin="4,0"
+                        Grid.Column="1"
+                        WithText="False"
+                        Type="{Binding Schema.DataType}" />
+                    <ContentControl
+                        Grid.Column="2"
+                        Margin="2,0,0,0"
+                        ContentTemplateSelector="{StaticResource ValueTemplateSelector}"
+                        Content="{Binding}" />
+                </Grid>
+            </DataTemplate>
+
+            <local:GenericTemplateSelector
+                x:Key="GenericTemplateSelector"
+                ObjectTemplate="{StaticResource ObjectTemplate}"
+                ArrayTemplate="{StaticResource ArrayTemplate}"
+                ValueTemplate="{StaticResource ValueTemplate}" />
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <TreeView
+        Grid.IsSharedSizeScope="True"
+        ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
         ItemTemplateSelector="{StaticResource GenericTemplateSelector}"
         DataContext="{Binding ElementName=ContainerElement}"
         ItemsSource="{Binding Root.Properties.Values}" />

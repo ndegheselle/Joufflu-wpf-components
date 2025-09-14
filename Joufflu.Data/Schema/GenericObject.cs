@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Usuel.Shared;
 
 namespace Joufflu.Data.Schema
 {
@@ -42,9 +43,14 @@ namespace Joufflu.Data.Schema
         public ISubSchemaElement Schema { get; } = new SchemaValue() { IsArray = true };
         public ObservableCollection<IGenericNode> Values { get; set; } = [];
 
+        public ICustomCommand AddCommand { get; set; }
+        public ICustomCommand RemoveCommand { get; set; }
+
         public GenericArray(ISubSchemaElement schema)
         {
             Schema = schema;
+            AddCommand = new DelegateCommand(() => Values.Add(Schema.ToValue()));
+            RemoveCommand = new DelegateCommand(() => Values.RemoveAt(Values.Count - 1));
         }
     }
 

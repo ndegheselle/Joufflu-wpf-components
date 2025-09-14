@@ -75,9 +75,18 @@
                         Orientation="Horizontal"
                         Visibility="Collapsed">
                         <Button Style="{StaticResource IconButtonSmall}">
+                            <Button.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Object" />
+                                    <MenuItem Header="Value" />
+                                </ContextMenu>
+                            </Button.ContextMenu>
                             <fonts:Icon Text="{x:Static fonts:IconFont.Plus}" />
                         </Button>
-                        <Button Margin="1,0,0,0" Style="{StaticResource IconButtonSmall}">
+                        <Button
+                            Margin="1,0,0,0"
+                            Style="{StaticResource IconButtonSmall}"
+                            Command="{Binding RemoveCommand}">
                             <fonts:Icon Text="{x:Static fonts:IconFont.Trash}" />
                         </Button>
                     </StackPanel>
@@ -174,7 +183,10 @@
                         HorizontalAlignment="Right"
                         Orientation="Horizontal"
                         Visibility="Collapsed">
-                        <Button Margin="1,0,0,0" Style="{StaticResource IconButtonSmall}">
+                        <Button
+                            Margin="1,0,0,0"
+                            Style="{StaticResource IconButtonSmall}"
+                            Command="{Binding RemoveCommand}">
                             <fonts:Icon Text="{x:Static fonts:IconFont.Trash}" />
                         </Button>
                     </StackPanel>
