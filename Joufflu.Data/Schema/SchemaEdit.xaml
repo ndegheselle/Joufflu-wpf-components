@@ -74,6 +74,15 @@
                         HorizontalAlignment="Right"
                         Orientation="Horizontal"
                         Visibility="Collapsed">
+                        <StackPanel>
+                            <ToggleButton Name="button">Tata
+                            </ToggleButton>
+                            <Popup IsOpen="{Binding IsChecked, ElementName=button}" StaysOpen="False">
+                                <Border>
+                                    <TextBlock>I'm the popup</TextBlock>
+                                </Border>
+                            </Popup>
+                        </StackPanel>
                         <Button Style="{StaticResource IconButtonSmall}">
                             <Button.ContextMenu>
                                 <ContextMenu>
