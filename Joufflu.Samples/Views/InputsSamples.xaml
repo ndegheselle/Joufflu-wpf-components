@@ -8,6 +8,7 @@
     xmlns:layouts="clr-namespace:Joufflu.Layouts;assembly=Joufflu.Layouts"
     xmlns:local="clr-namespace:Joufflu.Samples.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     d:DesignWidth="800"
     mc:Ignorable="d">
     <layouts:FlexibleGrid
@@ -97,5 +98,34 @@
         <TextBlock>Search</TextBlock>
         <inputs:Search x:Name="SearchInput" SearchChanged="SearchInput_SearchChanged" />
         <TextBlock x:Name="SearchValue" VerticalAlignment="Center" />
+
+        <TextBlock>Dropdown</TextBlock>
+        <inputs:Dropdown>
+            <inputs:Dropdown.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="20" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock>DropDown</TextBlock>
+                    <fonts:Icon  Grid.Column="1" Text="{x:Static fonts:IconFont.CaretDown}" />
+                </Grid>
+            </inputs:Dropdown.Header>
+            <StackPanel>
+                <Button Style="{StaticResource ItemButton}" Command="{Binding AddObjectCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <fonts:Icon Text="{x:Static fonts:IconFont.PiggyBank}" />
+                        <TextBlock Margin="4,0,0,0">item 1</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource ItemButton}" Command="{Binding AddValueCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <fonts:Icon Text="{x:Static fonts:IconFont.Barn}" />
+                        <TextBlock Margin="4,0,0,0">item 2</TextBlock>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </inputs:Dropdown>
+        <TextBlock />
     </layouts:FlexibleGrid>
 </UserControl>

@@ -5,6 +5,14 @@
     </ResourceDictionary.MergedDictionaries>
 
     <Style
+        x:Key="ItemButton"
+        TargetType="Button"
+        BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+    </Style>
+
+    <Style
         x:Key="IconButton"
         TargetType="Button"
         BasedOn="{StaticResource {x:Type Button}}">

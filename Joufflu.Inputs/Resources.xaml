@@ -9,6 +9,7 @@
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/FilePicker.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/TextEditable.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/Search.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Inputs;component/Dropdown.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <!--  HACK : fix a binding error  -->

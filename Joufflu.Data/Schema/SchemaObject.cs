@@ -35,22 +35,23 @@ namespace Joufflu.Data.Schema
     public class SchemaValue : ISubSchemaElement
     {
         public string? Name { get; set; }
-
-        public EnumDataType DataType { get; set; }
-
+        public EnumDataType DataType { get; set; } = EnumDataType.String;
         public bool IsArray { get; set; }
 
         [JsonIgnore]
         public SchemaObject? Parent { get; set; }
-
         [JsonIgnore]
         public bool IsSelected { get; set; }
 
         public ICustomCommand RemoveCommand { get; set; }
 
-        public SchemaValue() { RemoveCommand = new DelegateCommand(() => Parent?.Remove(this)); }
+        public SchemaValue() {
+            RemoveCommand = new DelegateCommand(() => Parent?.Remove(this)); 
+        }
 
-        public IGenericNode ToValue() { return IsArray ? new GenericArray(this) : new GenericValue(this); }
+        public IGenericNode ToValue() { 
+            return IsArray ? new GenericArray(this) : new GenericValue(this); 
+        }
     }
 
     public class SchemaObject : ISubSchemaElement

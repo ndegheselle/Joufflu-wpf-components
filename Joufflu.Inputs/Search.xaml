@@ -34,10 +34,9 @@
                                 <!--  Clear button  -->
                                 <Button
                                     Command="{Binding ClearCommand}"
-                                    Padding="6,4"
                                     Name="ClearButton"
-                                    Style="{StaticResource IconButton}">
-                                    <fonts:Icon Text="{x:Static fonts:IconFont.X}" />
+                                    Style="{StaticResource IconButtonSmall}">
+                                    <fonts:Icon Text="{x:Static fonts:IconFont.X}" FontSize="10" />
                                 </Button>
                             </StackPanel>
                         </Grid>

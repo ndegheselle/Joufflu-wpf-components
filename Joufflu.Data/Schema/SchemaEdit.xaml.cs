@@ -16,6 +16,9 @@ namespace Joufflu.Data.Schema
             object parameter,
             System.Globalization.CultureInfo culture)
         {
+            if (value == null)
+                return null;
+
             if (value is not ISchemaElement)
                 throw new InvalidOperationException("Can't get depth without a schema element.");
             ISubSchemaElement? schema = value as ISubSchemaElement;
