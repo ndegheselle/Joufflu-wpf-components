@@ -4,11 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
-    xmlns:local="clr-namespace:Joufflu.Samples"
-    xmlns:views="clr-namespace:Joufflu.Samples.Views"
-    xmlns:popups="clr-namespace:Joufflu.Popups;assembly=Joufflu.Popups"
+    xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:layouts="clr-namespace:Joufflu.Layouts;assembly=Joufflu.Layouts"
-    xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared">
+    xmlns:local="clr-namespace:Joufflu.Samples"
+    xmlns:popups="clr-namespace:Joufflu.Popups;assembly=Joufflu.Popups"
+    xmlns:views="clr-namespace:Joufflu.Samples.Views">
     <adonisControls:AdonisWindow.Resources>
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Popups;component/Resources.xaml" />
     </adonisControls:AdonisWindow.Resources>
@@ -22,35 +22,37 @@
             <ListBox x:Name="SideMenu" />
 
             <TabControl x:Name="MainContainer" Grid.Column="1">
-                <TabItem Visibility="Collapsed" Header="Inputs">
+                <TabItem Header="Inputs" Visibility="Collapsed">
                     <views:InputsSamples VerticalAlignment="Top" />
                 </TabItem>
-                <TabItem Visibility="Collapsed" Header="Data">
+                <TabItem Header="Data" Visibility="Collapsed">
                     <views:DataSamples />
                 </TabItem>
-                <TabItem Visibility="Collapsed" Header="Popups">
+                <TabItem Header="Popups" Visibility="Collapsed">
                     <views:PopupsSamples />
                 </TabItem>
 
-                <TabItem Visibility="Collapsed" Header="Layouts">
-                    <layouts:FlexibleGrid
-                        Columns="2"
-                        Gap="4"
-                        ColumnsWidth="200,*">
-                        <Button Content="Button 1" />
-                        <Button Content="Button 2" />
+                <TabItem Header="Layouts" Visibility="Collapsed">
+                    <GroupBox Header="Flexible grid">
+                        <layouts:FlexibleGrid
+                            Columns="2"
+                            ColumnsWidth="200,*"
+                            Gap="4">
+                            <Button Content="Button 1" />
+                            <Button Content="Button 2" />
 
-                        <Button Content="Button 3" />
-                        <Button Content="Button 4" />
+                            <Button Content="Button 3" />
+                            <Button Content="Button 4" />
 
-                        <Button Content="Button 5" />
-                        <Button Content="Button 6" />
+                            <Button Content="Button 5" />
+                            <Button Content="Button 6" />
 
-                        <Button Content="Button 7" />
-                        <Button Content="Button 8" />
+                            <Button Content="Button 7" />
+                            <Button Content="Button 8" />
 
-                        <Button Content="Button 9" />
-                    </layouts:FlexibleGrid>
+                            <Button Content="Button 9" />
+                        </layouts:FlexibleGrid>
+                    </GroupBox>
                 </TabItem>
             </TabControl>
         </Grid>

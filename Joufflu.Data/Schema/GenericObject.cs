@@ -38,18 +38,17 @@ namespace Joufflu.Data.Schema
         }
     }
 
-    public class GenericArray : IGenericNode
+    public class GenericArray : GenericNode<SchemaArray>
     {
-        public ISubSchemaElement Schema { get; } = new SchemaValue() { IsArray = true };
         public ObservableCollection<IGenericNode> Values { get; set; } = [];
 
         public ICustomCommand AddCommand { get; set; }
         public ICustomCommand RemoveCommand { get; set; }
 
-        public GenericArray(ISubSchemaElement schema)
+        public GenericArray(SchemaArray schema)
         {
             Schema = schema;
-            AddCommand = new DelegateCommand(() => Values.Add(Schema.ToValue()));
+            AddCommand = new DelegateCommand(() => Values.Add(Schema.Type.ToValue()));
             RemoveCommand = new DelegateCommand(() => Values.RemoveAt(Values.Count - 1));
         }
     }

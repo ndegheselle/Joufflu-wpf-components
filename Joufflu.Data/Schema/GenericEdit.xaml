@@ -40,9 +40,16 @@
                 DecimalTemplate="{StaticResource DecimalTemplate}"
                 DateTimeTemplate="{StaticResource DateTimeTemplate}"
                 TimeSpanTemplate="{StaticResource TimeSpanTemplate}" />
+        </ResourceDictionary>
+    </UserControl.Resources>
 
+    <TreeView
+        Grid.IsSharedSizeScope="True"
+        ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
+        DataContext="{Binding ElementName=ContainerElement}"
+        ItemsSource="{Binding Root.Properties.Values}">
+        <TreeView.Resources>
             <HierarchicalDataTemplate
-                x:Key="ObjectTemplate"
                 DataType="{x:Type local:GenericObject}"
                 ItemsSource="{Binding Properties.Values}">
                 <Grid>
@@ -65,7 +72,6 @@
                 </Grid>
             </HierarchicalDataTemplate>
             <HierarchicalDataTemplate
-                x:Key="ArrayTemplate"
                 DataType="{x:Type local:GenericArray}"
                 ItemsSource="{Binding Values}">
                 <Grid>
@@ -73,37 +79,21 @@
                         <ColumnDefinition SharedSizeGroup="Name" />
                         <ColumnDefinition Width="24" />
                         <ColumnDefinition />
-                        <ColumnDefinition Width="100" />
                     </Grid.ColumnDefinitions>
                     <TextBlock
                         VerticalAlignment="Center"
                         Text="{Binding Schema.Name}"
                         Margin="{Binding Schema, Converter={StaticResource DepthToMarginConverter}}" />
 
-                    <local:IconDataType
-                        Opacity="0.8"
-                        Margin="4,0"
-                        Grid.Column="1"
-                        WithText="False"
-                        Type="{Binding Schema.DataType}" />
-
-                    <StackPanel
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center"
-                        Margin="2,0,0,0"
-                        Grid.Column="2">
-                        <TextBlock Text="{Binding Values.Count, StringFormat={}{0} elements}" />
-                        <fonts:Icon
+                    <fonts:Icon
                             Opacity="0.8"
-                            Name="IsArrayIcon"
                             Grid.Column="1"
                             Margin="4,0"
                             HorizontalAlignment="Left"
                             Text="{x:Static fonts:IconFont.BracketsSquare}" />
-                    </StackPanel>
 
                     <StackPanel
-                        Grid.Column="3"
+                        Grid.Column="2"
                         HorizontalAlignment="Right"
                         Orientation="Horizontal">
                         <Button Style="{StaticResource IconButtonSmall}" Command="{Binding AddCommand}">
@@ -118,7 +108,7 @@
                     </StackPanel>
                 </Grid>
             </HierarchicalDataTemplate>
-            <DataTemplate x:Key="ValueTemplate" DataType="{x:Type local:GenericValue}">
+            <DataTemplate DataType="{x:Type local:GenericValue}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
@@ -142,19 +132,6 @@
                         Content="{Binding}" />
                 </Grid>
             </DataTemplate>
-
-            <local:GenericTemplateSelector
-                x:Key="GenericTemplateSelector"
-                ObjectTemplate="{StaticResource ObjectTemplate}"
-                ArrayTemplate="{StaticResource ArrayTemplate}"
-                ValueTemplate="{StaticResource ValueTemplate}" />
-        </ResourceDictionary>
-    </UserControl.Resources>
-
-    <TreeView
-        Grid.IsSharedSizeScope="True"
-        ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
-        ItemTemplateSelector="{StaticResource GenericTemplateSelector}"
-        DataContext="{Binding ElementName=ContainerElement}"
-        ItemsSource="{Binding Root.Properties.Values}" />
+        </TreeView.Resources>
+    </TreeView>
 </UserControl>

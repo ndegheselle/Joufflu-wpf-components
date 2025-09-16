@@ -3,33 +3,6 @@ using System.Windows.Controls;
 
 namespace Joufflu.Data.Schema
 {
-    public class GenericTemplateSelector : DataTemplateSelector
-    {
-        public DataTemplate? ObjectTemplate { get; set; }
-        public DataTemplate? ArrayTemplate { get; set; }
-        public DataTemplate? ValueTemplate { get; set; }
-
-        public override DataTemplate? SelectTemplate(object item, DependencyObject container)
-        {
-            if (item is not IGenericNode node)
-                throw new InvalidOperationException($"The item must be of type '{typeof(IGenericNode)}'.");
-
-            if (node.Schema is SchemaObject schemaObject)
-            {
-                if (schemaObject.IsArray)
-                    return ArrayTemplate;
-                return ObjectTemplate;
-            }
-            else if (node.Schema is SchemaValue schemaValue)
-            {
-                if (schemaValue.IsArray)
-                    return ArrayTemplate;
-                return ValueTemplate;
-            }
-            return base.SelectTemplate(item, container);
-        }
-    }
-
     public class ValueTemplateSelector : DataTemplateSelector
     {
         public DataTemplate? StringTemplate { get; set; }
@@ -41,7 +14,7 @@ namespace Joufflu.Data.Schema
         public override DataTemplate? SelectTemplate(object item, DependencyObject container)
         {
             if (item is not GenericValue value)
-                throw new InvalidOperationException($"The item must be of type '{typeof(SchemaValue)}'.");
+                throw new InvalidOperationException($"The item must be of type '{typeof(GenericValue)}'.");
 
             return value.Schema?.DataType switch
             {
@@ -69,7 +42,7 @@ namespace Joufflu.Data.Schema
             sub.Add("sub", new SchemaValue() { DataType = EnumDataType.String });
 
             root.Add("tata", new SchemaValue() { DataType = EnumDataType.Boolean });
-            root.Add("toto", new SchemaValue() { DataType = EnumDataType.Decimal, IsArray = true });
+            root.Add("toto", new SchemaArray());
             root.Add("titi", sub);
 
             Root = (GenericObject)root.ToValue();

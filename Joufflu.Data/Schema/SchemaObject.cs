@@ -16,17 +16,13 @@ namespace Joufflu.Data.Schema
 
     public interface ISchemaElement
     {
-        bool IsArray { get; }
-
         IGenericNode ToValue();
     }
 
     public interface ISubSchemaElement : ISchemaElement
     {
         string? Name { get; set; }
-
         SchemaObject? Parent { get; set; }
-
         bool IsSelected { get; }
 
         ICustomCommand RemoveCommand { get; }
@@ -36,7 +32,6 @@ namespace Joufflu.Data.Schema
     {
         public string? Name { get; set; }
         public EnumDataType DataType { get; set; } = EnumDataType.String;
-        public bool IsArray { get; set; }
 
         [JsonIgnore]
         public SchemaObject? Parent { get; set; }
@@ -50,31 +45,71 @@ namespace Joufflu.Data.Schema
         }
 
         public IGenericNode ToValue() { 
-            return IsArray ? new GenericArray(this) : new GenericValue(this); 
+            return new GenericValue(this); 
         }
     }
 
-    public class SchemaObject : ISubSchemaElement
+    public interface ISchemaParent : ISubSchemaElement
+    {
+        public ICustomCommand AddValueCommand { get; }
+        public ICustomCommand AddArrayCommand { get; }
+        public ICustomCommand AddObjectCommand { get; }
+        void Remove(ISubSchemaElement property);
+    }
+
+    public class SchemaArray : ISchemaParent
     {
         public string? Name { get; set; }
-
-        public bool IsArray { get; set; }
+        /// <summary>
+        /// Contain the type of the array
+        /// </summary>
+        public ISubSchemaElement Type { get; set; }
 
         [JsonIgnore]
         public SchemaObject? Parent { get; set; }
-
         [JsonIgnore]
         public bool IsSelected { get; set; }
 
-        public ObservableCollection<ISubSchemaElement> Properties { get; set; } = [];
-
         public ICustomCommand AddValueCommand { get; set; }
+        public ICustomCommand AddArrayCommand { get; set; }
         public ICustomCommand AddObjectCommand { get; set; }
         public ICustomCommand RemoveCommand { get; set; }
+
+        public SchemaArray()
+        {
+            Type = new SchemaValue() {Parent=this, Name = "Type"};
+            UseValueCommand = new DelegateCommand(() => Type = new SchemaValue());
+            UseArrayCommand = new DelegateCommand(() => Type = new SchemaArray());
+            UseObjectCommand = new DelegateCommand(() => Type = new SchemaObject());
+            RemoveCommand = new DelegateCommand(() => Parent?.Remove(this));
+        }
+
+        public IGenericNode ToValue()
+        {
+            return new GenericArray(this);
+        }
+    }
+
+    public class SchemaObject : ISchemaParent
+    {
+        public string? Name { get; set; }
+
+        [JsonIgnore]
+        public SchemaObject? Parent { get; set; }
+        [JsonIgnore]
+        public bool IsSelected { get; set; }
+
+        public ObservableCollection<ISubSchemaElement> Properties { get; } = [];
+
+        public ICustomCommand AddValueCommand { get; }
+        public ICustomCommand AddArrayCommand { get; }
+        public ICustomCommand AddObjectCommand { get; }
+        public ICustomCommand RemoveCommand { get; }
 
         public SchemaObject()
         {
             AddValueCommand = new DelegateCommand(() => Parent?.Add("Default", new SchemaValue()));
+            AddArrayCommand = new DelegateCommand(() => Parent?.Add("Default", new SchemaArray()));
             AddObjectCommand = new DelegateCommand(() => Parent?.Add("Default", new SchemaObject()));
             RemoveCommand = new DelegateCommand(() => Parent?.Remove(this));
         }
@@ -95,7 +130,7 @@ namespace Joufflu.Data.Schema
                 prop => prop.Name ?? "",
                 prop => prop.ToValue());
 
-            return IsArray ? new GenericArray(this) : new GenericObject(this, values);
+            return new GenericObject(this, values);
         }
 
         private bool IsPropertyNameUnique(string name)

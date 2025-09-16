@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -14,7 +15,7 @@ namespace Joufflu.Data.Schema
             object value,
             Type targetType,
             object parameter,
-            System.Globalization.CultureInfo culture)
+            CultureInfo culture)
         {
             if (value == null)
                 return null;
@@ -35,8 +36,27 @@ namespace Joufflu.Data.Schema
             object value,
             Type targetType,
             object parameter,
-            System.Globalization.CultureInfo culture)
+            CultureInfo culture)
         { throw new NotImplementedException(); }
+    }
+
+    public class ObjectToListConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is IEnumerable enumerable && !(value is string))
+                return enumerable;
+
+            if (value != null)
+                return new List<object> { value };
+
+            return new List<object>();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
     }
 
     /// <summary>
@@ -55,7 +75,7 @@ namespace Joufflu.Data.Schema
             sub.Add("sub", new SchemaValue() { DataType = EnumDataType.String });
 
             Root.Add("tata", new SchemaValue() { DataType = EnumDataType.Boolean});
-            Root.Add("toto", new SchemaValue() { DataType = EnumDataType.Decimal, IsArray = true});
+            Root.Add("toto", new SchemaArray());
             Root.Add("titi", sub);
 
             InitializeComponent();
