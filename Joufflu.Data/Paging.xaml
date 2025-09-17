@@ -62,7 +62,7 @@
                                 </Button.Style>
                                 <fonts:Icon Text="{x:Static fonts:IconFont.SkipBack}" FontSize="10" />
                             </Button>
-                            <Button Command="{Binding PreviousCommand}" Margin="1,0,6,0">
+                            <Button Command="{Binding PreviousCommand}" Margin="1,0,1,0">
                                 <fonts:Icon Text="{x:Static fonts:IconFont.CaretLeft}" FontSize="10" />
                             </Button>
 
@@ -74,7 +74,7 @@
                                 Text="{Binding PageNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                             <TextBlock
-                                Margin="4,0"
+                                Margin="4,0,0,0"
                                 VerticalAlignment="Center"
                                 Text="{Binding PageMax, StringFormat='/ {0}'}">
                                 <TextBlock.Style>

@@ -35,7 +35,7 @@ namespace Joufflu.Data.Schema
     {
         public GenericObject Root { get; set; }
         public GenericEdit()
-        {
+        {/*
             var root = new SchemaObject();
 
             var sub = new SchemaObject();
@@ -46,7 +46,7 @@ namespace Joufflu.Data.Schema
             root.Add("titi", sub);
 
             Root = (GenericObject)root.ToValue();
-
+            */
             InitializeComponent();
         }
     }

@@ -13,88 +13,74 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="ContainerElement"
     mc:Ignorable="d">
-
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Joufflu.Data;component/Schema/SchemaTreeView.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-            <local:DepthToMarginConverter x:Key="DepthToMarginConverter" />
-            <local:ObjectToListConverter x:Key="ObjectToListConverter" />
-        </ResourceDictionary>
-    </UserControl.Resources>
-
     <TreeView
         DataContext="{Binding ElementName=ContainerElement}"
         Grid.IsSharedSizeScope="True"
-        ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
         ItemsSource="{Binding Root.Properties}">
+
+        <TreeView.ItemContainerStyle>
+            <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeViewItemStyle}">
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="Transparent" />
+                <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="{DynamicResource {x:Static adonisUi:Dimensions.BorderThickness}}" />
+                <Setter Property="adonisExtensions:CornerRadiusExtension.CornerRadius" Value="{DynamicResource {x:Static adonisUi:Dimensions.CornerRadius}}" />
+                <Setter Property="Padding" Value="2" />
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="UseLayoutRounding" Value="True" />
+                <Setter Property="IsExpanded" Value="True" />
+            </Style>
+        </TreeView.ItemContainerStyle>
+
         <TreeView.Resources>
-            <HierarchicalDataTemplate DataType="{x:Type local:SchemaObject}" ItemsSource="{Binding Properties}">
+
+            <DataTemplate DataType="{x:Type local:SchemaObject}">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition SharedSizeGroup="Name" />
-                        <ColumnDefinition Width="102" />
+                        <ColumnDefinition Width="100" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-
-                    <Grid Margin="{Binding Converter={StaticResource DepthToMarginConverter}}" VerticalAlignment="Center">
-                        <TextBlock Padding="4,0" Text="{Binding Name}" />
-                        <TextBox
-                            Name="NameInput"
-                            Padding="4,2"
-                            Text="{Binding Name}"
-                            Visibility="Collapsed" />
-                    </Grid>
-
                     <fonts:Icon
-                        Grid.Column="1"
                         Margin="6,3,0,3"
                         HorizontalAlignment="Left"
                         Opacity="0.8"
                         Text="{x:Static fonts:IconFont.BracketsCurly}" />
-
-                    <StackPanel
+                    <inputs:Dropdown
                         Name="ActionContainer"
-                        Grid.Column="2"
+                        Visibility="Collapsed"
                         HorizontalAlignment="Right"
-                        Orientation="Horizontal"
-                        Visibility="Collapsed">
-                        <inputs:Dropdown
-                            Height="20"
-                            Padding="3,0"
-                            BorderThickness="0">
-                            <inputs:Dropdown.Header>
-                                <fonts:Icon Text="{x:Static fonts:IconFont.Plus}" />
-                            </inputs:Dropdown.Header>
-                            <StackPanel Width="100">
-                                <Button Command="{Binding AddValueCommand}" Style="{StaticResource ItemButton}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <fonts:Icon Text="{x:Static fonts:IconFont.Quotes}" />
-                                        <TextBlock Margin="4,0,0,0">value</TextBlock>
-                                    </StackPanel>
-                                </Button>
-                                <Button Command="{Binding AddArrayCommand}" Style="{StaticResource ItemButton}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <fonts:Icon Text="{x:Static fonts:IconFont.BracketsSquare}" />
-                                        <TextBlock Margin="4,0,0,0">array</TextBlock>
-                                    </StackPanel>
-                                </Button>
-                                <Button Command="{Binding AddObjectCommand}" Style="{StaticResource ItemButton}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <fonts:Icon Text="{x:Static fonts:IconFont.BracketsCurly}" />
-                                        <TextBlock Margin="4,0,0,0">object</TextBlock>
-                                    </StackPanel>
-                                </Button>
-                            </StackPanel>
-                        </inputs:Dropdown>
-                        <Button
-                            Margin="1,0,0,0"
-                            Command="{Binding RemoveCommand}"
-                            Style="{StaticResource IconButtonSmall}">
-                            <fonts:Icon Text="{x:Static fonts:IconFont.Trash}" />
-                        </Button>
-                    </StackPanel>
+                        Grid.Column="1"
+                        Height="20"
+                        Padding="3,0"
+                        BorderThickness="0">
+                        <inputs:Dropdown.Header>
+                            <fonts:Icon Text="{x:Static fonts:IconFont.Plus}" />
+                        </inputs:Dropdown.Header>
+                        <StackPanel Width="100">
+                            <Button Command="{Binding AddValueCommand}" Style="{StaticResource ItemButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <fonts:Icon Text="{x:Static fonts:IconFont.Quotes}" />
+                                    <TextBlock Margin="4,0,0,0">value</TextBlock>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding AddArrayCommand}" Style="{StaticResource ItemButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <fonts:Icon Text="{x:Static fonts:IconFont.BracketsSquare}" />
+                                    <TextBlock Margin="4,0,0,0">array</TextBlock>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding AddObjectCommand}" Style="{StaticResource ItemButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <fonts:Icon Text="{x:Static fonts:IconFont.BracketsCurly}" />
+                                    <TextBlock Margin="4,0,0,0">object</TextBlock>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </inputs:Dropdown>
                 </Grid>
 
                 <DataTemplate.Triggers>
@@ -104,7 +90,6 @@
                             <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:SchemaEdit}}}" Value="False" />
                         </MultiDataTrigger.Conditions>
                         <MultiDataTrigger.Setters>
-                            <Setter TargetName="NameInput" Property="Visibility" Value="Visible" />
                             <Setter TargetName="ActionContainer" Property="Visibility" Value="Visible" />
                         </MultiDataTrigger.Setters>
                     </MultiDataTrigger>
@@ -114,78 +99,55 @@
                             <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:SchemaEdit}}}" Value="False" />
                         </MultiDataTrigger.Conditions>
                         <MultiDataTrigger.Setters>
-                            <Setter TargetName="NameInput" Property="Visibility" Value="Visible" />
                             <Setter TargetName="ActionContainer" Property="Visibility" Value="Visible" />
                         </MultiDataTrigger.Setters>
                     </MultiDataTrigger>
                 </DataTemplate.Triggers>
-            </HierarchicalDataTemplate>
+            </DataTemplate>
 
-            <HierarchicalDataTemplate DataType="{x:Type local:SchemaArray}" ItemsSource="{Binding Type, Converter={StaticResource ObjectToListConverter}}">
+            <DataTemplate DataType="{x:Type local:SchemaArray}">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition SharedSizeGroup="Name" />
-                        <ColumnDefinition Width="102" />
+                        <ColumnDefinition Width="100" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-
-                    <Grid Margin="{Binding Converter={StaticResource DepthToMarginConverter}}" VerticalAlignment="Center">
-                        <TextBlock Padding="4,0" Text="{Binding Name}" />
-                        <TextBox
-                            Name="NameInput"
-                            Padding="4,2"
-                            Text="{Binding Name}"
-                            Visibility="Collapsed" />
-                    </Grid>
-
                     <fonts:Icon
-                        Grid.Column="1"
                         Margin="6,3,0,3"
                         HorizontalAlignment="Left"
                         Opacity="0.8"
                         Text="{x:Static fonts:IconFont.BracketsSquare}" />
-
-                    <StackPanel
-                        Name="ActionContainer"
-                        Grid.Column="2"
+                    <inputs:Dropdown
                         HorizontalAlignment="Right"
-                        Orientation="Horizontal"
-                        Visibility="Collapsed">
-                        <inputs:Dropdown
-                            Height="20"
-                            Padding="3,0"
-                            BorderThickness="0">
-                            <inputs:Dropdown.Header>
-                                <fonts:Icon Text="{x:Static fonts:IconFont.Plus}" />
-                            </inputs:Dropdown.Header>
-                            <StackPanel Width="100">
-                                <Button Command="{Binding UseValueCommand}" Style="{StaticResource ItemButton}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <fonts:Icon Text="{x:Static fonts:IconFont.Quotes}" />
-                                        <TextBlock Margin="4,0,0,0">value</TextBlock>
-                                    </StackPanel>
-                                </Button>
-                                <Button Command="{Binding UseArrayCommand}" Style="{StaticResource ItemButton}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <fonts:Icon Text="{x:Static fonts:IconFont.BracketsSquare}" />
-                                        <TextBlock Margin="4,0,0,0">array</TextBlock>
-                                    </StackPanel>
-                                </Button>
-                                <Button Command="{Binding UseObjectCommand}" Style="{StaticResource ItemButton}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <fonts:Icon Text="{x:Static fonts:IconFont.BracketsCurly}" />
-                                        <TextBlock Margin="4,0,0,0">object</TextBlock>
-                                    </StackPanel>
-                                </Button>
-                            </StackPanel>
-                        </inputs:Dropdown>
-                        <Button
-                            Margin="1,0,0,0"
-                            Command="{Binding RemoveCommand}"
-                            Style="{StaticResource IconButtonSmall}">
-                            <fonts:Icon Text="{x:Static fonts:IconFont.Trash}" />
-                        </Button>
-                    </StackPanel>
+                        Name="ActionContainer"
+                        Visibility="Collapsed"
+                        Grid.Column="1"
+                        Height="20"
+                        Padding="3,0"
+                        BorderThickness="0">
+                        <inputs:Dropdown.Header>
+                            <fonts:Icon Text="{x:Static fonts:IconFont.Plus}" />
+                        </inputs:Dropdown.Header>
+                        <StackPanel Width="100">
+                            <Button Command="{Binding UseValueCommand}" Style="{StaticResource ItemButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <fonts:Icon Text="{x:Static fonts:IconFont.Quotes}" />
+                                    <TextBlock Margin="4,0,0,0">value</TextBlock>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding UseArrayCommand}" Style="{StaticResource ItemButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <fonts:Icon Text="{x:Static fonts:IconFont.BracketsSquare}" />
+                                    <TextBlock Margin="4,0,0,0">array</TextBlock>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding UseObjectCommand}" Style="{StaticResource ItemButton}">
+                                <StackPanel Orientation="Horizontal">
+                                    <fonts:Icon Text="{x:Static fonts:IconFont.BracketsCurly}" />
+                                    <TextBlock Margin="4,0,0,0">object</TextBlock>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </inputs:Dropdown>
                 </Grid>
 
                 <DataTemplate.Triggers>
@@ -195,7 +157,6 @@
                             <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:SchemaEdit}}}" Value="False" />
                         </MultiDataTrigger.Conditions>
                         <MultiDataTrigger.Setters>
-                            <Setter TargetName="NameInput" Property="Visibility" Value="Visible" />
                             <Setter TargetName="ActionContainer" Property="Visibility" Value="Visible" />
                         </MultiDataTrigger.Setters>
                     </MultiDataTrigger>
@@ -205,37 +166,17 @@
                             <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:SchemaEdit}}}" Value="False" />
                         </MultiDataTrigger.Conditions>
                         <MultiDataTrigger.Setters>
-                            <Setter TargetName="NameInput" Property="Visibility" Value="Visible" />
                             <Setter TargetName="ActionContainer" Property="Visibility" Value="Visible" />
                         </MultiDataTrigger.Setters>
                     </MultiDataTrigger>
                 </DataTemplate.Triggers>
-            </HierarchicalDataTemplate>
+            </DataTemplate>
 
             <DataTemplate DataType="{x:Type local:SchemaValue}">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition SharedSizeGroup="Name" />
-                        <ColumnDefinition Width="102" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-
-                    <Grid Margin="{Binding Converter={StaticResource DepthToMarginConverter}}" VerticalAlignment="Center">
-                        <TextBlock Padding="4,0" Text="{Binding Name}" />
-                        <TextBox
-                            Name="NameInput"
-                            Padding="4,2"
-                            Text="{Binding Name}"
-                            Visibility="Collapsed" />
-                    </Grid>
-
-                    <local:IconDataType
-                        Grid.Column="1"
-                        Margin="6,2,0,2"
-                        Type="{Binding DataType}" />
+                    <local:IconDataType Margin="6,2,0,2" Type="{Binding DataType}" />
                     <ComboBox
                         Name="TypeInput"
-                        Grid.Column="1"
                         Width="100"
                         Margin="2,0,0,0"
                         Padding="4,2"
@@ -249,20 +190,6 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-
-                    <StackPanel
-                        Name="ActionContainer"
-                        Grid.Column="2"
-                        HorizontalAlignment="Right"
-                        Orientation="Horizontal"
-                        Visibility="Collapsed">
-                        <Button
-                            Margin="1,0,0,0"
-                            Command="{Binding RemoveCommand}"
-                            Style="{StaticResource IconButtonSmall}">
-                            <fonts:Icon Text="{x:Static fonts:IconFont.Trash}" />
-                        </Button>
-                    </StackPanel>
                 </Grid>
 
                 <DataTemplate.Triggers>
@@ -272,9 +199,56 @@
                             <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:SchemaEdit}}}" Value="False" />
                         </MultiDataTrigger.Conditions>
                         <MultiDataTrigger.Setters>
-                            <Setter TargetName="NameInput" Property="Visibility" Value="Visible" />
                             <Setter TargetName="TypeInput" Property="Visibility" Value="Visible" />
-                            <Setter TargetName="ActionContainer" Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger.Setters>
+                    </MultiDataTrigger>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
+                            <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:SchemaEdit}}}" Value="False" />
+                        </MultiDataTrigger.Conditions>
+                        <MultiDataTrigger.Setters>
+                            <Setter TargetName="TypeInput" Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger.Setters>
+                    </MultiDataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type local:SchemaParentProperty}" ItemsSource="{Binding ElementParent.Childrens}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="24" />
+                    </Grid.ColumnDefinitions>
+                    <Grid VerticalAlignment="Center">
+                        <TextBlock Padding="4,0" Text="{Binding Name}" />
+                        <TextBox
+                            Name="NameInput"
+                            Padding="4,2"
+                            Text="{Binding Name}"
+                            Visibility="Collapsed" />
+                    </Grid>
+                    <ContentControl Grid.Column="1" Content="{Binding Element}" />
+                    <Button
+                        Name="RemoveButton"
+                        Grid.Column="2"
+                        ToolTip="Remove"
+                        Visibility="Collapsed"
+                        Command="{Binding RemoveCommand}"
+                        Style="{StaticResource IconButtonSmall}">
+                        <fonts:Icon Text="{x:Static fonts:IconFont.Trash}" />
+                    </Button>
+                </Grid>
+                <DataTemplate.Triggers>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
+                            <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:SchemaEdit}}}" Value="False" />
+                        </MultiDataTrigger.Conditions>
+                        <MultiDataTrigger.Setters>
+                            <Setter TargetName="NameInput" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="RemoveButton" Property="Visibility" Value="Visible" />
                         </MultiDataTrigger.Setters>
                     </MultiDataTrigger>
                     <MultiDataTrigger>
@@ -284,8 +258,56 @@
                         </MultiDataTrigger.Conditions>
                         <MultiDataTrigger.Setters>
                             <Setter TargetName="NameInput" Property="Visibility" Value="Visible" />
-                            <Setter TargetName="TypeInput" Property="Visibility" Value="Visible" />
-                            <Setter TargetName="ActionContainer" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="RemoveButton" Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger.Setters>
+                    </MultiDataTrigger>
+                </DataTemplate.Triggers>
+            </HierarchicalDataTemplate>
+            <DataTemplate DataType="{x:Type local:SchemaProperty}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Name" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="24" />
+                    </Grid.ColumnDefinitions>
+                    <Grid VerticalAlignment="Center">
+                        <TextBlock Padding="4,0" Text="{Binding Name}" />
+                        <TextBox
+                            Name="NameInput"
+                            Padding="4,2"
+                            Text="{Binding Name}"
+                            Visibility="Collapsed" />
+                    </Grid>
+                    <ContentControl Grid.Column="1" Content="{Binding Element}" />
+                    <Button
+                        Name="RemoveButton"
+                        Grid.Column="2"
+                        ToolTip="Remove"
+                        Visibility="Collapsed"
+                        Command="{Binding RemoveCommand}"
+                        Style="{StaticResource IconButtonSmall}">
+                        <fonts:Icon Text="{x:Static fonts:IconFont.Trash}" />
+                    </Button>
+                </Grid>
+                <DataTemplate.Triggers>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
+                            <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:SchemaEdit}}}" Value="False" />
+                        </MultiDataTrigger.Conditions>
+                        <MultiDataTrigger.Setters>
+                            <Setter TargetName="NameInput" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="RemoveButton" Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger.Setters>
+                    </MultiDataTrigger>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
+                            <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:SchemaEdit}}}" Value="False" />
+                        </MultiDataTrigger.Conditions>
+                        <MultiDataTrigger.Setters>
+                            <Setter TargetName="NameInput" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="RemoveButton" Property="Visibility" Value="Visible" />
                         </MultiDataTrigger.Setters>
                     </MultiDataTrigger>
                 </DataTemplate.Triggers>

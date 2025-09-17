@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections;
+using System.Collections.ObjectModel;
+using System.DirectoryServices.ActiveDirectory;
 using System.Text.Json.Serialization;
 using Usuel.Shared;
 
@@ -19,126 +21,112 @@ namespace Joufflu.Data.Schema
         IGenericNode ToValue();
     }
 
-    public interface ISubSchemaElement : ISchemaElement
+    public class SchemaValue : ISchemaElement
     {
-        string? Name { get; set; }
-        SchemaObject? Parent { get; set; }
-        bool IsSelected { get; }
-
-        ICustomCommand RemoveCommand { get; }
-    }
-
-    public class SchemaValue : ISubSchemaElement
-    {
-        public string? Name { get; set; }
         public EnumDataType DataType { get; set; } = EnumDataType.String;
-
-        [JsonIgnore]
-        public SchemaObject? Parent { get; set; }
-        [JsonIgnore]
-        public bool IsSelected { get; set; }
-
-        public ICustomCommand RemoveCommand { get; set; }
-
-        public SchemaValue() {
-            RemoveCommand = new DelegateCommand(() => Parent?.Remove(this)); 
-        }
-
-        public IGenericNode ToValue() { 
-            return new GenericValue(this); 
-        }
+        public IGenericNode ToValue() => new GenericValue(this);
     }
 
-    public interface ISchemaParent : ISubSchemaElement
+    public interface ISchemaParent : ISchemaElement
     {
-        public ICustomCommand AddValueCommand { get; }
-        public ICustomCommand AddArrayCommand { get; }
-        public ICustomCommand AddObjectCommand { get; }
-        void Remove(ISubSchemaElement property);
+        public IEnumerable Childrens { get; }
     }
 
     public class SchemaArray : ISchemaParent
     {
-        public string? Name { get; set; }
+        public IEnumerable Childrens => new List<ISchemaElement>() { Type };
         /// <summary>
         /// Contain the type of the array
         /// </summary>
-        public ISubSchemaElement Type { get; set; }
-
+        public ISchemaElement Type { get; set; }
         [JsonIgnore]
-        public SchemaObject? Parent { get; set; }
-        [JsonIgnore]
-        public bool IsSelected { get; set; }
+        public ISchemaParent? Parent { get; set; }
 
-        public ICustomCommand AddValueCommand { get; set; }
-        public ICustomCommand AddArrayCommand { get; set; }
-        public ICustomCommand AddObjectCommand { get; set; }
-        public ICustomCommand RemoveCommand { get; set; }
+        public ICustomCommand UseValueCommand { get; set; }
+        public ICustomCommand UseArrayCommand { get; set; }
+        public ICustomCommand UseObjectCommand { get; set; }
 
         public SchemaArray()
         {
-            Type = new SchemaValue() {Parent=this, Name = "Type"};
+            Type = new SchemaValue();
             UseValueCommand = new DelegateCommand(() => Type = new SchemaValue());
             UseArrayCommand = new DelegateCommand(() => Type = new SchemaArray());
             UseObjectCommand = new DelegateCommand(() => Type = new SchemaObject());
-            RemoveCommand = new DelegateCommand(() => Parent?.Remove(this));
         }
 
-        public IGenericNode ToValue()
+        public IGenericNode ToValue() => new GenericArray(this);
+    }
+
+    public class SchemaProperty
+    {
+        public string Name { get; set; }
+        public ISchemaElement Element { get; }
+
+        [JsonIgnore]
+        public SchemaObject Parent { get; }
+        public ICustomCommand RemoveCommand { get; }
+
+        public SchemaProperty(SchemaObject parent, string name, ISchemaElement element)
         {
-            return new GenericArray(this);
+            Name = name;
+            Parent = parent;
+            Element = element;
+            RemoveCommand = new DelegateCommand(() => Parent.Remove(this));
         }
+    }
+
+    public class SchemaParentProperty : SchemaProperty
+    {
+        public ISchemaParent ElementParent => (ISchemaParent)Element;
+        public SchemaParentProperty(SchemaObject parent, string name, ISchemaParent element) : base(parent, name, element)
+        {}
     }
 
     public class SchemaObject : ISchemaParent
     {
-        public string? Name { get; set; }
-
         [JsonIgnore]
-        public SchemaObject? Parent { get; set; }
-        [JsonIgnore]
-        public bool IsSelected { get; set; }
+        public ISchemaParent? Parent { get; set; }
 
-        public ObservableCollection<ISubSchemaElement> Properties { get; } = [];
+        public IEnumerable Childrens => Properties;
+        public ObservableCollection<SchemaProperty> Properties { get; } = [];
 
         public ICustomCommand AddValueCommand { get; }
         public ICustomCommand AddArrayCommand { get; }
         public ICustomCommand AddObjectCommand { get; }
-        public ICustomCommand RemoveCommand { get; }
 
         public SchemaObject()
         {
-            AddValueCommand = new DelegateCommand(() => Parent?.Add("Default", new SchemaValue()));
-            AddArrayCommand = new DelegateCommand(() => Parent?.Add("Default", new SchemaArray()));
-            AddObjectCommand = new DelegateCommand(() => Parent?.Add("Default", new SchemaObject()));
-            RemoveCommand = new DelegateCommand(() => Parent?.Remove(this));
+            AddValueCommand = new DelegateCommand(() => Add("Default", new SchemaValue()));
+            AddArrayCommand = new DelegateCommand(() => Add("Default", new SchemaArray()));
+            AddObjectCommand = new DelegateCommand(() => Add("Default", new SchemaObject()));
         }
 
-        public SchemaObject Add(string name, ISubSchemaElement element)
+        public SchemaObject Add(string name, ISchemaElement element)
         {
-            element.Parent = this;
-            element.Name = GetUniquePropertyName(name);
-            Properties.Add(element);
+            if (element is ISchemaParent parent)
+                Properties.Add(new SchemaParentProperty(this, GetUniquePropertyName(name), parent));
+            else
+                Properties.Add(new SchemaProperty(this, GetUniquePropertyName(name), element));
             return this;
         }
 
-        public void Remove(ISubSchemaElement property) { Properties.Remove(property); }
+        public void Remove(SchemaProperty property) { Properties.Remove(property); }
 
         public IGenericNode ToValue()
         {
             Dictionary<string, IGenericNode> values = Properties.ToDictionary(
                 prop => prop.Name ?? "",
-                prop => prop.ToValue());
+                prop => prop.Element.ToValue());
 
             return new GenericObject(this, values);
         }
 
         private bool IsPropertyNameUnique(string name)
         {
-            return !Properties.Any(
-                p => (p.Name ?? "").Trim()
+            return Properties.Any(p => (p.Name ?? "").Trim()
                     .ToLowerInvariant()
-                    .Equals(name.Trim().ToLowerInvariant(), StringComparison.OrdinalIgnoreCase));
+                    .Equals(name.Trim().ToLowerInvariant(), StringComparison.OrdinalIgnoreCase)
+                    ) == false;
         }
 
         /// <summary>

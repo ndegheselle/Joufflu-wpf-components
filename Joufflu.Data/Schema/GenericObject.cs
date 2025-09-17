@@ -5,11 +5,11 @@ namespace Joufflu.Data.Schema
 {
     public interface IGenericNode
     {
-        ISubSchemaElement? Schema { get; }
+        ISchemaElement? Schema { get; }
     }
-    public class GenericNode<TSchema> : IGenericNode where TSchema : ISubSchemaElement
+    public class GenericNode<TSchema> : IGenericNode where TSchema : ISchemaElement
     {
-        ISubSchemaElement? IGenericNode.Schema => Schema;
+        ISchemaElement? IGenericNode.Schema => Schema;
         public TSchema? Schema { get; protected set; }
     }
 

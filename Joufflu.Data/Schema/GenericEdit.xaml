@@ -10,39 +10,10 @@
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     mc:Ignorable="d"
     x:Name="ContainerElement">
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Joufflu.Data;component/Schema/SchemaTreeView.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-            <local:DepthToMarginConverter x:Key="DepthToMarginConverter" />
 
-            <DataTemplate x:Key="StringTemplate" DataType="{x:Type local:GenericValue}">
-                <TextBox Padding="4,2" Text="{Binding Value, Mode=TwoWay}" />
-            </DataTemplate>
-            <DataTemplate x:Key="BooleanTemplate" DataType="{x:Type local:GenericValue}">
-                <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" />
-            </DataTemplate>
-            <DataTemplate x:Key="DecimalTemplate" DataType="{x:Type local:GenericValue}">
-                <inputs:DecimalUpDown Value="{Binding Value, Mode=TwoWay}" />
-            </DataTemplate>
-            <DataTemplate x:Key="DateTimeTemplate" DataType="{x:Type local:GenericValue}">
-                <Calendar SelectedDate="{Binding Value, Mode=TwoWay}" />
-            </DataTemplate>
-            <DataTemplate x:Key="TimeSpanTemplate" DataType="{x:Type local:GenericValue}">
-                <inputs:TimeSpanPicker Value="{Binding Value, Mode=TwoWay}" />
-            </DataTemplate>
 
-            <local:ValueTemplateSelector
-                x:Key="ValueTemplateSelector"
-                StringTemplate="{StaticResource StringTemplate}"
-                BooleanTemplate="{StaticResource BooleanTemplate}"
-                DecimalTemplate="{StaticResource DecimalTemplate}"
-                DateTimeTemplate="{StaticResource DateTimeTemplate}"
-                TimeSpanTemplate="{StaticResource TimeSpanTemplate}" />
-        </ResourceDictionary>
-    </UserControl.Resources>
-
+    <TextBlock>Tat</TextBlock>
+    <!--
     <TreeView
         Grid.IsSharedSizeScope="True"
         ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
@@ -133,5 +104,5 @@
                 </Grid>
             </DataTemplate>
         </TreeView.Resources>
-    </TreeView>
+    </TreeView>-->
 </UserControl>
