@@ -13,50 +13,40 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="ContainerElement"
     mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Joufflu.Data;component/Schema/SchemaTreeView.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <TreeView
         DataContext="{Binding ElementName=ContainerElement}"
         Grid.IsSharedSizeScope="True"
+        ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
         ItemsSource="{Binding Root.Properties}">
-
-        <TreeView.ItemContainerStyle>
-            <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeViewItemStyle}">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}" />
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderBrush" Value="Transparent" />
-                <Setter Property="adonisExtensions:CursorSpotlightExtension.BackgroundBrush" Value="Transparent" />
-                <Setter Property="adonisExtensions:CursorSpotlightExtension.BorderBrush" Value="Transparent" />
-                <Setter Property="BorderThickness" Value="{DynamicResource {x:Static adonisUi:Dimensions.BorderThickness}}" />
-                <Setter Property="adonisExtensions:CornerRadiusExtension.CornerRadius" Value="{DynamicResource {x:Static adonisUi:Dimensions.CornerRadius}}" />
-                <Setter Property="Padding" Value="2" />
-                <Setter Property="HorizontalAlignment" Value="Stretch" />
-                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                <Setter Property="SnapsToDevicePixels" Value="True" />
-                <Setter Property="UseLayoutRounding" Value="True" />
-                <Setter Property="IsExpanded" Value="True" />
-            </Style>
-        </TreeView.ItemContainerStyle>
-
         <TreeView.Resources>
-
             <DataTemplate DataType="{x:Type local:SchemaObject}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <fonts:Icon
-                        Margin="6,3,0,3"
-                        HorizontalAlignment="Left"
-                        Opacity="0.8"
-                        Text="{x:Static fonts:IconFont.BracketsCurly}" />
+
+                    <local:IconDataType
+                        Margin="6,2"
+                        Opacity="0.6"
+                        Type="Object" />
                     <inputs:Dropdown
                         Name="ActionContainer"
-                        Visibility="Collapsed"
-                        HorizontalAlignment="Right"
                         Grid.Column="1"
                         Height="20"
                         Padding="3,0"
-                        BorderThickness="0">
+                        HorizontalAlignment="Right"
+                        BorderThickness="0"
+                        Visibility="Collapsed">
                         <inputs:Dropdown.Header>
                             <fonts:Icon Text="{x:Static fonts:IconFont.Plus}" />
                         </inputs:Dropdown.Header>
@@ -111,19 +101,19 @@
                         <ColumnDefinition Width="100" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <fonts:Icon
-                        Margin="6,3,0,3"
-                        HorizontalAlignment="Left"
-                        Opacity="0.8"
-                        Text="{x:Static fonts:IconFont.BracketsSquare}" />
+
+                    <local:IconDataType
+                        Margin="6,2"
+                        Opacity="0.6"
+                        Type="Array" />
                     <inputs:Dropdown
-                        HorizontalAlignment="Right"
                         Name="ActionContainer"
-                        Visibility="Collapsed"
                         Grid.Column="1"
                         Height="20"
                         Padding="3,0"
-                        BorderThickness="0">
+                        HorizontalAlignment="Right"
+                        BorderThickness="0"
+                        Visibility="Collapsed">
                         <inputs:Dropdown.Header>
                             <fonts:Icon Text="{x:Static fonts:IconFont.Plus}" />
                         </inputs:Dropdown.Header>
@@ -181,7 +171,8 @@
                         Margin="2,0,0,0"
                         Padding="4,2"
                         HorizontalAlignment="Left"
-                        ItemsSource="{extensions:EnumValuesExtension {x:Type local:EnumDataType}}"
+                        ItemsSource="{extensions:EnumValuesExtension {x:Type local:EnumDataType},
+                                                                     IgnoreElements=2}"
                         SelectedItem="{Binding DataType, Mode=TwoWay}"
                         Visibility="Collapsed">
                         <ComboBox.ItemTemplate>
@@ -214,86 +205,69 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
 
-            <HierarchicalDataTemplate DataType="{x:Type local:SchemaParentProperty}" ItemsSource="{Binding ElementParent.Childrens}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto" />
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="24" />
-                    </Grid.ColumnDefinitions>
-                    <Grid VerticalAlignment="Center">
-                        <TextBlock Padding="4,0" Text="{Binding Name}" />
-                        <TextBox
-                            Name="NameInput"
-                            Padding="4,2"
-                            Text="{Binding Name}"
-                            Visibility="Collapsed" />
-                    </Grid>
-                    <ContentControl Grid.Column="1" Content="{Binding Element}" />
-                    <Button
-                        Name="RemoveButton"
-                        Grid.Column="2"
-                        ToolTip="Remove"
-                        Visibility="Collapsed"
-                        Command="{Binding RemoveCommand}"
-                        Style="{StaticResource IconButtonSmall}">
-                        <fonts:Icon Text="{x:Static fonts:IconFont.Trash}" />
-                    </Button>
-                </Grid>
-                <DataTemplate.Triggers>
-                    <MultiDataTrigger>
-                        <MultiDataTrigger.Conditions>
-                            <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
-                            <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:SchemaEdit}}}" Value="False" />
-                        </MultiDataTrigger.Conditions>
-                        <MultiDataTrigger.Setters>
-                            <Setter TargetName="NameInput" Property="Visibility" Value="Visible" />
-                            <Setter TargetName="RemoveButton" Property="Visibility" Value="Visible" />
-                        </MultiDataTrigger.Setters>
-                    </MultiDataTrigger>
-                    <MultiDataTrigger>
-                        <MultiDataTrigger.Conditions>
-                            <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
-                            <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:SchemaEdit}}}" Value="False" />
-                        </MultiDataTrigger.Conditions>
-                        <MultiDataTrigger.Setters>
-                            <Setter TargetName="NameInput" Property="Visibility" Value="Visible" />
-                            <Setter TargetName="RemoveButton" Property="Visibility" Value="Visible" />
-                        </MultiDataTrigger.Setters>
-                    </MultiDataTrigger>
-                </DataTemplate.Triggers>
-            </HierarchicalDataTemplate>
-            <DataTemplate DataType="{x:Type local:SchemaProperty}">
+            <DataTemplate x:Key="SharedSchemaTemplate" DataType="{x:Type local:SchemaProperty}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
                         <ColumnDefinition />
-                        <ColumnDefinition Width="24" />
+                        <ColumnDefinition Width="22" />
                     </Grid.ColumnDefinitions>
-                    <Grid VerticalAlignment="Center">
-                        <TextBlock Padding="4,0" Text="{Binding Name}" />
-                        <TextBox
-                            Name="NameInput"
-                            Padding="4,2"
-                            Text="{Binding Name}"
-                            Visibility="Collapsed" />
+
+                    <Grid>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        
+                        <ItemsControl ItemsSource="{Binding Element.ParentsTree}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Margin="8,0"
+                                        BorderBrush="{StaticResource {x:Static adonisUi:Brushes.Layer0BorderBrush}}"
+                                        BorderThickness="1,0,0,0" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Grid Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock
+                                Name="NameText"
+                                Padding="4,0"
+                                Text="{Binding Name}" />
+                            <TextBox
+                                Name="NameInput"
+                                Padding="4,2"
+                                Text="{Binding Name}"
+                                Visibility="Collapsed" />
+                        </Grid>
                     </Grid>
-                    <ContentControl Grid.Column="1" Content="{Binding Element}" />
+                    <ContentControl Margin="0,2" Grid.Column="1" Content="{Binding Element}" />
                     <Button
                         Name="RemoveButton"
                         Grid.Column="2"
-                        ToolTip="Remove"
-                        Visibility="Collapsed"
                         Command="{Binding RemoveCommand}"
-                        Style="{StaticResource IconButtonSmall}">
+                        Style="{StaticResource IconButtonSmall}"
+                        ToolTip="Remove"
+                        Visibility="Collapsed">
                         <fonts:Icon Text="{x:Static fonts:IconFont.Trash}" />
                     </Button>
                 </Grid>
                 <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding IsConst}" Value="True">
+                        <Setter TargetName="NameText" Property="Opacity" Value="0.6" />
+                    </DataTrigger>
                     <MultiDataTrigger>
                         <MultiDataTrigger.Conditions>
                             <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
                             <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:SchemaEdit}}}" Value="False" />
+                            <Condition Binding="{Binding IsConst}" Value="False" />
                         </MultiDataTrigger.Conditions>
                         <MultiDataTrigger.Setters>
                             <Setter TargetName="NameInput" Property="Visibility" Value="Visible" />
@@ -304,6 +278,7 @@
                         <MultiDataTrigger.Conditions>
                             <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
                             <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:SchemaEdit}}}" Value="False" />
+                            <Condition Binding="{Binding IsConst}" Value="False" />
                         </MultiDataTrigger.Conditions>
                         <MultiDataTrigger.Setters>
                             <Setter TargetName="NameInput" Property="Visibility" Value="Visible" />
@@ -311,6 +286,14 @@
                         </MultiDataTrigger.Setters>
                     </MultiDataTrigger>
                 </DataTemplate.Triggers>
+            </DataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type local:SchemaParentProperty}" ItemsSource="{Binding ElementParent.Childrens}">
+                <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
+            </HierarchicalDataTemplate>
+
+            <DataTemplate DataType="{x:Type local:SchemaProperty}">
+                <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
             </DataTemplate>
         </TreeView.Resources>
     </TreeView>

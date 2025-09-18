@@ -1,7 +1,6 @@
 ﻿using Joufflu.Shared.Resources.Fonts;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -46,6 +45,8 @@ namespace Joufflu.Data.Schema
         {
             Icon = Type switch
             {
+                EnumDataType.Object => IconFont.BracketsCurly,
+                EnumDataType.Array => IconFont.BracketsSquare,
                 EnumDataType.String => IconFont.Quotes,
                 EnumDataType.Decimal => IconFont.Hash,
                 EnumDataType.Boolean => IconFont.Check,

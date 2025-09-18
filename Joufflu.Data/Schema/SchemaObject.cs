@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using System.Collections.ObjectModel;
-using System.DirectoryServices.ActiveDirectory;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using Usuel.Shared;
 
@@ -8,7 +8,8 @@ namespace Joufflu.Data.Schema
 {
     public enum EnumDataType
     {
-        Dynamic = 0,
+        Object,
+        Array,
         String,
         Decimal,
         Boolean,
@@ -18,29 +19,60 @@ namespace Joufflu.Data.Schema
 
     public interface ISchemaElement
     {
+        ISchemaParent? Parent { get; set; }
+        IEnumerable<ISchemaParent> ParentsTree { get; }
         IGenericNode ToValue();
     }
 
     public class SchemaValue : ISchemaElement
     {
+        [JsonIgnore]
+        public ISchemaParent? Parent { get; set; }
+        [JsonIgnore]
+        public IEnumerable<ISchemaParent> ParentsTree => Parent?.Parent == null ? [] : [..Parent.ParentsTree, Parent];
         public EnumDataType DataType { get; set; } = EnumDataType.String;
         public IGenericNode ToValue() => new GenericValue(this);
     }
 
     public interface ISchemaParent : ISchemaElement
     {
-        public IEnumerable Childrens { get; }
+        IList<SchemaProperty> Childrens { get; }
+        public void Remove(SchemaProperty property)
+        {
+            Childrens.Remove(property);
+        }
     }
 
-    public class SchemaArray : ISchemaParent
+    public class SchemaArray : ISchemaParent, INotifyPropertyChanged
     {
-        public IEnumerable Childrens => new List<ISchemaElement>() { Type };
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public void NotifyPropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public IList<SchemaProperty> Childrens => new List<SchemaProperty>() { Type };
+
         /// <summary>
         /// Contain the type of the array
         /// </summary>
-        public ISchemaElement Type { get; set; }
+        private SchemaProperty _type;
+        public SchemaProperty Type
+        {
+            get => _type;
+            set
+            {
+                if (value == _type)
+                    return;
+                _type = value;
+                NotifyPropertyChanged(nameof(Childrens));
+            }
+        }
+
         [JsonIgnore]
         public ISchemaParent? Parent { get; set; }
+        [JsonIgnore]
+        public IEnumerable<ISchemaParent> ParentsTree => Parent?.Parent == null ? [] : [.. Parent.ParentsTree, Parent];
 
         public ICustomCommand UseValueCommand { get; set; }
         public ICustomCommand UseArrayCommand { get; set; }
@@ -48,10 +80,10 @@ namespace Joufflu.Data.Schema
 
         public SchemaArray()
         {
-            Type = new SchemaValue();
-            UseValueCommand = new DelegateCommand(() => Type = new SchemaValue());
-            UseArrayCommand = new DelegateCommand(() => Type = new SchemaArray());
-            UseObjectCommand = new DelegateCommand(() => Type = new SchemaObject());
+            _type = new SchemaProperty("Type", new SchemaValue() { Parent = this }) { IsConst = true };
+            UseValueCommand = new DelegateCommand(() => Type = new SchemaProperty("Type", new SchemaValue() { Parent = this }) { IsConst = true });
+            UseArrayCommand = new DelegateCommand(() => Type = new SchemaParentProperty("Type", new SchemaArray() { Parent = this }) { IsConst = true });
+            UseObjectCommand = new DelegateCommand(() => Type = new SchemaParentProperty("Type", new SchemaObject() { Parent = this }) { IsConst = true });
         }
 
         public IGenericNode ToValue() => new GenericArray(this);
@@ -61,33 +93,32 @@ namespace Joufflu.Data.Schema
     {
         public string Name { get; set; }
         public ISchemaElement Element { get; }
-
-        [JsonIgnore]
-        public SchemaObject Parent { get; }
         public ICustomCommand RemoveCommand { get; }
+        public bool IsConst { get; set; } = false;
 
-        public SchemaProperty(SchemaObject parent, string name, ISchemaElement element)
+        public SchemaProperty(string name, ISchemaElement element)
         {
             Name = name;
-            Parent = parent;
             Element = element;
-            RemoveCommand = new DelegateCommand(() => Parent.Remove(this));
+            RemoveCommand = new DelegateCommand(() => Element.Parent?.Remove(this), () => IsConst == false);
         }
     }
 
     public class SchemaParentProperty : SchemaProperty
     {
         public ISchemaParent ElementParent => (ISchemaParent)Element;
-        public SchemaParentProperty(SchemaObject parent, string name, ISchemaParent element) : base(parent, name, element)
-        {}
+        public SchemaParentProperty(string name, ISchemaParent element) : base(name, element)
+        { }
     }
 
     public class SchemaObject : ISchemaParent
     {
         [JsonIgnore]
         public ISchemaParent? Parent { get; set; }
+        [JsonIgnore]
+        public IEnumerable<ISchemaParent> ParentsTree => Parent?.Parent == null ? [] : [.. Parent.ParentsTree, Parent];
 
-        public IEnumerable Childrens => Properties;
+        public IList<SchemaProperty> Childrens => Properties;
         public ObservableCollection<SchemaProperty> Properties { get; } = [];
 
         public ICustomCommand AddValueCommand { get; }
@@ -103,14 +134,13 @@ namespace Joufflu.Data.Schema
 
         public SchemaObject Add(string name, ISchemaElement element)
         {
+            element.Parent = this;
             if (element is ISchemaParent parent)
-                Properties.Add(new SchemaParentProperty(this, GetUniquePropertyName(name), parent));
+                Properties.Add(new SchemaParentProperty(GetUniquePropertyName(name), parent));
             else
-                Properties.Add(new SchemaProperty(this, GetUniquePropertyName(name), element));
+                Properties.Add(new SchemaProperty(GetUniquePropertyName(name), element));
             return this;
         }
-
-        public void Remove(SchemaProperty property) { Properties.Remove(property); }
 
         public IGenericNode ToValue()
         {

@@ -5,6 +5,7 @@
     xmlns:adonisExtensions="clr-namespace:AdonisUI.Extensions;assembly=AdonisUI"
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
+    xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:local="clr-namespace:Joufflu.Inputs">
     <Style TargetType="{x:Type local:Dropdown}">
         <Setter Property="Height" Value="24" />
@@ -14,7 +15,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:Dropdown}">
-                    <Grid Name="container">
+                    <Grid DataContext="{Binding Temp}">
                         <ToggleButton
                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                             Height="{TemplateBinding Height}"

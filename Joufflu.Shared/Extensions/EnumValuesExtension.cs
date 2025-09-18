@@ -7,12 +7,16 @@ namespace Joufflu.Shared.Extensions
     /// </summary>
     public class EnumValuesExtension : MarkupExtension
     {
-        public Type EnumType { get; set; }
+        /// <summary>
+        /// Ignore the X first elements
+        /// </summary>
+        public int IgnoreElements { get; set; } = 0;
 
+        private readonly Type _enumType;
         public EnumValuesExtension(Type enumType)
-        { EnumType = enumType; }
+        { _enumType = enumType; }
 
         public override object ProvideValue(IServiceProvider serviceProvider)
-        { return Enum.GetValues(EnumType); }
+        { return Enum.GetValues(_enumType).Cast<Enum>().Skip(IgnoreElements); }
     }
 }

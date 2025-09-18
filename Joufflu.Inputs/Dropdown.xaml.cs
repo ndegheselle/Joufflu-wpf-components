@@ -18,9 +18,5 @@ namespace Joufflu.Inputs
             get { return (object)GetValue(HeaderProperty); }
             set { SetValue(HeaderProperty, value); }
         }
-
-        public Dropdown()
-        {
-        }
     }
 }

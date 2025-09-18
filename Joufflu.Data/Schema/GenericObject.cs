@@ -48,7 +48,7 @@ namespace Joufflu.Data.Schema
         public GenericArray(SchemaArray schema)
         {
             Schema = schema;
-            AddCommand = new DelegateCommand(() => Values.Add(Schema.Type.ToValue()));
+            AddCommand = new DelegateCommand(() => Values.Add(Schema.Type.Element.ToValue()));
             RemoveCommand = new DelegateCommand(() => Values.RemoveAt(Values.Count - 1));
         }
     }

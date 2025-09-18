@@ -5,7 +5,6 @@ using System.Windows.Data;
 
 namespace Joufflu.Data.Schema
 {
-    /// <summary>
     /// Logique d'interaction pour SchemaEdit.xaml
     /// </summary>
     public partial class SchemaEdit : UserControl
