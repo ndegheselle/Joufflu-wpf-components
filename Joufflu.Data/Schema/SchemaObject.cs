@@ -31,7 +31,13 @@ namespace Joufflu.Data.Schema
         [JsonIgnore]
         public IEnumerable<ISchemaParent> ParentsTree => Parent?.Parent == null ? [] : [..Parent.ParentsTree, Parent];
         public EnumDataType DataType { get; set; } = EnumDataType.String;
+
+        public SchemaValue(ISchemaParent? parent = null)
+        {
+            Parent = parent;
+        }
         public IGenericNode ToValue() => new GenericValue(this);
+
     }
 
     public interface ISchemaParent : ISchemaElement
@@ -78,12 +84,13 @@ namespace Joufflu.Data.Schema
         public ICustomCommand UseArrayCommand { get; set; }
         public ICustomCommand UseObjectCommand { get; set; }
 
-        public SchemaArray()
+        public SchemaArray(ISchemaParent? parent = null)
         {
+            Parent = parent;
             _type = new SchemaProperty("Type", new SchemaValue() { Parent = this }) { IsConst = true };
             UseValueCommand = new DelegateCommand(() => Type = new SchemaProperty("Type", new SchemaValue() { Parent = this }) { IsConst = true });
-            UseArrayCommand = new DelegateCommand(() => Type = new SchemaParentProperty("Type", new SchemaArray() { Parent = this }) { IsConst = true });
-            UseObjectCommand = new DelegateCommand(() => Type = new SchemaParentProperty("Type", new SchemaObject() { Parent = this }) { IsConst = true });
+            UseArrayCommand = new DelegateCommand(() => Type = new SchemaProperty("Type", new SchemaArray() { Parent = this }) { IsConst = true });
+            UseObjectCommand = new DelegateCommand(() => Type = new SchemaProperty("Type", new SchemaObject() { Parent = this }) { IsConst = true });
         }
 
         public IGenericNode ToValue() => new GenericArray(this);
@@ -104,13 +111,6 @@ namespace Joufflu.Data.Schema
         }
     }
 
-    public class SchemaParentProperty : SchemaProperty
-    {
-        public ISchemaParent ElementParent => (ISchemaParent)Element;
-        public SchemaParentProperty(string name, ISchemaParent element) : base(name, element)
-        { }
-    }
-
     public class SchemaObject : ISchemaParent
     {
         [JsonIgnore]
@@ -125,8 +125,9 @@ namespace Joufflu.Data.Schema
         public ICustomCommand AddArrayCommand { get; }
         public ICustomCommand AddObjectCommand { get; }
 
-        public SchemaObject()
+        public SchemaObject(ISchemaParent? parent = null)
         {
+            Parent = parent;
             AddValueCommand = new DelegateCommand(() => Add("Default", new SchemaValue()));
             AddArrayCommand = new DelegateCommand(() => Add("Default", new SchemaArray()));
             AddObjectCommand = new DelegateCommand(() => Add("Default", new SchemaObject()));
@@ -135,10 +136,7 @@ namespace Joufflu.Data.Schema
         public SchemaObject Add(string name, ISchemaElement element)
         {
             element.Parent = this;
-            if (element is ISchemaParent parent)
-                Properties.Add(new SchemaParentProperty(GetUniquePropertyName(name), parent));
-            else
-                Properties.Add(new SchemaProperty(GetUniquePropertyName(name), element));
+            Properties.Add(new SchemaProperty(GetUniquePropertyName(name), element));
             return this;
         }
 

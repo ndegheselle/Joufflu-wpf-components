@@ -3,6 +3,31 @@ using System.Windows.Controls;
 
 namespace Joufflu.Data.Schema
 {
+
+    public class GenericTemplateSelector : DataTemplateSelector
+    {
+        public DataTemplate? ObjectKeyTemplate { get; set; }
+        public DataTemplate? ArrayKeyTemplate { get; set; }
+        public DataTemplate? NodeKeyTemplate { get; set; }
+        public DataTemplate? ObjectTemplate { get; set; }
+        public DataTemplate? ArrayTemplate { get; set; }
+        public DataTemplate? NodeTemplate { get; set; }
+
+        public override DataTemplate? SelectTemplate(object item, DependencyObject container)
+        {
+            return item switch
+            {
+                _ when item is GenericObject => ObjectTemplate,
+                _ when item is GenericArray => ArrayTemplate,
+                _ when item is GenericValue => NodeTemplate,
+                _ when item is KeyValuePair<string, IGenericNode> keyValue && keyValue.Value is GenericObject => ObjectKeyTemplate,
+                _ when item is KeyValuePair<string, IGenericNode> keyValue && keyValue.Value is GenericArray => ArrayKeyTemplate,
+                _ when item is KeyValuePair<string, IGenericNode> keyValue && keyValue.Value is GenericValue => NodeKeyTemplate,
+                _ => base.SelectTemplate(item, container)
+            };
+        }
+    }
+
     public class ValueTemplateSelector : DataTemplateSelector
     {
         public DataTemplate? StringTemplate { get; set; }
@@ -15,7 +40,7 @@ namespace Joufflu.Data.Schema
         {
             if (item is not GenericValue value)
                 throw new InvalidOperationException($"The item must be of type '{typeof(GenericValue)}'.");
-
+            
             return value.Schema?.DataType switch
             {
                 EnumDataType.String => StringTemplate,
@@ -35,7 +60,7 @@ namespace Joufflu.Data.Schema
     {
         public GenericObject Root { get; set; }
         public GenericEdit()
-        {/*
+        {
             var root = new SchemaObject();
 
             var sub = new SchemaObject();
@@ -46,7 +71,7 @@ namespace Joufflu.Data.Schema
             root.Add("titi", sub);
 
             Root = (GenericObject)root.ToValue();
-            */
+
             InitializeComponent();
         }
     }

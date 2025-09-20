@@ -102,6 +102,14 @@
                             </ContentPresenter.Margin>
                         </ContentPresenter>
 
+                        <Border
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            HorizontalAlignment="Left"
+                            Width="1"
+                            BorderBrush="Red"
+                            BorderThickness="1,0,0,0" />
+
                         <ItemsPresenter
                             x:Name="ItemsHost"
                             Grid.Row="1"

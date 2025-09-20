@@ -13,21 +13,13 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="ContainerElement"
     mc:Ignorable="d">
-
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Joufflu.Data;component/Schema/SchemaTreeView.xaml" />
+                <ResourceDictionary Source="/Joufflu.Data;component/Schema/Separators.xaml" />
             </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
 
-    <TreeView
-        DataContext="{Binding ElementName=ContainerElement}"
-        Grid.IsSharedSizeScope="True"
-        ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
-        ItemsSource="{Binding Root.Properties}">
-        <TreeView.Resources>
             <DataTemplate DataType="{x:Type local:SchemaObject}">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -213,30 +205,8 @@
                         <ColumnDefinition Width="22" />
                     </Grid.ColumnDefinitions>
 
-                    <Grid>
-
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        
-                        <ItemsControl ItemsSource="{Binding Element.ParentsTree}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border
-                                        Margin="8,0"
-                                        BorderBrush="{StaticResource {x:Static adonisUi:Brushes.Layer0BorderBrush}}"
-                                        BorderThickness="1,0,0,0" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <Grid Grid.Column="1" VerticalAlignment="Center">
+                    <local:Separators Element="{Binding Element}">
+                        <Grid VerticalAlignment="Center">
                             <TextBlock
                                 Name="NameText"
                                 Padding="4,0"
@@ -247,8 +217,12 @@
                                 Text="{Binding Name}"
                                 Visibility="Collapsed" />
                         </Grid>
-                    </Grid>
-                    <ContentControl Margin="0,2" Grid.Column="1" Content="{Binding Element}" />
+                    </local:Separators>
+
+                    <ContentControl
+                        Margin="0,2"
+                        Grid.Column="1"
+                        Content="{Binding Element}" />
                     <Button
                         Name="RemoveButton"
                         Grid.Column="2"
@@ -288,13 +262,25 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
 
-            <HierarchicalDataTemplate DataType="{x:Type local:SchemaParentProperty}" ItemsSource="{Binding ElementParent.Childrens}">
-                <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
-            </HierarchicalDataTemplate>
+            <local:SchemaTemplateSelector x:Key="SchemaTemplateSelector">
+                <local:SchemaTemplateSelector.ParentTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type local:SchemaProperty}" ItemsSource="{Binding Element.Childrens}">
+                        <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
+                    </HierarchicalDataTemplate>
+                </local:SchemaTemplateSelector.ParentTemplate>
+                <local:SchemaTemplateSelector.ElementTemplate>
+                    <DataTemplate DataType="{x:Type local:SchemaProperty}">
+                        <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
+                    </DataTemplate>
+                </local:SchemaTemplateSelector.ElementTemplate>
+            </local:SchemaTemplateSelector>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
-            <DataTemplate DataType="{x:Type local:SchemaProperty}">
-                <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
-            </DataTemplate>
-        </TreeView.Resources>
-    </TreeView>
+    <TreeView
+        ItemTemplateSelector="{StaticResource SchemaTemplateSelector}"
+        DataContext="{Binding ElementName=ContainerElement}"
+        Grid.IsSharedSizeScope="True"
+        ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
+        ItemsSource="{Binding Root.Properties}" />
 </UserControl>
