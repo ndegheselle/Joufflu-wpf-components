@@ -37,8 +37,11 @@ namespace Joufflu.Data.Schema
             var sub = new SchemaObject();
             sub.Add("sub", new SchemaValue() { DataType = EnumDataType.String });
 
+            var subArray = new SchemaObject();
+            subArray.Add("sub", new SchemaValue() { DataType = EnumDataType.String });
+
             Root.Add("tata", new SchemaValue() { DataType = EnumDataType.Boolean });
-            Root.Add("toto", new SchemaArray());
+            Root.Add("toto", new SchemaArray(subArray));
             Root.Add("titi", sub);
 
             InitializeComponent();

@@ -84,13 +84,14 @@ namespace Joufflu.Data.Schema
         public ICustomCommand UseArrayCommand { get; set; }
         public ICustomCommand UseObjectCommand { get; set; }
 
-        public SchemaArray(ISchemaParent? parent = null)
+        public SchemaArray(ISchemaElement elementType, ISchemaParent? parent = null)
         {
+            elementType.Parent = this;
             Parent = parent;
-            _type = new SchemaProperty("Type", new SchemaValue() { Parent = this }) { IsConst = true };
-            UseValueCommand = new DelegateCommand(() => Type = new SchemaProperty("Type", new SchemaValue() { Parent = this }) { IsConst = true });
-            UseArrayCommand = new DelegateCommand(() => Type = new SchemaProperty("Type", new SchemaArray() { Parent = this }) { IsConst = true });
-            UseObjectCommand = new DelegateCommand(() => Type = new SchemaProperty("Type", new SchemaObject() { Parent = this }) { IsConst = true });
+            _type = new SchemaProperty("Type", elementType) { IsConst = true };
+            UseValueCommand = new DelegateCommand(() => Type = new SchemaProperty("Type", new SchemaValue(this)) { IsConst = true });
+            UseArrayCommand = new DelegateCommand(() => Type = new SchemaProperty("Type", new SchemaArray(new SchemaValue(), this)) { IsConst = true });
+            UseObjectCommand = new DelegateCommand(() => Type = new SchemaProperty("Type", new SchemaObject(this)) { IsConst = true });
         }
 
         public IGenericNode ToValue() => new GenericArray(this);
@@ -129,7 +130,7 @@ namespace Joufflu.Data.Schema
         {
             Parent = parent;
             AddValueCommand = new DelegateCommand(() => Add("Default", new SchemaValue()));
-            AddArrayCommand = new DelegateCommand(() => Add("Default", new SchemaArray()));
+            AddArrayCommand = new DelegateCommand(() => Add("Default", new SchemaArray(new SchemaValue())));
             AddObjectCommand = new DelegateCommand(() => Add("Default", new SchemaObject()));
         }
 

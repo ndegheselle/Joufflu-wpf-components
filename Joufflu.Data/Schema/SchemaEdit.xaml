@@ -21,14 +21,13 @@
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate DataType="{x:Type local:SchemaObject}">
-                <Grid>
+                <Grid Height="20">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-
                     <local:IconDataType
-                        Margin="6,2"
+                        Margin="6,0"
                         Opacity="0.6"
                         Type="Object" />
                     <inputs:Dropdown
@@ -88,14 +87,14 @@
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type local:SchemaArray}">
-                <Grid>
+                <Grid Height="20">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
                     <local:IconDataType
-                        Margin="6,2"
+                        Margin="6,0"
                         Opacity="0.6"
                         Type="Array" />
                     <inputs:Dropdown
@@ -155,8 +154,8 @@
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type local:SchemaValue}">
-                <Grid>
-                    <local:IconDataType Margin="6,2,0,2" Type="{Binding DataType}" />
+                <Grid Height="20">
+                    <local:IconDataType Margin="6,0" Type="{Binding DataType}" />
                     <ComboBox
                         Name="TypeInput"
                         Width="100"

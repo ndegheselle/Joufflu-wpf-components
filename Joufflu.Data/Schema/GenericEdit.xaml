@@ -15,6 +15,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Joufflu.Data;component/Schema/SchemaTreeView.xaml" />
+                <ResourceDictionary Source="/Joufflu.Data;component/Schema/Separators.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <local:ValueTemplateSelector x:Key="ValueTemplateSelector">
@@ -49,9 +50,9 @@
                 x:Key="ObjectTemplate"
                 DataType="{x:Type local:GenericObject}"
                 ItemsSource="{Binding Properties}">
-                <local:Separators Element="{Binding Schema}">
+                <local:Separators Element="{Binding Schema}" Height="24">
                     <local:IconDataType
-                        Margin="6,2"
+                        Margin="4,2"
                         Opacity="0.6"
                         Type="Object" />
                 </local:Separators>
@@ -61,14 +62,14 @@
                 x:Key="ArrayTemplate"
                 DataType="{x:Type local:GenericArray}"
                 ItemsSource="{Binding Values}">
-                <Grid>
+                <Grid Height="24">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <local:Separators Element="{Binding Schema}">
                         <local:IconDataType
-                            Margin="6,2"
+                            Margin="4,2"
                             Opacity="0.6"
                             Type="Array" />
                     </local:Separators>
@@ -86,9 +87,9 @@
                 </Grid>
             </HierarchicalDataTemplate>
 
-            <DataTemplate x:Key="NodeTemplate" DataType="{x:Type local:IGenericNode}">
-                <local:Separators Element="{Binding Schema}">
-                    <TextBlock>ELEMAANT</TextBlock>
+            <DataTemplate x:Key="NodeTemplate" DataType="{x:Type local:GenericValue}">
+                <local:Separators Element="{Binding Schema}" Height="24">
+                    <ContentControl Margin="1" Content="{Binding}" ContentTemplateSelector="{StaticResource ValueTemplateSelector}" />
                 </local:Separators>
             </DataTemplate>
 
@@ -96,18 +97,18 @@
                 x:Key="ObjectKeyTemplate"
                 DataType="{x:Type collections:KeyValuePair`2}"
                 ItemsSource="{Binding Value.Properties}">
-                <Grid>
+                <Grid Height="24">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
                         <ColumnDefinition Width="100" />
                     </Grid.ColumnDefinitions>
 
                     <local:Separators Element="{Binding Value.Schema}">
-                        <TextBlock Text="{Binding Key}" />
+                        <TextBlock Text="{Binding Key}" VerticalAlignment="Center" />
                     </local:Separators>
                     <local:IconDataType
                         Grid.Column="1"
-                        Margin="6,2"
+                        Margin="4,0,0,0"
                         Opacity="0.6"
                         Type="Object" />
                 </Grid>
@@ -117,7 +118,7 @@
                 x:Key="ArrayKeyTemplate"
                 DataType="{x:Type collections:KeyValuePair`2}"
                 ItemsSource="{Binding Value.Values}">
-                <Grid>
+                <Grid Height="24">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
                         <ColumnDefinition Width="100" />
@@ -125,22 +126,23 @@
                     </Grid.ColumnDefinitions>
 
                     <local:Separators Element="{Binding Value.Schema}">
-                        <TextBlock Text="{Binding Key}" />
+                        <TextBlock Text="{Binding Key}" VerticalAlignment="Center" />
                     </local:Separators>
                     <local:IconDataType
                         Grid.Column="1"
-                        Margin="6,2"
+                        Margin="4,0,0,0"
                         Opacity="0.6"
                         Type="Array" />
 
                     <StackPanel
                         Orientation="Horizontal"
                         Grid.Column="2"
-                        HorizontalAlignment="Right">
+                        HorizontalAlignment="Right"
+                        Margin="2">
                         <Button Style="{StaticResource IconButtonSmall}" Command="{Binding Value.AddCommand}">
                             <fonts:Icon Text="{x:Static fonts:IconFont.Plus}" />
                         </Button>
-                        <Button Style="{StaticResource IconButtonSmall}" Command="{Binding Value.RemoveCommand}">
+                        <Button Margin="1,0,0,0" Style="{StaticResource IconButtonSmall}" Command="{Binding Value.RemoveCommand}">
                             <fonts:Icon Text="{x:Static fonts:IconFont.Trash}" />
                         </Button>
                     </StackPanel>
@@ -148,16 +150,20 @@
             </HierarchicalDataTemplate>
 
             <DataTemplate x:Key="NodeKeyTemplate" DataType="{x:Type collections:KeyValuePair`2}">
-                <Grid>
+                <Grid Height="24">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
-                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
                     <local:Separators Element="{Binding Value.Schema}">
-                        <TextBlock Text="{Binding Key}" />
+                        <TextBlock Text="{Binding Key}" VerticalAlignment="Center" />
                     </local:Separators>
-                    <TextBlock Grid.Column="1">ELAMAMAMAMAT</TextBlock>
+                    <ContentControl
+                        Grid.Column="1"
+                        Margin="4,2,2,2"
+                        Content="{Binding Value}"
+                        ContentTemplateSelector="{StaticResource ValueTemplateSelector}" />
                 </Grid>
             </DataTemplate>
 
@@ -178,5 +184,4 @@
         ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
         DataContext="{Binding ElementName=ContainerElement}"
         ItemsSource="{Binding Root.Properties}" />
-
 </UserControl>
