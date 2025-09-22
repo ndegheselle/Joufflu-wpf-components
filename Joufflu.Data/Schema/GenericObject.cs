@@ -3,13 +3,13 @@ using Usuel.Shared;
 
 namespace Joufflu.Data.Schema
 {
-    public interface IGenericNode
+    public interface IGenericElement
     {
         ISchemaElement? Schema { get; }
     }
-    public class GenericNode<TSchema> : IGenericNode where TSchema : ISchemaElement
+    public class GenericNode<TSchema> : IGenericElement where TSchema : ISchemaElement
     {
-        ISchemaElement? IGenericNode.Schema => Schema;
+        ISchemaElement? IGenericElement.Schema => Schema;
         public TSchema? Schema { get; protected set; }
     }
 
@@ -40,7 +40,7 @@ namespace Joufflu.Data.Schema
 
     public class GenericArray : GenericNode<SchemaArray>
     {
-        public ObservableCollection<IGenericNode> Values { get; set; } = [];
+        public ObservableCollection<IGenericElement> Values { get; set; } = [];
 
         public ICustomCommand AddCommand { get; set; }
         public ICustomCommand RemoveCommand { get; set; }
@@ -55,9 +55,9 @@ namespace Joufflu.Data.Schema
 
     public class GenericObject : GenericNode<SchemaObject>
     {
-        public Dictionary<string, IGenericNode> Properties { get; } = [];
+        public Dictionary<string, IGenericElement> Properties { get; } = [];
 
-        public GenericObject(SchemaObject schema, Dictionary<string, IGenericNode> properties)
+        public GenericObject(SchemaObject schema, Dictionary<string, IGenericElement> properties)
         {
             Schema = schema;
             Properties = properties;

@@ -21,7 +21,7 @@ namespace Joufflu.Data.Schema
     {
         ISchemaParent? Parent { get; set; }
         IEnumerable<ISchemaParent> ParentsTree { get; }
-        IGenericNode ToValue();
+        IGenericElement ToValue();
     }
 
     public class SchemaValue : ISchemaElement
@@ -36,7 +36,7 @@ namespace Joufflu.Data.Schema
         {
             Parent = parent;
         }
-        public IGenericNode ToValue() => new GenericValue(this);
+        public IGenericElement ToValue() => new GenericValue(this);
 
     }
 
@@ -94,7 +94,7 @@ namespace Joufflu.Data.Schema
             UseObjectCommand = new DelegateCommand(() => Type = new SchemaProperty("Type", new SchemaObject(this)) { IsConst = true });
         }
 
-        public IGenericNode ToValue() => new GenericArray(this);
+        public IGenericElement ToValue() => new GenericArray(this);
     }
 
     public class SchemaProperty
@@ -141,9 +141,9 @@ namespace Joufflu.Data.Schema
             return this;
         }
 
-        public IGenericNode ToValue()
+        public IGenericElement ToValue()
         {
-            Dictionary<string, IGenericNode> values = Properties.ToDictionary(
+            Dictionary<string, IGenericElement> values = Properties.ToDictionary(
                 prop => prop.Name ?? "",
                 prop => prop.Element.ToValue());
 

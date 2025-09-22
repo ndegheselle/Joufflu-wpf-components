@@ -3,6 +3,7 @@ using System.Windows.Controls;
 
 namespace Joufflu.Data.Schema
 {
+    #region Template selector
     public class SchemaTemplateSelector : DataTemplateSelector
     {
         public DataTemplate? ParentTemplate { get; set; }
@@ -21,6 +22,7 @@ namespace Joufflu.Data.Schema
             };
         }
     }
+    #endregion
 
     /// Logique d'interaction pour SchemaEdit.xaml
     /// </summary>
