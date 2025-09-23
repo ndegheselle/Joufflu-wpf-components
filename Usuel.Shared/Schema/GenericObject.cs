@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace Usuel.Shared.Schema
 {
@@ -6,7 +8,8 @@ namespace Usuel.Shared.Schema
     {
         ISchemaElement? Schema { get; }
     }
-    public class GenericNode<TSchema> : IGenericElement where TSchema : ISchemaElement
+
+    public abstract class GenericNode<TSchema> : IGenericElement where TSchema : ISchemaElement
     {
         ISchemaElement? IGenericElement.Schema => Schema;
         public TSchema? Schema { get; protected set; }
@@ -37,7 +40,7 @@ namespace Usuel.Shared.Schema
         }
     }
 
-    public class GenericArray : GenericNode<SchemaArray>
+    public class GenericArray : GenericNode<SchemaArray>, INotifyCollectionChanged, IEnumerable<IGenericElement>
     {
         public ObservableCollection<IGenericElement> Values { get; set; } = [];
 
@@ -50,9 +53,20 @@ namespace Usuel.Shared.Schema
             AddCommand = new DelegateCommand(() => Values.Add(Schema.Type.Element.ToValue()));
             RemoveCommand = new DelegateCommand(() => Values.RemoveAt(Values.Count - 1));
         }
+
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+
+        public IEnumerator<IGenericElement> GetEnumerator()
+        {
+            return Values.GetEnumerator();
+        }
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 
-    public class GenericObject : GenericNode<SchemaObject>
+    public class GenericObject : GenericNode<SchemaObject>, IEnumerable<IGenericElement>
     {
         public Dictionary<string, IGenericElement> Properties { get; } = [];
 
@@ -60,6 +74,16 @@ namespace Usuel.Shared.Schema
         {
             Schema = schema;
             Properties = properties;
+        }
+
+        public IEnumerator<IGenericElement> GetEnumerator()
+        {
+            return Properties.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }
