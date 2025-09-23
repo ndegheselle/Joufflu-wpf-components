@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
-using Usuel.Shared;
 
-namespace Joufflu.Data.Schema
+namespace Usuel.Shared.Schema
 {
     public interface IGenericElement
     {
@@ -29,7 +28,7 @@ namespace Joufflu.Data.Schema
             return dataType switch
             {
                 EnumDataType.String => "",
-                EnumDataType.Decimal => 0.0,
+                EnumDataType.Decimal => 0.0m,
                 EnumDataType.Boolean => false,
                 EnumDataType.DateTime => DateTime.Now,
                 EnumDataType.TimeSpan => new TimeSpan(),

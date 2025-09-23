@@ -8,6 +8,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:extensions="clr-namespace:Joufflu.Shared.Extensions;assembly=Joufflu.Shared"
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
+    xmlns:schema="clr-namespace:Usuel.Shared.Schema;assembly=Usuel.Shared"
     xmlns:inputs="clr-namespace:Joufflu.Inputs;assembly=Joufflu.Inputs"
     xmlns:local="clr-namespace:Joufflu.Data.Schema"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -20,7 +21,7 @@
                 <ResourceDictionary Source="/Joufflu.Data;component/Schema/Separators.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <DataTemplate DataType="{x:Type local:SchemaObject}">
+            <DataTemplate DataType="{x:Type schema:SchemaObject}">
                 <Grid Height="20">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100" />
@@ -86,7 +87,7 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type local:SchemaArray}">
+            <DataTemplate DataType="{x:Type schema:SchemaArray}">
                 <Grid Height="20">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100" />
@@ -153,7 +154,7 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type local:SchemaValue}">
+            <DataTemplate DataType="{x:Type schema:SchemaValue}">
                 <Grid Height="20">
                     <local:IconDataType Margin="6,0" Type="{Binding DataType}" />
                     <ComboBox
@@ -162,7 +163,7 @@
                         Margin="2,0,0,0"
                         Padding="4,2"
                         HorizontalAlignment="Left"
-                        ItemsSource="{extensions:EnumValuesExtension {x:Type local:EnumDataType},
+                        ItemsSource="{extensions:EnumValuesExtension {x:Type schema:EnumDataType},
                                                                      IgnoreElements=2}"
                         SelectedItem="{Binding DataType, Mode=TwoWay}"
                         Visibility="Collapsed">
@@ -196,7 +197,7 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
 
-            <DataTemplate x:Key="SharedSchemaTemplate" DataType="{x:Type local:SchemaProperty}">
+            <DataTemplate x:Key="SharedSchemaTemplate" DataType="{x:Type schema:SchemaProperty}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
@@ -263,12 +264,12 @@
 
             <local:SchemaTemplateSelector x:Key="SchemaTemplateSelector">
                 <local:SchemaTemplateSelector.ParentTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type local:SchemaProperty}" ItemsSource="{Binding Element.Childrens}">
+                    <HierarchicalDataTemplate DataType="{x:Type schema:SchemaProperty}" ItemsSource="{Binding Element.Childrens}">
                         <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
                     </HierarchicalDataTemplate>
                 </local:SchemaTemplateSelector.ParentTemplate>
                 <local:SchemaTemplateSelector.ElementTemplate>
-                    <DataTemplate DataType="{x:Type local:SchemaProperty}">
+                    <DataTemplate DataType="{x:Type schema:SchemaProperty}">
                         <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
                     </DataTemplate>
                 </local:SchemaTemplateSelector.ElementTemplate>

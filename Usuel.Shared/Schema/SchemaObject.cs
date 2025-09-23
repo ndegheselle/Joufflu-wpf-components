@@ -1,10 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using Usuel.Shared;
 
-namespace Joufflu.Data.Schema
+namespace Usuel.Shared.Schema
 {
     public enum EnumDataType
     {
@@ -30,10 +30,11 @@ namespace Joufflu.Data.Schema
         public ISchemaParent? Parent { get; set; }
         [JsonIgnore]
         public IEnumerable<ISchemaParent> ParentsTree => Parent?.Parent == null ? [] : [..Parent.ParentsTree, Parent];
-        public EnumDataType DataType { get; set; } = EnumDataType.String;
+        public EnumDataType DataType { get; set; }
 
-        public SchemaValue(ISchemaParent? parent = null)
+        public SchemaValue(EnumDataType dataType = EnumDataType.String, ISchemaParent? parent = null)
         {
+            DataType = dataType;
             Parent = parent;
         }
         public IGenericElement ToValue() => new GenericValue(this);
@@ -89,7 +90,7 @@ namespace Joufflu.Data.Schema
             elementType.Parent = this;
             Parent = parent;
             _type = new SchemaProperty("Type", elementType) { IsConst = true };
-            UseValueCommand = new DelegateCommand(() => Type = new SchemaProperty("Type", new SchemaValue(this)) { IsConst = true });
+            UseValueCommand = new DelegateCommand(() => Type = new SchemaProperty("Type", new SchemaValue(EnumDataType.String, this)) { IsConst = true });
             UseArrayCommand = new DelegateCommand(() => Type = new SchemaProperty("Type", new SchemaArray(new SchemaValue(), this)) { IsConst = true });
             UseObjectCommand = new DelegateCommand(() => Type = new SchemaProperty("Type", new SchemaObject(this)) { IsConst = true });
         }

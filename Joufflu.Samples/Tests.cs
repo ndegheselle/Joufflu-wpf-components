@@ -1,4 +1,5 @@
-﻿using Usuel.Shared;
+﻿using System.Reflection.Emit;
+using Usuel.Shared;
 
 namespace Joufflu.Samples
 {
@@ -34,6 +35,12 @@ namespace Joufflu.Samples
         public override int GetHashCode() { return Name.GetHashCode(); }
     }
 
+    public class TestClassWithSub
+    {
+        public List<string> StringArray { get; set; } = new List<string>();
+        public List<TestClass> ArraySub { get; set; } = new List<TestClass>();
+        public TestClass Sub { get; set; } = new TestClass("tata", 10);
+    }
 
     public static class Tests
     {

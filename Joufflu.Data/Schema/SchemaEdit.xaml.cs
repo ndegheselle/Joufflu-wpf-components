@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using Usuel.Shared.Schema;
 
 namespace Joufflu.Data.Schema
 {
@@ -7,6 +8,7 @@ namespace Joufflu.Data.Schema
     public class SchemaTemplateSelector : DataTemplateSelector
     {
         public DataTemplate? ParentTemplate { get; set; }
+
         public DataTemplate? ElementTemplate { get; set; }
 
         public override DataTemplate? SelectTemplate(object item, DependencyObject container)
@@ -28,24 +30,19 @@ namespace Joufflu.Data.Schema
     /// </summary>
     public partial class SchemaEdit : UserControl
     {
-        public SchemaObject Root { get; set; }
+        public static readonly DependencyProperty RootProperty =
+            DependencyProperty.Register(nameof(Root), typeof(SchemaObject), typeof(SchemaEdit), new PropertyMetadata(null));
+
+        public SchemaObject Root
+        {
+            get { return (SchemaObject)GetValue(RootProperty); }
+            set { SetValue(RootProperty, value); }
+        }
 
         public bool IsReadOnly { get; set; }
 
         public SchemaEdit()
         {
-            Root = new SchemaObject();
-
-            var sub = new SchemaObject();
-            sub.Add("sub", new SchemaValue() { DataType = EnumDataType.String });
-
-            var subArray = new SchemaObject();
-            subArray.Add("sub", new SchemaValue() { DataType = EnumDataType.String });
-
-            Root.Add("tata", new SchemaValue() { DataType = EnumDataType.Boolean });
-            Root.Add("toto", new SchemaArray(subArray));
-            Root.Add("titi", sub);
-
             InitializeComponent();
         }
     }

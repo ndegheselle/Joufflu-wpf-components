@@ -1,9 +1,8 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Usuel.Shared.Schema;
 
 namespace Joufflu.Data.Schema
 {
@@ -13,20 +12,14 @@ namespace Joufflu.Data.Schema
         public DataTemplate? ObjectKeyTemplate { get; set; }
         public DataTemplate? ArrayKeyTemplate { get; set; }
         public DataTemplate? NodeKeyTemplate { get; set; }
-        public DataTemplate? ObjectTemplate { get; set; }
-        public DataTemplate? ArrayTemplate { get; set; }
-        public DataTemplate? NodeTemplate { get; set; }
 
         public override DataTemplate? SelectTemplate(object item, DependencyObject container)
         {
             return item switch
             {
-                _ when item is GenericObject => ObjectTemplate,
-                _ when item is GenericArray => ArrayTemplate,
-                _ when item is GenericValue => NodeTemplate,
-                _ when item is KeyValuePair<string, IGenericElement> keyValue && keyValue.Value is GenericObject => ObjectKeyTemplate,
-                _ when item is KeyValuePair<string, IGenericElement> keyValue && keyValue.Value is GenericArray => ArrayKeyTemplate,
-                _ when item is KeyValuePair<string, IGenericElement> keyValue && keyValue.Value is GenericValue => NodeKeyTemplate,
+                _ when item is PropertyWrapper prop && prop.Element is GenericObject => ObjectKeyTemplate,
+                _ when item is PropertyWrapper prop && prop.Element is GenericArray => ArrayKeyTemplate,
+                _ when item is PropertyWrapper prop && prop.Element is GenericValue => NodeKeyTemplate,
                 _ => base.SelectTemplate(item, container)
             };
         }
@@ -59,6 +52,8 @@ namespace Joufflu.Data.Schema
 
     #endregion
 
+    #region Converters
+
     public class WrapValuesConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
@@ -66,19 +61,21 @@ namespace Joufflu.Data.Schema
             if (value is GenericArray array)
             {
                 ObservableCollection<PropertyWrapper> wrappers = [];
-                for(int i = 0; i <= array.Values.Count; i++)
+                void AddElements(ObservableCollection<IGenericElement> _values, ObservableCollection<PropertyWrapper> _wrappers)
                 {
-                    wrappers.Add(new PropertyWrapper(i.ToString(), array.Values[i]));
+                    for (int i = 0; i < _values.Count; i++)
+                    {
+                        _wrappers.Add(new PropertyWrapper((i + 1).ToString(), _values[i]));
+                    }
                 }
 
+                AddElements(array.Values, wrappers);
                 array.Values.CollectionChanged += (obj, args) =>
                 {
                     wrappers.Clear();
-                    for (int i = 0; i <= array.Values.Count; i++)
-                    {
-                        wrappers.Add(new PropertyWrapper(i.ToString(), array.Values[i]));
-                    }
+                    AddElements(array.Values, wrappers);
                 };
+                return wrappers;
             }
             else if (value is GenericObject obj)
             {
@@ -98,6 +95,7 @@ namespace Joufflu.Data.Schema
             return value;
         }
     }
+    #endregion
 
     public class PropertyWrapper
     {
@@ -126,23 +124,17 @@ namespace Joufflu.Data.Schema
     /// </summary>
     public partial class GenericEdit : UserControl
     {
-        public GenericObject Root { get; set; }
+        public static readonly DependencyProperty RootProperty =
+            DependencyProperty.Register(nameof(Root), typeof(GenericObject), typeof(GenericEdit), new PropertyMetadata(null));
+
+        public GenericObject Root
+        {
+            get { return (GenericObject)GetValue(RootProperty); }
+            set { SetValue(RootProperty, value); }
+        }
+
         public GenericEdit()
         {
-            var root = new SchemaObject();
-
-            var sub = new SchemaObject();
-            sub.Add("sub", new SchemaValue() { DataType = EnumDataType.String });
-
-            var subArray = new SchemaObject();
-            subArray.Add("sub", new SchemaValue() { DataType = EnumDataType.String });
-
-            root.Add("tata", new SchemaValue() { DataType = EnumDataType.Boolean });
-            root.Add("toto", new SchemaArray(subArray) );
-            root.Add("titi", sub);
-
-            Root = (GenericObject)root.ToValue();
-
             InitializeComponent();
         }
     }

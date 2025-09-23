@@ -7,6 +7,7 @@
     xmlns:local="clr-namespace:Joufflu.Data.Schema"
     xmlns:inputs="clr-namespace:Joufflu.Inputs;assembly=Joufflu.Inputs"
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+    xmlns:schema="clr-namespace:Usuel.Shared.Schema;assembly=Usuel.Shared"
     xmlns:collections="clr-namespace:System.Collections.Generic;assembly=System.Runtime"
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     mc:Ignorable="d"
@@ -20,91 +21,46 @@
 
             <local:ValueTemplateSelector x:Key="ValueTemplateSelector">
                 <local:ValueTemplateSelector.StringTemplate>
-                    <DataTemplate DataType="{x:Type local:GenericValue}">
+                    <DataTemplate DataType="{x:Type schema:GenericValue}">
                         <TextBox Padding="4,2" Text="{Binding Value, Mode=TwoWay}" />
                     </DataTemplate>
                 </local:ValueTemplateSelector.StringTemplate>
                 <local:ValueTemplateSelector.BooleanTemplate>
-                    <DataTemplate DataType="{x:Type local:GenericValue}">
+                    <DataTemplate DataType="{x:Type schema:GenericValue}">
                         <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" />
                     </DataTemplate>
                 </local:ValueTemplateSelector.BooleanTemplate>
                 <local:ValueTemplateSelector.DecimalTemplate>
-                    <DataTemplate DataType="{x:Type local:GenericValue}">
+                    <DataTemplate DataType="{x:Type schema:GenericValue}">
                         <inputs:DecimalUpDown Value="{Binding Value, Mode=TwoWay}" />
                     </DataTemplate>
                 </local:ValueTemplateSelector.DecimalTemplate>
                 <local:ValueTemplateSelector.DateTimeTemplate>
-                    <DataTemplate DataType="{x:Type local:GenericValue}">
-                        <Calendar SelectedDate="{Binding Value, Mode=TwoWay}" />
+                    <DataTemplate DataType="{x:Type schema:GenericValue}">
+                        <DatePicker SelectedDate="{Binding Value, Mode=TwoWay}" />
                     </DataTemplate>
                 </local:ValueTemplateSelector.DateTimeTemplate>
                 <local:ValueTemplateSelector.TimeSpanTemplate>
-                    <DataTemplate DataType="{x:Type local:GenericValue}">
+                    <DataTemplate DataType="{x:Type schema:GenericValue}">
                         <inputs:TimeSpanPicker Value="{Binding Value, Mode=TwoWay}" />
                     </DataTemplate>
                 </local:ValueTemplateSelector.TimeSpanTemplate>
             </local:ValueTemplateSelector>
 
-            <HierarchicalDataTemplate
-                x:Key="ObjectTemplate"
-                DataType="{x:Type local:GenericObject}"
-                ItemsSource="{Binding Properties}">
-                <local:Separators Element="{Binding Schema}" Height="24">
-                    <local:IconDataType
-                        Margin="4,2"
-                        Opacity="0.6"
-                        Type="Object" />
-                </local:Separators>
-            </HierarchicalDataTemplate>
-
-            <HierarchicalDataTemplate
-                x:Key="ArrayTemplate"
-                DataType="{x:Type local:GenericArray}"
-                ItemsSource="{Binding Values}">
-                <Grid Height="24">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <local:Separators Element="{Binding Schema}">
-                        <local:IconDataType
-                            Margin="4,2"
-                            Opacity="0.6"
-                            Type="Array" />
-                    </local:Separators>
-                    <StackPanel
-                        Orientation="Horizontal"
-                        Grid.Column="2"
-                        HorizontalAlignment="Right">
-                        <Button Style="{StaticResource IconButtonSmall}" Command="{Binding AddCommand}">
-                            <fonts:Icon Text="{x:Static fonts:IconFont.Plus}" />
-                        </Button>
-                        <Button Style="{StaticResource IconButtonSmall}" Command="{Binding RemoveCommand}">
-                            <fonts:Icon Text="{x:Static fonts:IconFont.Trash}" />
-                        </Button>
-                    </StackPanel>
-                </Grid>
-            </HierarchicalDataTemplate>
-
-            <DataTemplate x:Key="NodeTemplate" DataType="{x:Type local:GenericValue}">
-                <local:Separators Element="{Binding Schema}" Height="24">
-                    <ContentControl Margin="1" Content="{Binding}" ContentTemplateSelector="{StaticResource ValueTemplateSelector}" />
-                </local:Separators>
-            </DataTemplate>
+            <local:WrapValuesConverter x:Key="WrapValuesConverter" />
 
             <HierarchicalDataTemplate
                 x:Key="ObjectKeyTemplate"
-                DataType="{x:Type collections:KeyValuePair`2}"
-                ItemsSource="{Binding Value.Properties}">
-                <Grid Height="24">
+                DataType="{x:Type local:PropertyWrapper}"
+                ItemsSource="{Binding Element, Converter={StaticResource WrapValuesConverter}}">
+                <Grid Height="26">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
                         <ColumnDefinition Width="100" />
                     </Grid.ColumnDefinitions>
 
-                    <local:Separators Element="{Binding Value.Schema}">
-                        <TextBlock Text="{Binding Key}" VerticalAlignment="Center" />
+                    <local:Separators Element="{Binding Element.Schema}">
+                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
                     </local:Separators>
                     <local:IconDataType
                         Grid.Column="1"
@@ -116,17 +72,17 @@
 
             <HierarchicalDataTemplate
                 x:Key="ArrayKeyTemplate"
-                DataType="{x:Type collections:KeyValuePair`2}"
-                ItemsSource="{Binding Value.Values}">
-                <Grid Height="24">
+                DataType="{x:Type local:PropertyWrapper}"
+                ItemsSource="{Binding Element, Converter={StaticResource WrapValuesConverter}}">
+                <Grid Height="26">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
                         <ColumnDefinition Width="100" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
-                    <local:Separators Element="{Binding Value.Schema}">
-                        <TextBlock Text="{Binding Key}" VerticalAlignment="Center" />
+                    <local:Separators Element="{Binding Element.Schema}">
+                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
                     </local:Separators>
                     <local:IconDataType
                         Grid.Column="1"
@@ -135,34 +91,37 @@
                         Type="Array" />
 
                     <StackPanel
+                        Margin="2"
                         Orientation="Horizontal"
                         Grid.Column="2"
-                        HorizontalAlignment="Right"
-                        Margin="2">
-                        <Button Style="{StaticResource IconButtonSmall}" Command="{Binding Value.AddCommand}">
+                        HorizontalAlignment="Right">
+                        <Button Style="{StaticResource IconButtonSmall}" Command="{Binding Element.AddCommand}">
                             <fonts:Icon Text="{x:Static fonts:IconFont.Plus}" />
                         </Button>
-                        <Button Margin="1,0,0,0" Style="{StaticResource IconButtonSmall}" Command="{Binding Value.RemoveCommand}">
+                        <Button
+                            Margin="1,0,0,0"
+                            Style="{StaticResource IconButtonSmall}"
+                            Command="{Binding Element.RemoveCommand}">
                             <fonts:Icon Text="{x:Static fonts:IconFont.Trash}" />
                         </Button>
                     </StackPanel>
                 </Grid>
             </HierarchicalDataTemplate>
 
-            <DataTemplate x:Key="NodeKeyTemplate" DataType="{x:Type collections:KeyValuePair`2}">
-                <Grid Height="24">
+            <DataTemplate x:Key="NodeKeyTemplate" DataType="{x:Type local:PropertyWrapper}">
+                <Grid Height="26">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
-                    <local:Separators Element="{Binding Value.Schema}">
-                        <TextBlock Text="{Binding Key}" VerticalAlignment="Center" />
+                    <local:Separators Element="{Binding Element.Schema}">
+                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
                     </local:Separators>
                     <ContentControl
                         Grid.Column="1"
-                        Margin="4,2,2,2"
-                        Content="{Binding Value}"
+                        Margin="4,1,1,1"
+                        Content="{Binding Element}"
                         ContentTemplateSelector="{StaticResource ValueTemplateSelector}" />
                 </Grid>
             </DataTemplate>
@@ -171,10 +130,7 @@
                 x:Key="GenericTemplateSelector"
                 ObjectKeyTemplate="{StaticResource ObjectKeyTemplate}"
                 ArrayKeyTemplate="{StaticResource ArrayKeyTemplate}"
-                NodeKeyTemplate="{StaticResource NodeKeyTemplate}"
-                ObjectTemplate="{StaticResource ObjectTemplate}"
-                ArrayTemplate="{StaticResource ArrayTemplate}"
-                NodeTemplate="{StaticResource NodeTemplate}" />
+                NodeKeyTemplate="{StaticResource NodeKeyTemplate}" />
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -183,5 +139,5 @@
         ItemTemplateSelector="{StaticResource GenericTemplateSelector}"
         ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
         DataContext="{Binding ElementName=ContainerElement}"
-        ItemsSource="{Binding Root.Properties}" />
+        ItemsSource="{Binding Root, Converter={StaticResource WrapValuesConverter}}" />
 </UserControl>
