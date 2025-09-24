@@ -5,17 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace Usuel.Shared.Schema
 {
-    public enum EnumDataType
-    {
-        Object,
-        Array,
-        String,
-        Decimal,
-        Boolean,
-        DateTime,
-        TimeSpan
-    }
-
+    /*
     public interface ISchemaElement
     {
         ISchemaParent? Parent { get; set; }
@@ -179,4 +169,5 @@ namespace Usuel.Shared.Schema
             return uniqueName;
         }
     }
+    */
 }

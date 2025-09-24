@@ -8,7 +8,7 @@ namespace Usuel.Shared.Schema
         public SchemaDefinitionException(string message) : base(message)
         { }
     }
-
+    /*
     public static class SchemaExtensions
     {
         /// <summary>
@@ -93,4 +93,5 @@ namespace Usuel.Shared.Schema
             return @object;
         }
     }
+    */
 }

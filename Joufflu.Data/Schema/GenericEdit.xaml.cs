@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Usuel.Shared;
 using Usuel.Shared.Schema;
 
 namespace Joufflu.Data.Schema
@@ -17,9 +18,9 @@ namespace Joufflu.Data.Schema
         {
             return item switch
             {
-                _ when item is PropertyWrapper prop && prop.Element is GenericObject => ObjectKeyTemplate,
-                _ when item is PropertyWrapper prop && prop.Element is GenericArray => ArrayKeyTemplate,
-                _ when item is PropertyWrapper prop && prop.Element is GenericValue => NodeKeyTemplate,
+                _ when item is GenericProperty prop && prop.Element is GenericObject => ObjectKeyTemplate,
+                _ when item is GenericProperty prop && prop.Element is GenericArray => ArrayKeyTemplate,
+                _ when item is GenericProperty prop && prop.Element is GenericValue => NodeKeyTemplate,
                 _ => base.SelectTemplate(item, container)
             };
         }
@@ -38,7 +39,7 @@ namespace Joufflu.Data.Schema
             if (item is not GenericValue value)
                 throw new InvalidOperationException($"The item must be of type '{typeof(GenericValue)}'.");
             
-            return value.Schema?.DataType switch
+            return value.DataType switch
             {
                 EnumDataType.String => StringTemplate,
                 EnumDataType.Decimal => DecimalTemplate,
@@ -54,34 +55,34 @@ namespace Joufflu.Data.Schema
 
     #region Converters
 
+    public class GenericProperty
+    {
+        public object Identifier { get; set; }
+        public IGenericElement Element { get; }
+        public bool IsConst { get; set; } = false;
+        public ICustomCommand RemoveCommand { get; }
+
+        public GenericProperty(object identifier, IGenericElement element)
+        {
+            Identifier = identifier;
+            Element = element;
+            RemoveCommand = new DelegateCommand(() => Element.Parent?.Remove(this), () => IsConst == false);
+        }
+    }
+
     public class WrapValuesConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is GenericArray array)
+            return value switch
             {
-                ObservableCollection<PropertyWrapper> wrappers = [];
-                void AddElements(ObservableCollection<IGenericElement> _values, ObservableCollection<PropertyWrapper> _wrappers)
-                {
-                    for (int i = 0; i < _values.Count; i++)
-                    {
-                        _wrappers.Add(new PropertyWrapper((i + 1).ToString(), _values[i]));
-                    }
-                }
-
-                AddElements(array.Values, wrappers);
-                array.Values.CollectionChanged += (obj, args) =>
-                {
-                    wrappers.Clear();
-                    AddElements(array.Values, wrappers);
-                };
-                return wrappers;
-            }
-            else if (value is GenericObject obj)
-            {
-                return obj.Properties.Select(x => new PropertyWrapper(x.Key, x.Value));
-            }
-            return new List<PropertyWrapper>();
+                _ when value is GenericObject obj => obj.Properties.Select(x => new GenericProperty(x.Key, x.Value)),
+                _ when value is GenericArray array => [
+                    new GenericProperty("Schema", array.Schema) { IsConst = true },
+                    ..array.Values.Select((val, index) => new GenericProperty(index, val))
+                ],
+                _ => null
+            };
         }
 
         public object ConvertBack(
@@ -97,28 +98,6 @@ namespace Joufflu.Data.Schema
     }
     #endregion
 
-    public class PropertyWrapper
-    {
-        public string Name { get; }
-        public IGenericElement Element { get; }
-
-        public PropertyWrapper(string name, IGenericElement element)
-        {
-            Name = name;
-            Element = element;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return Element.Equals(obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return Element.GetHashCode();
-        }
-    }
-
     /// <summary>
     /// Logique d'interaction pour GenericEdit.xaml
     /// </summary>
@@ -132,6 +111,10 @@ namespace Joufflu.Data.Schema
             get { return (GenericObject)GetValue(RootProperty); }
             set { SetValue(RootProperty, value); }
         }
+
+        public bool IsReadOnly { get; set; }
+        public bool WithSchemaEdit { get; set; }
+        public bool WithValueEdit { get; set; }
 
         public GenericEdit()
         {
