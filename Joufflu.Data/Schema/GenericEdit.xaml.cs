@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using Usuel.Shared;
@@ -10,17 +9,15 @@ namespace Joufflu.Data.Schema
     #region Template selector
     public class GenericTemplateSelector : DataTemplateSelector
     {
-        public DataTemplate? ObjectKeyTemplate { get; set; }
-        public DataTemplate? ArrayKeyTemplate { get; set; }
-        public DataTemplate? NodeKeyTemplate { get; set; }
+        public DataTemplate? ParentTemplate { get; set; }
+        public DataTemplate? ElementTemplate { get; set; }
 
         public override DataTemplate? SelectTemplate(object item, DependencyObject container)
         {
             return item switch
             {
-                _ when item is GenericProperty prop && prop.Element is GenericObject => ObjectKeyTemplate,
-                _ when item is GenericProperty prop && prop.Element is GenericArray => ArrayKeyTemplate,
-                _ when item is GenericProperty prop && prop.Element is GenericValue => NodeKeyTemplate,
+                _ when item is GenericProperty prop && prop.Element is IGenericParent => ParentTemplate,
+                _ when item is GenericProperty prop && prop.Element is IGenericElement => ElementTemplate,
                 _ => base.SelectTemplate(item, container)
             };
         }
@@ -53,51 +50,6 @@ namespace Joufflu.Data.Schema
 
     #endregion
 
-    #region Converters
-
-    public class GenericProperty
-    {
-        public object Identifier { get; set; }
-        public IGenericElement Element { get; }
-        public bool IsConst { get; set; } = false;
-        public ICustomCommand RemoveCommand { get; }
-
-        public GenericProperty(object identifier, IGenericElement element)
-        {
-            Identifier = identifier;
-            Element = element;
-            RemoveCommand = new DelegateCommand(() => Element.Parent?.Remove(this), () => IsConst == false);
-        }
-    }
-
-    public class WrapValuesConverter : IValueConverter
-    {
-        public object? Convert(object? value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return value switch
-            {
-                _ when value is GenericObject obj => obj.Properties.Select(x => new GenericProperty(x.Key, x.Value)),
-                _ when value is GenericArray array => [
-                    new GenericProperty("Schema", array.Schema) { IsConst = true },
-                    ..array.Values.Select((val, index) => new GenericProperty(index, val))
-                ],
-                _ => null
-            };
-        }
-
-        public object ConvertBack(
-            object value,
-            Type targetType,
-            object parameter,
-            System.Globalization.CultureInfo culture)
-        {
-            if (value is bool booleanValue)
-                return !booleanValue;
-            return value;
-        }
-    }
-    #endregion
-
     /// <summary>
     /// Logique d'interaction pour GenericEdit.xaml
     /// </summary>
@@ -118,6 +70,12 @@ namespace Joufflu.Data.Schema
 
         public GenericEdit()
         {
+            Root = new GenericObject();
+
+            Root.CreateProperty("tata", EnumDataType.String);
+            Root.CreateProperty("toto", EnumDataType.Array);
+            Root.CreateProperty("titi", EnumDataType.Object);
+
             InitializeComponent();
         }
     }

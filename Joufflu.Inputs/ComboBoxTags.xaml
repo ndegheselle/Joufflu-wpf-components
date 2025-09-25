@@ -53,7 +53,9 @@
                                                         Background="Transparent"
                                                         Command="{Binding RemoveSelectedCmd, RelativeSource={RelativeSource AncestorType=local:ComboBoxTags}}"
                                                         CommandParameter="{Binding}"
-                                                        Style="{StaticResource IconButtonSmall}">
+                                                        Style="{StaticResource IconButtonSmall}"
+                                                        Height="20"
+                                                        Width="20">
                                                         <fonts:Icon FontSize="10" Text="{x:Static fonts:IconFont.X}" />
                                                     </Button>
 

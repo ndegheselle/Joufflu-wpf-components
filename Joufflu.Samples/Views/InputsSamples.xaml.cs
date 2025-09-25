@@ -13,6 +13,8 @@ namespace Joufflu.Samples.Views
         public List<TestClass> ComboBoxSearchValues { get; private set; } = Tests.Values;
         public List<TestClass> ComboBoxTagsValues { get; private set; } = Tests.Values;
 
+        public TestClass Value { get; private set; } = Tests.Value;
+
         public ObservableCollection<TestClass> SelectedTestValues
         {
             get;

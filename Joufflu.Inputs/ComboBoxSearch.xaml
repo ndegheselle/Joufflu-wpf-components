@@ -105,12 +105,11 @@
                             <Button
                                 Grid.Column="1"
                                 Name="ClearButton"
-                                Margin="0,1"
                                 Padding="6,5"
                                 Command="{Binding ClearCommand, RelativeSource={RelativeSource TemplatedParent}}"
                                 Focusable="False"
-                                Style="{StaticResource IconButton}">
-                                <fonts:Icon Text="{x:Static fonts:IconFont.X}" />
+                                Style="{StaticResource IconButtonSmall}">
+                                <fonts:Icon Text="{x:Static fonts:IconFont.X}" FontSize="10" />
                             </Button>
                             <ToggleButton
                                 Grid.Column="2"

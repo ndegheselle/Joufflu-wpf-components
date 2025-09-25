@@ -10,7 +10,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     d:DesignWidth="800"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    x:Name="ContainerElement">
     <layouts:FlexibleGrid
         Columns="3"
         ColumnsWidth="200,*,*"
@@ -92,7 +93,7 @@
         </Button>
 
         <TextBlock>Text editable</TextBlock>
-        <inputs:TextEditable x:Name="TextEditableInput" />
+        <inputs:TextEditable x:Name="TextEditableInput" Text="{Binding Value.Name, ElementName=ContainerElement}" />
         <TextBlock VerticalAlignment="Center" Text="{Binding Text, ElementName=TextEditableInput}" />
 
         <TextBlock>Search</TextBlock>
@@ -108,7 +109,7 @@
                         <ColumnDefinition Width="20" />
                     </Grid.ColumnDefinitions>
                     <TextBlock>DropDown</TextBlock>
-                    <fonts:Icon  Grid.Column="1" Text="{x:Static fonts:IconFont.CaretDown}" />
+                    <fonts:Icon Grid.Column="1" Text="{x:Static fonts:IconFont.CaretDown}" />
                 </Grid>
             </inputs:Dropdown.Header>
             <StackPanel>

@@ -22,7 +22,7 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border
-                                        Margin="4,0,8,0"
+                                        Margin="8,0"
                                         BorderBrush="{StaticResource {x:Static adonisUi:Brushes.Layer0BorderBrush}}"
                                         BorderThickness="1,0,0,0" />
                                 </DataTemplate>
