@@ -5,9 +5,9 @@
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
     xmlns:collections="clr-namespace:System.Collections.Generic;assembly=System.Runtime"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:extensions="clr-namespace:Joufflu.Shared.Extensions;assembly=Joufflu.Shared"
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:inputs="clr-namespace:Joufflu.Inputs;assembly=Joufflu.Inputs"
-    xmlns:extensions="clr-namespace:Joufflu.Shared.Extensions;assembly=Joufflu.Shared"
     xmlns:local="clr-namespace:Joufflu.Data.Schema"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:schema="clr-namespace:Usuel.Shared.Schema;assembly=Usuel.Shared"
@@ -54,10 +54,10 @@
                         <ColumnDefinition Width="100" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <local:IconDataType Type="{Binding DataType}" Margin="10,0,0,0" />
+                    <local:IconDataType Margin="10,0,0,0" Type="{Binding DataType}" />
                     <ComboBox
-                        Margin="2,1"
                         Name="TypeInput"
+                        Margin="2,1"
                         ItemsSource="{extensions:EnumValuesExtension {x:Type schema:EnumDataType},
                                                                      IgnoreElements=2}"
                         SelectedItem="{Binding DataType, Mode=TwoWay}"
@@ -70,8 +70,8 @@
                     </ComboBox>
 
                     <ContentControl
-                        Margin="0,1,2,1"
                         Grid.Column="1"
+                        Margin="0,1,2,1"
                         Content="{Binding}"
                         ContentTemplateSelector="{StaticResource ValueTemplateSelector}" />
                 </Grid>
@@ -106,9 +106,9 @@
                     </Grid.ColumnDefinitions>
 
                     <local:IconDataType
+                        Margin="10,0,0,0"
                         Opacity="0.6"
-                        Type="Array"
-                        Margin="10,0,0,0" />
+                        Type="Array" />
 
                     <StackPanel
                         Name="ActionContainer"
@@ -117,13 +117,14 @@
                         Orientation="Horizontal"
                         Visibility="Collapsed">
                         <Button
-                            Command="{Binding AddValueCommand}"
-                            Style="{StaticResource IconButton}"
+                            ToolTip="Add value"
+                            Width="24"
                             Height="24"
-                            Width="24">
+                            Command="{Binding AddValueCommand}"
+                            Style="{StaticResource IconButton}">
                             <fonts:Icon Text="{x:Static fonts:IconFont.Plus}" />
                         </Button>
-                        <inputs:Dropdown BorderThickness="0">
+                        <inputs:Dropdown BorderThickness="0" ToolTip="Change type">
                             <inputs:Dropdown.Header>
                                 <fonts:Icon Text="{x:Static fonts:IconFont.Pen}" />
                             </inputs:Dropdown.Header>
@@ -189,16 +190,17 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <local:IconDataType
+                        Margin="10,0,0,0"
                         Opacity="0.6"
-                        Type="Object"
-                        Margin="10,0,0,0" />
+                        Type="Object" />
 
                     <inputs:Dropdown
                         Name="ActionContainer"
                         Grid.Column="1"
                         HorizontalAlignment="Right"
                         BorderThickness="0"
-                        Visibility="Collapsed">
+                        Visibility="Collapsed"
+                        ToolTip="Add property">
                         <inputs:Dropdown.Header>
                             <fonts:Icon Text="{x:Static fonts:IconFont.Plus}" />
                         </inputs:Dropdown.Header>
@@ -267,20 +269,26 @@
                     <local:Separators Element="{Binding Element}">
                         <Grid VerticalAlignment="Center">
                             <TextBlock Name="NameText" Text="{Binding Identifier}" />
-                            <TextBox
-                                Name="NameInput"
-                                Visibility="Collapsed"
-                                Text="{Binding Identifier, Mode=TwoWay}" />
+                            <Button
+                                Name="EditButton"
+                                HorizontalAlignment="Right"
+                                Background="Transparent"
+                                Click="EditIdentifierClick"
+                                Style="{StaticResource IconButton}"
+                                ToolTip="Edit"
+                                Visibility="Collapsed">
+                                <fonts:Icon Text="{x:Static fonts:IconFont.Pen}" />
+                            </Button>
                         </Grid>
                     </local:Separators>
 
                     <ContentControl Grid.Column="1" Content="{Binding Element}" />
                     <Button
-                        Margin="0,0,1,0"
-                        Height="24"
-                        Width="24"
                         Name="RemoveButton"
                         Grid.Column="2"
+                        Width="24"
+                        Height="24"
+                        Margin="0,0,1,0"
                         Command="{Binding RemoveCommand}"
                         Style="{StaticResource IconButton}"
                         ToolTip="Remove"
@@ -289,49 +297,33 @@
                     </Button>
                 </Grid>
                 <DataTemplate.Triggers>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
+                            <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:GenericEdit}}}" Value="False" />
+                        </MultiDataTrigger.Conditions>
+                        <MultiDataTrigger.Setters>
+                            <Setter TargetName="RemoveButton" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="EditButton" Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger.Setters>
+                    </MultiDataTrigger>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
+                            <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:GenericEdit}}}" Value="False" />
+                        </MultiDataTrigger.Conditions>
+                        <MultiDataTrigger.Setters>
+                            <Setter TargetName="RemoveButton" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="EditButton" Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger.Setters>
+                    </MultiDataTrigger>
                     <DataTrigger Binding="{Binding IsIdentifierEditable}" Value="False">
                         <Setter TargetName="NameText" Property="Opacity" Value="0.6" />
+                        <Setter TargetName="EditButton" Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
-                    <MultiDataTrigger>
-                        <MultiDataTrigger.Conditions>
-                            <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
-                            <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:GenericEdit}}}" Value="False" />
-                            <Condition Binding="{Binding IsIdentifierEditable}" Value="True" />
-                        </MultiDataTrigger.Conditions>
-                        <MultiDataTrigger.Setters>
-                            <Setter TargetName="NameInput" Property="Visibility" Value="Visible" />
-                        </MultiDataTrigger.Setters>
-                    </MultiDataTrigger>
-                    <MultiDataTrigger>
-                        <MultiDataTrigger.Conditions>
-                            <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
-                            <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:GenericEdit}}}" Value="False" />
-                            <Condition Binding="{Binding IsIdentifierEditable}" Value="False" />
-                        </MultiDataTrigger.Conditions>
-                        <MultiDataTrigger.Setters>
-                            <Setter TargetName="NameInput" Property="Visibility" Value="Visible" />
-                        </MultiDataTrigger.Setters>
-                    </MultiDataTrigger>
-                    <MultiDataTrigger>
-                        <MultiDataTrigger.Conditions>
-                            <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
-                            <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:GenericEdit}}}" Value="False" />
-                            <Condition Binding="{Binding IsRemovable}" Value="True" />
-                        </MultiDataTrigger.Conditions>
-                        <MultiDataTrigger.Setters>
-                            <Setter TargetName="RemoveButton" Property="Visibility" Value="Visible" />
-                        </MultiDataTrigger.Setters>
-                    </MultiDataTrigger>
-                    <MultiDataTrigger>
-                        <MultiDataTrigger.Conditions>
-                            <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
-                            <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:GenericEdit}}}" Value="False" />
-                            <Condition Binding="{Binding IsRemovable}" Value="False" />
-                        </MultiDataTrigger.Conditions>
-                        <MultiDataTrigger.Setters>
-                            <Setter TargetName="RemoveButton" Property="Visibility" Value="Visible" />
-                        </MultiDataTrigger.Setters>
-                    </MultiDataTrigger>
+                    <DataTrigger Binding="{Binding IsRemovable}" Value="False">
+                        <Setter TargetName="RemoveButton" Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
                 </DataTemplate.Triggers>
             </DataTemplate>
 
@@ -350,10 +342,14 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <TreeView
-        DataContext="{Binding ElementName=ContainerElement}"
-        Grid.IsSharedSizeScope="True"
-        ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
-        ItemTemplateSelector="{StaticResource GenericTemplateSelector}"
-        ItemsSource="{Binding Root.Childrens}" />
+    <Grid>
+        <TreeView
+            DataContext="{Binding ElementName=ContainerElement}"
+            Grid.IsSharedSizeScope="True"
+            ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
+            ItemTemplateSelector="{StaticResource GenericTemplateSelector}"
+            ItemsSource="{Binding Root.Childrens}" />
+
+        <local:EditIdentifierPopup x:Name="EditIdentifierPopup" />
+    </Grid>
 </UserControl>

@@ -1,7 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using Usuel.Shared;
 using Usuel.Shared.Schema;
 
 namespace Joufflu.Data.Schema
@@ -77,6 +75,11 @@ namespace Joufflu.Data.Schema
             Root.CreateProperty("titi", EnumDataType.Object);
 
             InitializeComponent();
+        }
+
+        private void EditIdentifierClick(object sender, RoutedEventArgs e)
+        {
+            EditIdentifierPopup.Show((FrameworkElement)((FrameworkElement)sender).Parent);
         }
     }
 }

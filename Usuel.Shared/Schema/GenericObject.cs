@@ -74,25 +74,11 @@ namespace Usuel.Shared.Schema
         public IGenericElement Clone() => new GenericValue(DataType, Value) { Parent = Parent};
     }
 
-    public class GenericProperty : ErrorValidationModel
+    public class GenericProperty : INotifyPropertyChanged
     {
-        private object _identifier;
-        public object Identifier
-        {
-            get => _identifier;
-            set
-            {
-                ClearErrors();
-                if (_identifier == value)
-                    return;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-                if (Element.Parent?.ChangeIdentifier(_identifier, value) == false)
-                    AddError($"Identifier '{value}' is already used.");
-                else
-                    _identifier = value;
-            }
-        }
-
+        public object Identifier { get; set; }
         public IGenericElement Element { get; }
         public ICustomCommand RemoveCommand { get; }
 
@@ -101,9 +87,14 @@ namespace Usuel.Shared.Schema
 
         public GenericProperty(object identifier, IGenericElement element)
         {
-            _identifier = identifier;
+            Identifier = identifier;
             Element = element;
             RemoveCommand = new DelegateCommand(() => Element.Parent?.Remove(Identifier), () => IsRemovable);
+        }
+
+        private void NotifypropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 
