@@ -1,15 +1,16 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Reflection;
 using System.Runtime.Serialization;
 
 namespace Usuel.Shared.Schema
 {
-    public class SchemaDefinitionException : Exception
+    public class GenericFactoryException : Exception
     {
-        public SchemaDefinitionException(string message) : base(message)
+        public GenericFactoryException(string message) : base(message)
         { }
     }
-    /*
-    public static class SchemaExtensions
+    
+    public static class GenericExtensions
     {
         /// <summary>
         /// Convert type to a <see cref="EnumDataType"/> if the type is compatible.
@@ -52,46 +53,39 @@ namespace Usuel.Shared.Schema
         }
     }
 
-    public static class SchemaFactory
+    public static class GenericFactory
     {
-        /// <summary>
-        /// Convert a type to a ISchema element recusively.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static ISchemaElement Convert(Type type)
+
+        public static IGenericElement Convert(Type type, object? data = null)
         {
             // Simple value
             if (type.IsValue(out EnumDataType dataType))
             {
-                return new SchemaValue(dataType);
+                return new GenericValue(dataType, data);
             }
             else if (type.IsEnumerable(out Type? enumerableType) && enumerableType != null)
             {
-                return new SchemaArray(Convert(enumerableType));
+                // XXX : generic array don't take 
+                return new GenericArray(
+                    Convert(enumerableType, data), 
+                    (data as IEnumerable)?.Cast<object>().Select(val => Convert(val.GetType(), val)).ToList());
             }
 
-            return ConvertObject(type);
+            return ConvertObject(type, data);
         }
 
-        /// <summary>
-        /// Get a recursive list of properties from a type.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        private static SchemaObject ConvertObject(Type type)
+        private static GenericObject ConvertObject(Type type, object? data)
         {
-            SchemaObject @object = new SchemaObject();
+            GenericObject @object = new GenericObject();
             IEnumerable<PropertyInfo> typeProps = type
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(prop => prop.IsIgnorable() == false);
 
             foreach (var property in typeProps)
             {
-                @object.Add(property.Name, Convert(property.PropertyType));
+                @object.AddProperty(property.Name, Convert(property.PropertyType, property.GetValue(data, null)));
             }
             return @object;
         }
     }
-    */
 }

@@ -189,6 +189,13 @@ namespace Usuel.Shared.Schema
                 CreateProperty("Default", EnumDataType.String);
         }
 
+        public void AddProperty(string name, IGenericElement element)
+        {
+            element.Parent = this;
+            Properties.Add(name, element);
+            NotifypropertyChanged(nameof(Childrens));
+        }
+
         public void CreateProperty(string name, EnumDataType type)
         {
             IGenericElement element = type switch
@@ -197,10 +204,7 @@ namespace Usuel.Shared.Schema
                 EnumDataType.Array => new GenericArray(new GenericValue(EnumDataType.String)),
                 _ => new GenericValue(type),
             };
-            element.Parent = this;
-
-            Properties.Add(GetUniquePropertyName(name), element);
-            NotifypropertyChanged(nameof(Childrens));
+            AddProperty(GetUniquePropertyName(name), element);
         }
 
         public void Remove(object identifier)
