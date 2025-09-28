@@ -68,12 +68,6 @@ namespace Joufflu.Data.Schema
 
         public GenericEdit()
         {
-            Root = new GenericObject();
-
-            Root.CreateProperty("tata", EnumDataType.String);
-            Root.CreateProperty("toto", EnumDataType.Array);
-            Root.CreateProperty("titi", EnumDataType.Object);
-
             InitializeComponent();
         }
 

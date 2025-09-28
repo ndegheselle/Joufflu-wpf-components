@@ -54,7 +54,7 @@ namespace Joufflu.Samples
 
     public class TestClassWithSub
     {
-        public List<string> StringArray { get; set; } = new List<string>();
+        public List<string> StringArray { get; set; } = new List<string>() { "Toto" };
         public List<TestClass> ArraySub { get; set; } = new List<TestClass>();
         public TestClass Sub { get; set; } = new TestClass("tata", 10);
     }
@@ -62,6 +62,7 @@ namespace Joufflu.Samples
     public static class Tests
     {
         public static TestClass Value { get; set; } = new TestClass("Minus", -1);
+        public static TestClassWithSub ValueWithSub { get; set; } = new TestClassWithSub();
 
         public static List<TestClass> Values
         {

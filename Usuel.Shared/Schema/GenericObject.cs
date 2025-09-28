@@ -8,6 +8,7 @@ namespace Usuel.Shared.Schema
     {
         Object,
         Array,
+        Enum,
         String,
         Decimal,
         Boolean,

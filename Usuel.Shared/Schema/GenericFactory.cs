@@ -67,14 +67,19 @@ namespace Usuel.Shared.Schema
             {
                 // XXX : generic array don't take 
                 return new GenericArray(
-                    Convert(enumerableType, data), 
+                    Convert(enumerableType, null),
                     (data as IEnumerable)?.Cast<object>().Select(val => Convert(val.GetType(), val)).ToList());
             }
 
             return ConvertObject(type, data);
         }
 
-        private static GenericObject ConvertObject(Type type, object? data)
+        public static IGenericElement Convert(object data)
+        {
+            return Convert(data.GetType(), data);
+        }
+
+        public static GenericObject ConvertObject(Type type, object? data)
         {
             GenericObject @object = new GenericObject();
             IEnumerable<PropertyInfo> typeProps = type
@@ -87,5 +92,11 @@ namespace Usuel.Shared.Schema
             }
             return @object;
         }
+
+        public static GenericObject ConvertObject(object data)
+        {
+            return ConvertObject(data.GetType(), data);
+        }
+
     }
 }
