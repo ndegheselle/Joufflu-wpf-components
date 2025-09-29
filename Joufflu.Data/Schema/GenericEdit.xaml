@@ -21,6 +21,8 @@
                 <ResourceDictionary Source="/Joufflu.Data;component/Schema/Separators.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <converters:TypeConverter x:Key="TypeConverter" />
+
             <local:ValueTemplateSelector x:Key="ValueTemplateSelector">
                 <local:ValueTemplateSelector.StringTemplate>
                     <DataTemplate DataType="{x:Type schema:GenericValue}">
@@ -65,7 +67,7 @@
                         Name="TypeInput"
                         Margin="2,1"
                         ItemsSource="{extensions:EnumValuesExtension {x:Type schema:EnumDataType},
-                                                                     IgnoreElements=2}"
+                                                                     IgnoreElements=3}"
                         SelectedItem="{Binding DataType, Mode=TwoWay}"
                         Visibility="Collapsed">
                         <ComboBox.ItemTemplate>
@@ -76,10 +78,16 @@
                     </ComboBox>
 
                     <ContentControl
+                        Name="ValueInput"
                         Grid.Column="1"
                         Margin="0,1,2,1"
                         Content="{Binding}"
                         ContentTemplateSelector="{StaticResource ValueTemplateSelector}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Name="ValueDisplay"
+                        Grid.Column="1"
+                        Text="{Binding Value}" />
                 </Grid>
 
                 <DataTemplate.Triggers>
@@ -101,6 +109,14 @@
                             <Setter TargetName="TypeInput" Property="Visibility" Value="Visible" />
                         </MultiDataTrigger.Setters>
                     </MultiDataTrigger>
+                    <DataTrigger Binding="{Binding WithValueEdit, RelativeSource={RelativeSource AncestorType={x:Type local:GenericEdit}}}" Value="False">
+                        <Setter TargetName="ValueDisplay" Property="Visibility" Value="Visible" />
+                        <Setter TargetName="ValueInput" Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding WithValueEdit, RelativeSource={RelativeSource AncestorType={x:Type local:GenericEdit}}}" Value="True">
+                        <Setter TargetName="ValueDisplay" Property="Visibility" Value="Collapsed" />
+                        <Setter TargetName="ValueInput" Property="Visibility" Value="Visible" />
+                    </DataTrigger>
                 </DataTemplate.Triggers>
             </DataTemplate>
 
@@ -110,7 +126,8 @@
                         <ColumnDefinition Width="100" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <local:IconDataType Margin="10,0,0,0" 
+                    <local:IconDataType
+                        Margin="10,0,0,0"
                         Opacity="0.6"
                         Type="Enum" />
                     <ComboBox
@@ -147,6 +164,7 @@
                         Orientation="Horizontal"
                         Visibility="Collapsed">
                         <Button
+                            Name="AddValueButton"
                             ToolTip="Add value"
                             Width="24"
                             Height="24"
@@ -154,7 +172,10 @@
                             Style="{StaticResource IconButton}">
                             <fonts:Icon Text="{x:Static fonts:IconFont.Plus}" />
                         </Button>
-                        <inputs:Dropdown BorderThickness="0" ToolTip="Change type">
+                        <inputs:Dropdown
+                            Name="EditSchemaButton"
+                            BorderThickness="0"
+                            ToolTip="Change type">
                             <inputs:Dropdown.Header>
                                 <fonts:Icon Text="{x:Static fonts:IconFont.Pen}" />
                             </inputs:Dropdown.Header>
@@ -210,6 +231,12 @@
                             <Setter TargetName="ActionContainer" Property="Visibility" Value="Visible" />
                         </MultiDataTrigger.Setters>
                     </MultiDataTrigger>
+                    <DataTrigger Binding="{Binding WithValueEdit, RelativeSource={RelativeSource AncestorType={x:Type local:GenericEdit}}}" Value="False">
+                        <Setter TargetName="AddValueButton" Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding WithSchemaEdit, RelativeSource={RelativeSource AncestorType={x:Type local:GenericEdit}}}" Value="False">
+                        <Setter TargetName="EditSchemaButton" Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
                 </DataTemplate.Triggers>
             </DataTemplate>
 
@@ -225,7 +252,7 @@
                         Type="Object" />
 
                     <inputs:Dropdown
-                        Name="ActionContainer"
+                        Name="EditSchemaButton"
                         Grid.Column="1"
                         HorizontalAlignment="Right"
                         BorderThickness="0"
@@ -271,18 +298,20 @@
                         <MultiDataTrigger.Conditions>
                             <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
                             <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:GenericEdit}}}" Value="False" />
+                            <Condition Binding="{Binding WithSchemaEdit, RelativeSource={RelativeSource AncestorType={x:Type local:GenericEdit}}}" Value="True" />
                         </MultiDataTrigger.Conditions>
                         <MultiDataTrigger.Setters>
-                            <Setter TargetName="ActionContainer" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="EditSchemaButton" Property="Visibility" Value="Visible" />
                         </MultiDataTrigger.Setters>
                     </MultiDataTrigger>
                     <MultiDataTrigger>
                         <MultiDataTrigger.Conditions>
                             <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True" />
                             <Condition Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:GenericEdit}}}" Value="False" />
+                            <Condition Binding="{Binding WithSchemaEdit, RelativeSource={RelativeSource AncestorType={x:Type local:GenericEdit}}}" Value="True" />
                         </MultiDataTrigger.Conditions>
                         <MultiDataTrigger.Setters>
-                            <Setter TargetName="ActionContainer" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="EditSchemaButton" Property="Visibility" Value="Visible" />
                         </MultiDataTrigger.Setters>
                     </MultiDataTrigger>
                 </DataTemplate.Triggers>
@@ -345,6 +374,15 @@
                         <MultiDataTrigger.Setters>
                             <Setter TargetName="RemoveButton" Property="Visibility" Value="Visible" />
                             <Setter TargetName="EditButton" Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger.Setters>
+                    </MultiDataTrigger>
+                    <MultiDataTrigger>
+                        <MultiDataTrigger.Conditions>
+                            <Condition Binding="{Binding Element.Parent, Converter={StaticResource TypeConverter}}" Value="{x:Type schema:GenericObject}" />
+                            <Condition Binding="{Binding WithSchemaEdit, RelativeSource={RelativeSource AncestorType={x:Type local:GenericEdit}}}" Value="False" />
+                        </MultiDataTrigger.Conditions>
+                        <MultiDataTrigger.Setters>
+                            <Setter TargetName="RemoveButton" Property="Visibility" Value="Collapsed" />
                         </MultiDataTrigger.Setters>
                     </MultiDataTrigger>
                     <DataTrigger Binding="{Binding IsIdentifierEditable}" Value="False">

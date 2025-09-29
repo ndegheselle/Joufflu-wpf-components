@@ -118,7 +118,9 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <schema:GenericEdit Root="{Binding GenericObject}" />
+            <schema:GenericEdit
+                Root="{Binding GenericObject}"
+                WithValueEdit="False" />
         </Grid>
     </Grid>
 </UserControl>

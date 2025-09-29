@@ -65,8 +65,8 @@ namespace Joufflu.Data.Schema
         }
 
         public bool IsReadOnly { get; set; }
-        public bool WithSchemaEdit { get; set; }
-        public bool WithValueEdit { get; set; }
+        public bool WithSchemaEdit { get; set; } = true;
+        public bool WithValueEdit { get; set; } = true;
 
         public GenericEdit()
         {

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
@@ -75,6 +76,20 @@ namespace Usuel.Shared.Schema
         }
 
         public IGenericElement Clone() => new GenericValue(DataType, Value) { Parent = Parent};
+
+        public override string? ToString()
+        {
+            return DataType switch
+            {
+                EnumDataType.String or
+                EnumDataType.Decimal or
+                EnumDataType.Integer => Value.ToString(),
+                EnumDataType.Boolean => (bool)Value ? "True" : "False",
+                EnumDataType.DateTime => ((DateTime)Value).ToString("yyyy/MM/dd HH:mm"),
+                EnumDataType.TimeSpan => ((TimeSpan)Value).ToString("d:hh:mm:ss"),
+                _ => throw new NotImplementedException($"Value of type {DataType} is not handled."),
+            };
+        }
     }
 
     public class GenericEnum : IGenericElement
