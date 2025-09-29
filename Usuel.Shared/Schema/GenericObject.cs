@@ -10,6 +10,7 @@ namespace Usuel.Shared.Schema
         Array,
         Enum,
         String,
+        Integer,
         Decimal,
         Boolean,
         DateTime,
@@ -65,6 +66,7 @@ namespace Usuel.Shared.Schema
             {
                 EnumDataType.String => "",
                 EnumDataType.Decimal => 0.0m,
+                EnumDataType.Integer => 0,
                 EnumDataType.Boolean => false,
                 EnumDataType.DateTime => DateTime.Now,
                 EnumDataType.TimeSpan => new TimeSpan(),
@@ -73,6 +75,37 @@ namespace Usuel.Shared.Schema
         }
 
         public IGenericElement Clone() => new GenericValue(DataType, Value) { Parent = Parent};
+    }
+
+    public class GenericEnum : IGenericElement
+    {
+        public class EnumValue
+        {
+            public int Index { get; private set; }
+            public string Name { get; private set; }
+
+            public EnumValue(int index, string name)
+            {
+                Index = index;
+                Name = name;
+            }
+        }
+
+        [JsonIgnore]
+        public IGenericParent? Parent { get; set; }
+        [JsonIgnore]
+        public IEnumerable<IGenericParent> ParentsTree => Parent?.Parent == null ? [] : [.. Parent.ParentsTree, Parent];
+
+        public int Value { get; set; }
+        public IEnumerable<EnumValue> Availables { get; set; }
+
+        public GenericEnum(IEnumerable<EnumValue> availables, int value = 0)
+        {
+            Availables = availables;
+            Value = value;
+        }
+
+        public IGenericElement Clone() => new GenericEnum(Availables, Value) { Parent = Parent };
     }
 
     public class GenericProperty : INotifyPropertyChanged
@@ -186,7 +219,7 @@ namespace Usuel.Shared.Schema
             Properties = properties ?? [];
             CreatePropertyCommand = new DelegateCommand<EnumDataType>((type) => CreateProperty("Default", type));
 
-            if (Properties.Count == 0)
+            if (properties == null)
                 CreateProperty("Default", EnumDataType.String);
         }
 

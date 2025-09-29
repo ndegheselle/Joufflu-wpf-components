@@ -24,6 +24,7 @@ namespace Joufflu.Data.Schema
     public class ValueTemplateSelector : DataTemplateSelector
     {
         public DataTemplate? StringTemplate { get; set; }
+        public DataTemplate? IntegerTemplate { get; set; }
         public DataTemplate? DecimalTemplate { get; set; }
         public DataTemplate? BooleanTemplate { get; set; }
         public DataTemplate? DateTimeTemplate { get; set; }
@@ -37,6 +38,7 @@ namespace Joufflu.Data.Schema
             return value.DataType switch
             {
                 EnumDataType.String => StringTemplate,
+                EnumDataType.Integer => IntegerTemplate,
                 EnumDataType.Decimal => DecimalTemplate,
                 EnumDataType.Boolean => BooleanTemplate,
                 EnumDataType.DateTime => DateTimeTemplate,

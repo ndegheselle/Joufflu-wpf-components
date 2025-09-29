@@ -39,6 +39,11 @@ namespace Joufflu.Samples
 
         public string FilePath { get; set; } = "";
 
+        public TestClass()
+        {
+            Name = "Default";
+        }
+
         public TestClass(string name, int value)
         {
             Name = name;

@@ -22,7 +22,7 @@ namespace Usuel.Shared.Schema
             datatype = type switch
             {
                 _ when type == typeof(string) => EnumDataType.String,
-                _ when type == typeof(int) => EnumDataType.Decimal,
+                _ when type == typeof(int) => EnumDataType.Integer,
                 _ when type == typeof(float) => EnumDataType.Decimal,
                 _ when type == typeof(double) => EnumDataType.Decimal,
                 _ when type == typeof(decimal) => EnumDataType.Decimal,
@@ -35,15 +35,24 @@ namespace Usuel.Shared.Schema
         }
 
         /// <summary>
-        /// If the type is an IEnumerable<> get the generic type, null otherwise.
+        /// If the type is an IEnumerable<>
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static bool IsEnumerable(this Type type, out Type? enumerableType)
+        public static bool IsEnumerable(this Type type)
+        {
+            return type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+        }
+
+        /// <summary>
+        /// Get the generic type of an an IEnumerable<>
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static Type? GetEnumerableType(this Type type)
         {
             var enumerableInterface = type.GetInterfaces().FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
-            enumerableType = enumerableInterface?.GetGenericArguments()[0];
-            return enumerableType != null;
+            return enumerableInterface?.GetGenericArguments()[0];
         }
 
         public static bool IsIgnorable(this PropertyInfo property)
@@ -58,17 +67,25 @@ namespace Usuel.Shared.Schema
 
         public static IGenericElement Convert(Type type, object? data = null)
         {
-            // Simple value
-            if (type.IsValue(out EnumDataType dataType))
+            if (type.IsEnum)
+            {
+                return ConvertEnum(type, data);
+            }
+            else if (type.IsValue(out EnumDataType dataType))
             {
                 return new GenericValue(dataType, data);
             }
-            else if (type.IsEnumerable(out Type? enumerableType) && enumerableType != null)
+            
+            // Get data from parameter less constructor if exist
+            if (data == null)
             {
-                // XXX : generic array don't take 
-                return new GenericArray(
-                    Convert(enumerableType, null),
-                    (data as IEnumerable)?.Cast<object>().Select(val => Convert(val.GetType(), val)).ToList());
+                var constructor = type.GetConstructor(Type.EmptyTypes);
+                data = constructor?.Invoke(null);
+            }
+
+            if (type.IsEnumerable())
+            {
+                return ConvertArray(type, data);
             }
 
             return ConvertObject(type, data);
@@ -79,16 +96,29 @@ namespace Usuel.Shared.Schema
             return Convert(data.GetType(), data);
         }
 
+        public static GenericEnum ConvertEnum(Type type, object? data)
+        {
+            return new GenericEnum(Enum.GetValues(type).Cast<Enum>().Select((x, i) => new GenericEnum.EnumValue(i, x.ToString())));
+        }
+
+        public static GenericArray ConvertArray(Type type, object? data)
+        {
+            var enumerableType = type.GetEnumerableType() ?? throw new Exception($"Can't get the generic type of '{type}'");
+            return new GenericArray(
+                    Convert(enumerableType, null),
+                    (data as IEnumerable)?.Cast<object>().Select(val => Convert(val.GetType(), val)).ToList());
+        }
+
         public static GenericObject ConvertObject(Type type, object? data)
         {
-            GenericObject @object = new GenericObject();
+            GenericObject @object = new GenericObject([]);
             IEnumerable<PropertyInfo> typeProps = type
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(prop => prop.IsIgnorable() == false);
 
             foreach (var property in typeProps)
             {
-                @object.AddProperty(property.Name, Convert(property.PropertyType, property.GetValue(data, null)));
+                @object.AddProperty(property.Name, Convert(property.PropertyType, data == null ? null : property.GetValue(data, null)));
             }
             return @object;
         }

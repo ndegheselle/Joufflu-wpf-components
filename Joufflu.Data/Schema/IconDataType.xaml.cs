@@ -48,6 +48,7 @@ namespace Joufflu.Data.Schema
             {
                 EnumDataType.Object => IconFont.BracketsCurly,
                 EnumDataType.Array => IconFont.BracketsSquare,
+                EnumDataType.Enum => IconFont.ListNumbers,
                 EnumDataType.String => IconFont.Quotes,
                 EnumDataType.Decimal => IconFont.Hash,
                 EnumDataType.Boolean => IconFont.Check,

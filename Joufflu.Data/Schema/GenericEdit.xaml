@@ -6,6 +6,7 @@
     xmlns:collections="clr-namespace:System.Collections.Generic;assembly=System.Runtime"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:extensions="clr-namespace:Joufflu.Shared.Extensions;assembly=Joufflu.Shared"
+    xmlns:converters="clr-namespace:Joufflu.Shared.Converters;assembly=Joufflu.Shared"
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:inputs="clr-namespace:Joufflu.Inputs;assembly=Joufflu.Inputs"
     xmlns:local="clr-namespace:Joufflu.Data.Schema"
@@ -31,6 +32,11 @@
                         <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" />
                     </DataTemplate>
                 </local:ValueTemplateSelector.BooleanTemplate>
+                <local:ValueTemplateSelector.IntegerTemplate>
+                    <DataTemplate DataType="{x:Type schema:GenericValue}">
+                        <inputs:NumericUpDown Value="{Binding Value, Mode=TwoWay}" />
+                    </DataTemplate>
+                </local:ValueTemplateSelector.IntegerTemplate>
                 <local:ValueTemplateSelector.DecimalTemplate>
                     <DataTemplate DataType="{x:Type schema:GenericValue}">
                         <inputs:DecimalUpDown Value="{Binding Value, Mode=TwoWay}" />
@@ -96,6 +102,30 @@
                         </MultiDataTrigger.Setters>
                     </MultiDataTrigger>
                 </DataTemplate.Triggers>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type schema:GenericEnum}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <local:IconDataType Margin="10,0,0,0" 
+                        Opacity="0.6"
+                        Type="Enum" />
+                    <ComboBox
+                        Grid.Column="1"
+                        Margin="0,1,2,1"
+                        SelectedValuePath="Index"
+                        SelectedValue="{Binding Value, Mode=TwoWay}"
+                        ItemsSource="{Binding Availables}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type schema:GenericArray}">
