@@ -120,7 +120,12 @@
             </Grid.ColumnDefinitions>
             <schema:GenericEdit
                 Root="{Binding GenericObject}"
-                WithValueEdit="False" />
+                WithSchemaEdit="True" 
+                WithValueEdit="False"/>
+            <schema:GenericEdit
+                Grid.Column="1"
+                Root="{Binding GenericObject}"
+                WithSchemaEdit="False" />
         </Grid>
     </Grid>
 </UserControl>

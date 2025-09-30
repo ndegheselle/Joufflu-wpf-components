@@ -175,6 +175,8 @@ namespace Usuel.Shared.Schema
             ChangeSchemaCommand = new DelegateCommand<EnumDataType>(ChangeSchema);
             AddValueCommand = new DelegateCommand(Add);
             Schema.Parent = this;
+            foreach (var value in Values)
+                value.Parent = this;
         }
 
         public void ChangeSchema(EnumDataType type)
