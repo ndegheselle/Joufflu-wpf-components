@@ -19,6 +19,7 @@
                         <ToggleButton
                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                             Height="{TemplateBinding Height}"
+                            Width="{TemplateBinding Width}"
                             Name="button"
                             Margin="{TemplateBinding Margin}"
                             Padding="{TemplateBinding Padding}"

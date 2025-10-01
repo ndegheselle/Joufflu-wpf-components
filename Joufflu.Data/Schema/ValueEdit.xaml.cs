@@ -5,21 +5,6 @@ using Usuel.Shared.Schema;
 namespace Joufflu.Data.Schema
 {
     #region Template selector
-    public class GenericTemplateSelector : DataTemplateSelector
-    {
-        public DataTemplate? ParentTemplate { get; set; }
-        public DataTemplate? ElementTemplate { get; set; }
-
-        public override DataTemplate? SelectTemplate(object item, DependencyObject container)
-        {
-            return item switch
-            {
-                _ when item is GenericProperty prop && prop.Element is IGenericParent => ParentTemplate,
-                _ when item is GenericProperty prop && prop.Element is IGenericElement => ElementTemplate,
-                _ => base.SelectTemplate(item, container)
-            };
-        }
-    }
 
     public class ValueTemplateSelector : DataTemplateSelector
     {
@@ -53,10 +38,10 @@ namespace Joufflu.Data.Schema
     /// <summary>
     /// Logique d'interaction pour GenericEdit.xaml
     /// </summary>
-    public partial class GenericEdit : UserControl
+    public partial class ValueEdit : UserControl
     {
         public static readonly DependencyProperty RootProperty =
-            DependencyProperty.Register(nameof(Root), typeof(GenericObject), typeof(GenericEdit), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(Root), typeof(GenericObject), typeof(ValueEdit), new PropertyMetadata(null));
 
         public GenericObject Root
         {
@@ -65,17 +50,10 @@ namespace Joufflu.Data.Schema
         }
 
         public bool IsReadOnly { get; set; }
-        public bool WithSchemaEdit { get; set; } = true;
-        public bool WithValueEdit { get; set; } = true;
 
-        public GenericEdit()
+        public ValueEdit()
         {
             InitializeComponent();
-        }
-
-        private void EditIdentifierClick(object sender, RoutedEventArgs e)
-        {
-            EditIdentifierPopup.Show((FrameworkElement)((FrameworkElement)sender).Parent);
         }
     }
 }

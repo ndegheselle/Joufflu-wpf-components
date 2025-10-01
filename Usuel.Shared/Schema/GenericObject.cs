@@ -32,7 +32,8 @@ namespace Usuel.Shared.Schema
 
     public interface IGenericParent : IGenericElement, INotifyPropertyChanged
     {
-        IEnumerable<GenericProperty> Childrens { get; }
+        IEnumerable<GenericProperty> SchemaProperties { get; }
+        IEnumerable<GenericProperty> ValuesProperties { get; }
 
         /// <summary>
         /// Change an identifier to a new value.
@@ -155,11 +156,11 @@ namespace Usuel.Shared.Schema
         public IGenericParent? Parent { get; set; }
         [JsonIgnore]
         public IEnumerable<IGenericParent> ParentsTree => Parent?.Parent == null ? [] : [.. Parent.ParentsTree, Parent];
+
         [JsonIgnore]
-        public IEnumerable<GenericProperty> Childrens => [
-                    new GenericProperty("Schema", Schema) { IsRemovable = false, IsIdentifierEditable = false },
-                    ..Values.Select((val, index) => new GenericProperty(index, val) { IsIdentifierEditable = false })
-                ];
+        public IEnumerable<GenericProperty> SchemaProperties => [new GenericProperty("Schema", Schema) { IsRemovable = false, IsIdentifierEditable = false }];
+        [JsonIgnore]
+        public IEnumerable<GenericProperty> ValuesProperties => Values.Select((val, index) => new GenericProperty(index, val) { IsIdentifierEditable = false });
 
         public ICustomCommand AddValueCommand { get; }
         public ICustomCommand ChangeSchemaCommand { get; }
@@ -189,19 +190,19 @@ namespace Usuel.Shared.Schema
                 _ => new GenericValue(type),
             };
             Schema.Parent = this;
-            NotifypropertyChanged(nameof(Childrens));
+            NotifypropertyChanged(nameof(SchemaProperties));
         }
 
         public void Add()
         {
             Values.Add(Schema.Clone());
-            NotifypropertyChanged(nameof(Childrens));
+            NotifypropertyChanged(nameof(ValuesProperties));
         }
 
         public void Remove(object identifier)
         {
             Values.RemoveAt((int)identifier);
-            NotifypropertyChanged(nameof(Childrens));
+            NotifypropertyChanged(nameof(ValuesProperties));
         }
 
         public IGenericElement Clone() => new GenericArray(Schema, Values.Select(x => x.Clone()).ToList()) { Parent = Parent };
@@ -226,7 +227,10 @@ namespace Usuel.Shared.Schema
         [JsonIgnore]
         public IEnumerable<IGenericParent> ParentsTree => Parent?.Parent == null ? [] : [.. Parent.ParentsTree, Parent];
         [JsonIgnore]
-        public IEnumerable<GenericProperty> Childrens => Properties.Select(x => new GenericProperty(x.Key, x.Value));
+        public IEnumerable<GenericProperty> SchemaProperties => Properties.Select(x => new GenericProperty(x.Key, x.Value));
+        [JsonIgnore]
+        public IEnumerable<GenericProperty> ValuesProperties => SchemaProperties;
+
 
         public Dictionary<string, IGenericElement> Properties { get; }
         public ICustomCommand CreatePropertyCommand { get; }
@@ -244,7 +248,8 @@ namespace Usuel.Shared.Schema
         {
             element.Parent = this;
             Properties.Add(name, element);
-            NotifypropertyChanged(nameof(Childrens));
+            NotifypropertyChanged(nameof(SchemaProperties));
+            NotifypropertyChanged(nameof(ValuesProperties));
         }
 
         public void CreateProperty(string name, EnumDataType type)
@@ -261,7 +266,8 @@ namespace Usuel.Shared.Schema
         public void Remove(object identifier)
         {
             Properties.Remove((string)identifier);
-            NotifypropertyChanged(nameof(Childrens));
+            NotifypropertyChanged(nameof(SchemaProperties));
+            NotifypropertyChanged(nameof(ValuesProperties));
         }
 
         public IGenericElement Clone()
