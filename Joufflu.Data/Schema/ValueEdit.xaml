@@ -133,12 +133,22 @@
                             Opacity="0.6" />
                     </Grid>
                     <ToggleButton
-                        Command=""
+                        Command="{Binding ClearReferenceCommand}"
+                        CommandParameter="{Binding IsChecked, RelativeSource={RelativeSource Self}}"
                         x:Name="ShowContextRefButton"
                         Margin="1,0,1,0"
                         Grid.Column="2"
-                        ToolTip="Use a contexte reference"
-                        Style="{StaticResource IconToggleButton}">
+                        ToolTip="Use a contexte reference">
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton" BasedOn="{StaticResource IconToggleButton}">
+                                <Setter Property="IsChecked" Value="True" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ContextReference}" Value="">
+                                        <Setter Property="IsChecked" Value="False" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
                         <fonts:Icon Text="{x:Static fonts:IconFont.Key}" />
                     </ToggleButton>
                 </Grid>

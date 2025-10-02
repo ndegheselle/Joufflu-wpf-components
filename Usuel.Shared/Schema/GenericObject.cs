@@ -60,8 +60,10 @@ namespace Usuel.Shared.Schema
         public override string ToString() => Identifier;
     }
 
-    public class GenericValue : IGenericElement
+    public class GenericValue : IGenericElement, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         [JsonIgnore]
         public IGenericParent? Parent { get; set; }
         [JsonIgnore]
@@ -71,26 +73,18 @@ namespace Usuel.Shared.Schema
         public object Value { get; set; }
         public EnumDataType DataType { get; set; }
 
-        public ICommand ClearContextReference { get; private set; }
+        public ICommand ClearReferenceCommand { get; private set; }
 
         public GenericValue(EnumDataType datatype, object? value = null)
         {
             DataType = datatype;
             Value = value ?? GetDefault(datatype);
-        }
 
-        public object GetDefault(EnumDataType dataType)
-        {
-            return dataType switch
+            ClearReferenceCommand = new DelegateCommand<bool>((clear) =>
             {
-                EnumDataType.String => "",
-                EnumDataType.Decimal => 0.0m,
-                EnumDataType.Integer => 0,
-                EnumDataType.Boolean => false,
-                EnumDataType.DateTime => DateTime.Now,
-                EnumDataType.TimeSpan => new TimeSpan(),
-                _ => throw new NotImplementedException($"Value of type {dataType} is not handled."),
-            };
+                if (clear)
+                    ContextReference = string.Empty;
+            });
         }
 
         public virtual IGenericElement Clone() => new GenericValue(DataType, Value) { Parent = Parent};
@@ -106,6 +100,20 @@ namespace Usuel.Shared.Schema
                 EnumDataType.DateTime => ((DateTime)Value).ToString("yyyy/MM/dd HH:mm"),
                 EnumDataType.TimeSpan => ((TimeSpan)Value).ToString("d:hh:mm:ss"),
                 _ => throw new NotImplementedException($"Value of type {DataType} is not handled."),
+            };
+        }
+
+        public static object GetDefault(EnumDataType dataType)
+        {
+            return dataType switch
+            {
+                EnumDataType.String => "",
+                EnumDataType.Decimal => 0.0m,
+                EnumDataType.Integer => 0,
+                EnumDataType.Boolean => false,
+                EnumDataType.DateTime => DateTime.Now,
+                EnumDataType.TimeSpan => new TimeSpan(),
+                _ => throw new NotImplementedException($"Value of type {dataType} is not handled."),
             };
         }
     }
