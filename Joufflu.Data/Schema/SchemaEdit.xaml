@@ -10,6 +10,7 @@
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:inputs="clr-namespace:Joufflu.Inputs;assembly=Joufflu.Inputs"
     xmlns:local="clr-namespace:Joufflu.Data.Schema"
+    xmlns:components="clr-namespace:Joufflu.Data.Schema.Components"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:schema="clr-namespace:Usuel.Shared.Schema;assembly=Usuel.Shared"
     x:Name="ContainerElement"
@@ -17,8 +18,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Joufflu.Data;component/Schema/SchemaTreeView.xaml" />
-                <ResourceDictionary Source="/Joufflu.Data;component/Schema/Separators.xaml" />
+                <ResourceDictionary Source="/Joufflu.Data;component/Schema/Components/SchemaTreeView.xaml" />
+                <ResourceDictionary Source="/Joufflu.Data;component/Schema/Components/Separators.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <converters:BooleansConverter x:Key="BooleansConverter" />
@@ -29,26 +30,28 @@
                         <ColumnDefinition Width="100" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <local:IconDataType Margin="10,0,0,0" Type="{Binding DataType}" />
+                    <components:IconDataType Margin="10,0,0,0" Type="{Binding DataType}" />
                     <ComboBox
                         Name="TypeInput"
                         Margin="2,1"
                         ItemsSource="{extensions:EnumValuesExtension {x:Type schema:EnumDataType},
-                                                                     IgnoreElements=3}"
+                                                                     IgnoreElements=2}"
                         SelectedItem="{Binding DataType, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <local:IconDataType Type="{Binding}" />
+                                <components:IconDataType Type="{Binding}" />
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <TextBlock
+                    <TextBlock 
+                        Opacity="0.6"
                         Margin="2,0,0,0"
                         VerticalAlignment="Center"
                         Name="ValueDisplay"
                         Grid.Column="1"
-                        Text="{Binding Value}" />
+                        ToolTip="Default value"
+                        Text="{Binding}" />
                 </Grid>
                 <DataTemplate.Triggers>
                     <DataTrigger Value="False">
@@ -66,37 +69,6 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type schema:GenericEnum}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <local:IconDataType
-                        Margin="10,0,0,0"
-                        Opacity="0.6"
-                        Type="Enum" />
-
-                    <ItemsControl
-                        Margin="2,0,0,0"
-                        Grid.Column="1"
-                        ItemsSource="{Binding Availables}"
-                        VerticalAlignment="Center"
-                        Opacity="0.6">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}" Margin="0,0,4,0" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Grid>
-            </DataTemplate>
-
             <DataTemplate DataType="{x:Type schema:GenericArray}">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -104,7 +76,7 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
-                    <local:IconDataType
+                    <components:IconDataType
                         Margin="10,0,0,0"
                         Opacity="0.6"
                         Type="Array" />
@@ -172,7 +144,7 @@
                         <ColumnDefinition Width="100" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <local:IconDataType
+                    <components:IconDataType
                         Margin="10,0,0,0"
                         Opacity="0.6"
                         Type="Object" />
@@ -241,25 +213,27 @@
                         <ColumnDefinition />
                         <ColumnDefinition Width="24" />
                     </Grid.ColumnDefinitions>
-                    <local:Separators Element="{Binding Element}">
+                    <components:Separators Element="{Binding Element}">
                         <Grid VerticalAlignment="Center">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
-                                <ColumnDefinition Width="15" />
+                                <ColumnDefinition Width="24" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Name="NameText" Text="{Binding Identifier}" />
+                            <TextBlock
+                                Name="NameText"
+                                Text="{Binding Identifier}"
+                                VerticalAlignment="Center" />
                             <Button
-                                Margin="4,0,0,0"
+                                Margin="2,0,0,0"
                                 Grid.Column="1"
                                 Name="EditButton"
-                                Background="Transparent"
                                 Click="EditIdentifierClick"
-                                Style="{StaticResource IconButton}"
+                                Style="{StaticResource IconButtonSmall}"
                                 ToolTip="Edit">
                                 <fonts:Icon Text="{x:Static fonts:IconFont.Pen}" />
                             </Button>
                         </Grid>
-                    </local:Separators>
+                    </components:Separators>
 
                     <ContentControl Grid.Column="1" Content="{Binding Element}" />
                     <Button
@@ -322,6 +296,6 @@
             ItemTemplateSelector="{StaticResource GenericTemplateSelector}"
             ItemsSource="{Binding Root.SchemaProperties}" />
 
-        <local:EditIdentifierPopup x:Name="EditIdentifierPopup" />
+        <components:EditIdentifierPopup x:Name="EditIdentifierPopup" />
     </Grid>
 </UserControl>

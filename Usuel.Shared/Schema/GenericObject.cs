@@ -1,7 +1,8 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using System.Windows.Input;
 
 namespace Usuel.Shared.Schema
 {
@@ -45,6 +46,20 @@ namespace Usuel.Shared.Schema
         void Remove(object index);
     }
 
+    public class GenericReference
+    {
+        public string Identifier { get; set; }
+        public EnumDataType DataType { get; set; }
+
+        public GenericReference(string identifier, EnumDataType dataType)
+        {
+            Identifier=identifier;
+            DataType=dataType;
+        }
+
+        public override string ToString() => Identifier;
+    }
+
     public class GenericValue : IGenericElement
     {
         [JsonIgnore]
@@ -55,6 +70,8 @@ namespace Usuel.Shared.Schema
         public string ContextReference { get; set; } = string.Empty;
         public object Value { get; set; }
         public EnumDataType DataType { get; set; }
+
+        public ICommand ClearContextReference { get; private set; }
 
         public GenericValue(EnumDataType datatype, object? value = null)
         {
@@ -76,7 +93,7 @@ namespace Usuel.Shared.Schema
             };
         }
 
-        public IGenericElement Clone() => new GenericValue(DataType, Value) { Parent = Parent};
+        public virtual IGenericElement Clone() => new GenericValue(DataType, Value) { Parent = Parent};
 
         public override string? ToString()
         {
@@ -93,7 +110,7 @@ namespace Usuel.Shared.Schema
         }
     }
 
-    public class GenericEnum : IGenericElement
+    public class GenericEnum : GenericValue
     {
         public class EnumValue
         {
@@ -105,23 +122,24 @@ namespace Usuel.Shared.Schema
                 Index = index;
                 Name = name;
             }
+
+            public override string ToString()
+            {
+                return Name;
+            }
         }
 
-        [JsonIgnore]
-        public IGenericParent? Parent { get; set; }
-        [JsonIgnore]
-        public IEnumerable<IGenericParent> ParentsTree => Parent?.Parent == null ? [] : [.. Parent.ParentsTree, Parent];
-
-        public int Value { get; set; }
         public IEnumerable<EnumValue> Availables { get; set; }
-
-        public GenericEnum(IEnumerable<EnumValue> availables, int value = 0)
+        public GenericEnum(IEnumerable<EnumValue> availables, int value = 0) : base(EnumDataType.Enum, value)
         {
             Availables = availables;
-            Value = value;
         }
 
-        public IGenericElement Clone() => new GenericEnum(Availables, Value) { Parent = Parent };
+        public override IGenericElement Clone() => new GenericEnum(Availables, Value as int? ?? 0) { Parent = Parent };
+        public override string ToString()
+        {
+            return string.Join(", ", Availables);
+        }
     }
 
     public class GenericProperty : INotifyPropertyChanged
@@ -288,6 +306,30 @@ namespace Usuel.Shared.Schema
             Properties[(string)newIdentifier] = Properties[(string)oldIdentifier];
             Properties.Remove((string)oldIdentifier);
             return true;
+        }
+
+        public IEnumerable<GenericReference> GetReferences(IEnumerable<string>? parentIdentifiers = null)
+        {
+            parentIdentifiers = parentIdentifiers ?? [];
+            List<GenericReference> references = new List<GenericReference>();
+            foreach(var property in Properties)
+            {
+                var identifiers = parentIdentifiers.Append(property.Key);
+                string identifier = string.Join(".", identifiers);
+                if (property.Value is GenericObject @object)
+                {
+                    references.AddRange(@object.GetReferences(identifiers));
+                }
+                else if (property.Value is GenericArray array)
+                {
+                    references.Add(new GenericReference(identifier, EnumDataType.Array));
+                }
+                else if (property.Value is GenericValue value)
+                {
+                    references.Add(new GenericReference(identifier, value.DataType));
+                }
+            }
+            return references;
         }
 
         /// <summary>

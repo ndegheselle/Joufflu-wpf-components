@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using Usuel.Shared.Schema;
 
-namespace Joufflu.Data.Schema
+namespace Joufflu.Data.Schema.Components
 {
     public class Separators : ContentControl
     {

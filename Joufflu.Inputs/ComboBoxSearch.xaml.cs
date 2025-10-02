@@ -72,11 +72,23 @@ namespace Joufflu.Inputs
             {
                 case Key.Up:
                     if (IsDropDownOpen == false)
+                    {
                         IsDropDownOpen = true;
+                    }
+                    else if (SelectedItem == null)
+                    {
+                        SelectedIndex = Items.Count - 1;
+                    }
                     break;
                 case Key.Down:
                     if (IsDropDownOpen == false)
+                    {
                         IsDropDownOpen = true;
+                    }
+                    else if (SelectedItem == null)
+                    {
+                        SelectedIndex = 0;
+                    }
                     break;
                 case Key.Tab:
                 case Key.Enter:

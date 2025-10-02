@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Usuel.Shared.Schema;
 
-namespace Joufflu.Data.Schema
+namespace Joufflu.Data.Schema.Components
 {
     public partial class IconDataType : UserControl, INotifyPropertyChanged
     {
@@ -50,6 +50,7 @@ namespace Joufflu.Data.Schema
                 EnumDataType.Array => IconFont.BracketsSquare,
                 EnumDataType.Enum => IconFont.ListNumbers,
                 EnumDataType.String => IconFont.Quotes,
+                EnumDataType.Integer => IconFont.HashStraight,
                 EnumDataType.Decimal => IconFont.Hash,
                 EnumDataType.Boolean => IconFont.Check,
                 EnumDataType.DateTime => IconFont.Calendar,

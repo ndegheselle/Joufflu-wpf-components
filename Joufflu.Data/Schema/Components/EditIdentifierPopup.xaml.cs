@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using Usuel.Shared.Schema;
 
-namespace Joufflu.Data.Schema
+namespace Joufflu.Data.Schema.Components
 {
     /// <summary>
     /// Logique d'interaction pour EditIdentifierPopup.xaml

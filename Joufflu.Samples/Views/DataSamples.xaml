@@ -118,8 +118,11 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <schema:SchemaEdit IsReadOnly="True" Root="{Binding GenericObject}" />
-            <schema:ValueEdit IsReadOnly="True" Grid.Column="1" Root="{Binding GenericObject}" />
+            <schema:SchemaEdit Root="{Binding GenericObject}" />
+            <schema:ValueEdit
+                Grid.Column="1"
+                Root="{Binding GenericObject}"
+                AvailableReferences="{Binding References}" />
         </Grid>
     </Grid>
 </UserControl>

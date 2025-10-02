@@ -60,12 +60,14 @@ namespace Joufflu.Samples.Views
         public CustomDropHandler DropHandler { get; private set; }
 
         public GenericObject GenericObject { get; private set; }
+        public IEnumerable<GenericReference> References { get; private set; }
 
         public DataSamples()
         {
             DropHandler = new CustomDropHandler();
             DragHandler = new CustomDragHandler(this);
             GenericObject = GenericFactory.ConvertObject(Tests.ValueWithSub);
+            References = GenericObject.GetReferences();
             InitializeComponent();
             PagingDataGrid.ItemsSource = Tests.Values.Take(5);
         }

@@ -10,6 +10,7 @@
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:inputs="clr-namespace:Joufflu.Inputs;assembly=Joufflu.Inputs"
     xmlns:local="clr-namespace:Joufflu.Data.Schema"
+    xmlns:components="clr-namespace:Joufflu.Data.Schema.Components"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:schema="clr-namespace:Usuel.Shared.Schema;assembly=Usuel.Shared"
     x:Name="ContainerElement"
@@ -17,12 +18,13 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Joufflu.Data;component/Schema/SchemaTreeView.xaml" />
-                <ResourceDictionary Source="/Joufflu.Data;component/Schema/Separators.xaml" />
+                <ResourceDictionary Source="/Joufflu.Data;component/Schema/Components/SchemaTreeView.xaml" />
+                <ResourceDictionary Source="/Joufflu.Data;component/Schema/Components/Separators.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <converters:TypeConverter x:Key="TypeConverter" />
             <converters:BooleansConverter x:Key="BooleansConverter" />
+            <local:GenericReferencesConverter x:Key="GenericReferencesConverter" />
 
             <local:ValueTemplateSelector x:Key="ValueTemplateSelector">
                 <local:ValueTemplateSelector.StringTemplate>
@@ -55,6 +57,20 @@
                         <inputs:TimeSpanPicker Value="{Binding Value, Mode=TwoWay}" />
                     </DataTemplate>
                 </local:ValueTemplateSelector.TimeSpanTemplate>
+                <local:ValueTemplateSelector.EnumTemplate>
+                    <DataTemplate DataType="{x:Type schema:GenericEnum}">
+                        <ComboBox
+                            SelectedValuePath="Index"
+                            SelectedValue="{Binding Value, Mode=TwoWay}"
+                            ItemsSource="{Binding Availables}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </DataTemplate>
+                </local:ValueTemplateSelector.EnumTemplate>
             </local:ValueTemplateSelector>
 
             <DataTemplate DataType="{x:Type schema:GenericValue}">
@@ -62,49 +78,69 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="28" />
                         <ColumnDefinition />
+                        <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
-                    <local:IconDataType
+                    <components:IconDataType
                         Margin="10,0,0,0"
                         Type="{Binding DataType}"
                         WithText="False" />
                     <ContentControl
                         Name="ValueInput"
                         Grid.Column="1"
-                        Margin="0,1,2,1"
+                        Margin="0,1,0,1"
                         Content="{Binding}"
                         ContentTemplateSelector="{StaticResource ValueTemplateSelector}" />
-                </Grid>
-                <DataTemplate.Triggers>
-                    <DataTrigger Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:ValueEdit}}}" Value="True">
-                        <Setter TargetName="ValueInput" Property="IsEnabled" Value="False" />
-                    </DataTrigger>
-                </DataTemplate.Triggers>
-            </DataTemplate>
 
-            <DataTemplate DataType="{x:Type schema:GenericEnum}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="28" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <local:IconDataType
-                        Margin="10,0,0,0"
-                        Opacity="0.6"
-                        Type="Enum"
-                        WithText="False" />
-                    <ComboBox
-                        Name="ValueInput"
-                        Grid.Column="1"
-                        Margin="0,1,2,1"
-                        SelectedValuePath="Index"
-                        SelectedValue="{Binding Value, Mode=TwoWay}"
-                        ItemsSource="{Binding Availables}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
+                    <Grid Grid.Column="1" Margin="0,1,0,1">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsChecked, ElementName=ShowContextRefButton}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+
+                        <inputs:ComboBoxSearch
+                            Padding="22,0,0,0"
+                            SelectedValuePath="Identifier"
+                            SelectedValue="{Binding ContextReference, Mode=TwoWay}">
+                            <inputs:ComboBoxSearch.ItemsSource>
+                                <MultiBinding Converter="{StaticResource GenericReferencesConverter}">
+                                    <Binding Path="DataType" />
+                                    <Binding Path="AvailableReferencesPerType" RelativeSource="{RelativeSource AncestorType={x:Type local:ValueEdit}}" />
+                                </MultiBinding>
+                            </inputs:ComboBoxSearch.ItemsSource>
+                            <inputs:ComboBoxSearch.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <components:IconDataType Type="{Binding DataType}" WithText="False" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Margin="4,0,0,0"
+                                            Text="{Binding Identifier}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </inputs:ComboBoxSearch.ItemTemplate>
+                        </inputs:ComboBoxSearch>
+
+                        <fonts:Icon
+                            Text="{x:Static fonts:IconFont.Key}"
+                            HorizontalAlignment="Left"
+                            Margin="4,0,0,0"
+                            IsHitTestVisible="False"
+                            Opacity="0.6" />
+                    </Grid>
+                    <ToggleButton
+                        Command=""
+                        x:Name="ShowContextRefButton"
+                        Margin="1,0,1,0"
+                        Grid.Column="2"
+                        ToolTip="Use a contexte reference"
+                        Style="{StaticResource IconToggleButton}">
+                        <fonts:Icon Text="{x:Static fonts:IconFont.Key}" />
+                    </ToggleButton>
                 </Grid>
                 <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:ValueEdit}}}" Value="True">
@@ -120,7 +156,7 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
-                    <local:IconDataType
+                    <components:IconDataType
                         Margin="10,0,0,0"
                         Opacity="0.6"
                         Type="Array"
@@ -151,7 +187,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="28" />
                     </Grid.ColumnDefinitions>
-                    <local:IconDataType
+                    <components:IconDataType
                         Margin="10,0,0,0"
                         Opacity="0.6"
                         Type="Object"
@@ -164,21 +200,19 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
                         <ColumnDefinition />
-                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="24" />
                     </Grid.ColumnDefinitions>
-                    <local:Separators Element="{Binding Element}">
+                    <components:Separators Element="{Binding Element}">
                         <TextBlock
                             Name="NameText"
                             Text="{Binding Identifier}"
                             VerticalAlignment="Center" />
-                    </local:Separators>
+                    </components:Separators>
 
                     <ContentControl Grid.Column="1" Content="{Binding Element}" />
                     <Button
                         Name="RemoveButton"
                         Grid.Column="2"
-                        Width="28"
-                        Height="24"
                         Margin="0,0,1,0"
                         Command="{Binding RemoveCommand}"
                         Style="{StaticResource IconButton}"
@@ -187,15 +221,6 @@
                     </Button>
                 </Grid>
                 <DataTemplate.Triggers>
-                    <DataTrigger Value="False">
-                        <DataTrigger.Binding>
-                            <MultiBinding Converter="{StaticResource BooleansConverter}" ConverterParameter="||">
-                                <Binding Path="IsMouseOver" RelativeSource="{RelativeSource AncestorType={x:Type TreeViewItem}}" />
-                                <Binding Path="IsSelected" RelativeSource="{RelativeSource AncestorType={x:Type TreeViewItem}}" />
-                            </MultiBinding>
-                        </DataTrigger.Binding>
-                        <Setter TargetName="RemoveButton" Property="Visibility" Value="Collapsed" />
-                    </DataTrigger>
                     <DataTrigger Binding="{Binding Element.Parent, Converter={StaticResource TypeConverter}}" Value="{x:Type schema:GenericObject}">
                         <Setter TargetName="RemoveButton" Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
