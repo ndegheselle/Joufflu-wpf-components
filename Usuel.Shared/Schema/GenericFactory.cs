@@ -62,9 +62,11 @@ namespace Usuel.Shared.Schema
         }
     }
 
+    /// <summary>
+    /// Convert a type to a IGenericElement
+    /// </summary>
     public static class GenericFactory
     {
-
         public static IGenericElement Convert(Type type, object? data = null)
         {
             if (type.IsEnum)
@@ -127,6 +129,68 @@ namespace Usuel.Shared.Schema
         {
             return ConvertObject(data.GetType(), data);
         }
+    }
 
+    public class ObjectFactory
+    {
+        public static TObject Convert<TObject>(IGenericElement element, GenericObject? context)
+        {
+            return (TObject)Convert(element, typeof(TObject), context);
+        }
+
+        private static object Convert(IGenericElement element, Type type,  GenericObject? context)
+        {
+            return element switch
+            {
+                GenericEnum genericEnum => ConvertEnum(genericEnum, type, context),
+                GenericValue genericValue => ConvertValue(genericValue, type, context),
+                GenericArray genericArray => ConvertBackArray(genericArray, targetType),
+                GenericObject genericObject => ConvertBackObject(genericObject, targetType),
+                _ => throw new ArgumentException($"Unsupported IGenericElement type: {element.GetType()}")
+            };
+        }
+
+        private static object ConvertEnum(GenericEnum genericEnum, Type type, GenericObject? context)
+        {
+            object? contextValue = ConvertContext(genericEnum.ContextReference, type, context);
+            return contextValue ?? Enum.ToObject(type, genericEnum.Value);
+        }
+
+        private static object ConvertValue(GenericValue genericValue, Type type, GenericObject? context)
+        {
+            object? contextValue = ConvertContext(genericValue.ContextReference, type, context);
+            return contextValue ?? genericValue.Value;
+        }
+
+        private static IGenericElement? ResolveContext(string contextReference, GenericObject? context)
+        {
+            if (context == null)
+                return null;
+            if (string.IsNullOrEmpty(contextReference))
+                return null;
+
+            string[] referenceTree = contextReference.Split(".");
+
+            for(int i = 0; i < referenceTree.Length - 1; i++)
+            {
+                string reference = referenceTree[i];
+                if (!context.Properties.TryGetValue(reference, out var nextElement))
+                    throw new KeyNotFoundException($"Could not find property '{reference}' in '{contextReference}'.");
+
+                if (nextElement is not GenericObject objectElement)
+                    throw new InvalidOperationException($"Property '{reference}' is not an object in '{contextReference}'.");
+
+                context = objectElement;
+            }
+
+            return context.Properties[referenceTree[^1]];
+        }
+        private static object? ConvertContext(string contextReference, Type type, GenericObject? context)
+        {
+            IGenericElement? element = ResolveContext(contextReference, context);
+            if (element == null)
+                return null;
+            return Convert(element, type, context);
+        }
     }
 }
