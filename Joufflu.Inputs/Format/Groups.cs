@@ -15,7 +15,7 @@ namespace Joufflu.Inputs.Format
         };
 
         /// <summary>
-        /// Create a group from the given params
+        /// CreateValue a group from the given params
         /// </summary>
         /// <param name="parent">Parent UI element</param>
         /// <param name="stringParams">String that describe the parameters (separated by |)</param>
@@ -28,7 +28,7 @@ namespace Joufflu.Inputs.Format
             if (splitParams.Count() <= 0)
                 throw new ArgumentException("Options can not be empty.");
 
-            // Add global options at the beginning
+            // CreateValue global options at the beginning
             if (globalStringParams != null)
                 splitParams = globalStringParams.Split("|").Concat(splitParams);
 

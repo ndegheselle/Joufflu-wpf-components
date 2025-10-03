@@ -7,11 +7,11 @@ namespace Joufflu.Data.Schema.Components
     public class Separators : ContentControl
     {
         public static readonly DependencyProperty ElementProperty =
-            DependencyProperty.Register(nameof(Element), typeof(IGenericElement), typeof(Separators), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(Element), typeof(GenericElement), typeof(Separators), new PropertyMetadata(null));
 
-        public IGenericElement Element
+        public GenericElement Element
         {
-            get { return (IGenericElement)GetValue(ElementProperty); }
+            get { return (GenericElement)GetValue(ElementProperty); }
             set { SetValue(ElementProperty, value); }
         }
     }

@@ -15,7 +15,7 @@ namespace Joufflu.Data.Schema
             return item switch
             {
                 _ when item is GenericProperty prop && prop.Element is IGenericParent => ParentTemplate,
-                _ when item is GenericProperty prop && prop.Element is IGenericElement => ElementTemplate,
+                _ when item is GenericProperty prop && prop.Element is GenericElement => ElementTemplate,
                 _ => base.SelectTemplate(item, container)
             };
         }

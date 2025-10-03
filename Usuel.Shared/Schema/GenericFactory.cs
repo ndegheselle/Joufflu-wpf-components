@@ -63,11 +63,11 @@ namespace Usuel.Shared.Schema
     }
 
     /// <summary>
-    /// Convert a type to a IGenericElement
+    /// Convert a type to a GenericElement
     /// </summary>
     public static class GenericFactory
     {
-        public static IGenericElement Convert(Type type, object? data = null)
+        public static GenericElement Convert(Type type, object? data = null)
         {
             if (type.IsEnum)
             {
@@ -93,7 +93,7 @@ namespace Usuel.Shared.Schema
             return ConvertObject(type, data);
         }
 
-        public static IGenericElement Convert(object data)
+        public static GenericElement Convert(object data)
         {
             return Convert(data.GetType(), data);
         }
@@ -133,19 +133,19 @@ namespace Usuel.Shared.Schema
 
     public class ObjectFactory
     {
-        public static TObject Convert<TObject>(IGenericElement element, GenericObject? context)
+        public static TObject Convert<TObject>(GenericElement element, GenericObject? context)
         {
             return (TObject)Convert(element, typeof(TObject), context);
         }
 
-        private static object Convert(IGenericElement element, Type type,  GenericObject? context)
+        private static object Convert(GenericElement element, Type type,  GenericObject? context)
         {
             return element switch
             {
                 GenericEnum genericEnum => ConvertEnum(genericEnum, type, context),
                 GenericValue genericValue => ConvertValue(genericValue, type, context),
-                GenericArray genericArray => ConvertBackArray(genericArray, targetType),
-                GenericObject genericObject => ConvertBackObject(genericObject, targetType),
+                GenericArray genericArray => ConvertArray(genericArray, type, context),
+                GenericObject genericObject => ConvertObject(genericObject, type, context),
                 _ => throw new ArgumentException($"Unsupported IGenericElement type: {element.GetType()}")
             };
         }
@@ -162,7 +162,47 @@ namespace Usuel.Shared.Schema
             return contextValue ?? genericValue.Value;
         }
 
-        private static IGenericElement? ResolveContext(string contextReference, GenericObject? context)
+        private static object ConvertArray(GenericArray genericArray, Type type, GenericObject? context)
+        {
+            if (!type.IsEnumerable())
+                throw new ArgumentException($"Target type {type} is not an enumerable type.");
+
+            object instance = Activator.CreateInstance(type)
+                ?? throw new Exception($"Cannot create type {type}.");
+
+
+            MethodInfo addMethod = type.GetMethod("Add", [type])
+                ?? throw new InvalidOperationException($"{type.Name} does not support adding items.");
+
+            var genericType = type.GetGenericArguments()[0];
+            foreach (var value in genericArray.Values)
+            {
+                addMethod.Invoke(instance, [Convert(value, genericType, context)]);
+            }
+
+            return instance;
+        }
+
+        private static object ConvertObject(GenericObject genericObject, Type type, GenericObject? context)
+        {
+            object instance = Activator.CreateInstance(type) 
+                ?? throw new Exception($"Cannot create type {type}.");
+
+            foreach (var property in genericObject.Properties)
+            {
+                PropertyInfo propInfo = type.GetProperty(property.Key)
+                    ?? throw new ArgumentException($"Property {property.Key} not found in type {type}.");
+
+                object? value = Convert(property.Value, propInfo.PropertyType, context);
+                propInfo.SetValue(instance, value);
+            }
+
+            return instance;
+        }
+
+        // TODO : move to GenericElement
+        [Obsolete]
+        private static GenericElement? ResolveContext(string contextReference, GenericObject? context)
         {
             if (context == null)
                 return null;
@@ -185,9 +225,10 @@ namespace Usuel.Shared.Schema
 
             return context.Properties[referenceTree[^1]];
         }
+
         private static object? ConvertContext(string contextReference, Type type, GenericObject? context)
         {
-            IGenericElement? element = ResolveContext(contextReference, context);
+            GenericElement? element = ResolveContext(contextReference, context);
             if (element == null)
                 return null;
             return Convert(element, type, context);

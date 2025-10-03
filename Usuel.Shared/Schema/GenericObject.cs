@@ -1,167 +1,28 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using System.Windows.Input;
 
 namespace Usuel.Shared.Schema
 {
-    public enum EnumDataType
-    {
-        Object,
-        Array,
-        Enum,
-        String,
-        Integer,
-        Decimal,
-        Boolean,
-        DateTime,
-        TimeSpan
-    }
-
-    public interface IGenericElement : ICloneable
-    {
-        IGenericParent? Parent { get; set; }
-        IEnumerable<IGenericParent> ParentsTree { get; }
-
-        new IGenericElement Clone();
-        object ICloneable.Clone()
-        {
-            return Clone();
-        }
-    }
-
-    public interface IGenericParent : IGenericElement, INotifyPropertyChanged
-    {
-        IEnumerable<GenericProperty> SchemaProperties { get; }
-        IEnumerable<GenericProperty> ValuesProperties { get; }
-
-        /// <summary>
-        /// Change an identifier to a new value.
-        /// </summary>
-        /// <param name="oldIdentifier"></param>
-        /// <param name="newIdentifier"></param>
-        /// <returns>Return false if the newIdentifier is already used.</returns>
-        bool ChangeIdentifier(object oldIdentifier, object newIdentifier);
-        void Remove(object index);
-    }
-
-    public class GenericReference
-    {
-        public string Identifier { get; set; }
-        public EnumDataType DataType { get; set; }
-
-        public GenericReference(string identifier, EnumDataType dataType)
-        {
-            Identifier=identifier;
-            DataType=dataType;
-        }
-
-        public override string ToString() => Identifier;
-    }
-
-    public class GenericValue : IGenericElement, INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        [JsonIgnore]
-        public IGenericParent? Parent { get; set; }
-        [JsonIgnore]
-        public IEnumerable<IGenericParent> ParentsTree => Parent?.Parent == null ? [] : [.. Parent.ParentsTree, Parent];
-
-        public string ContextReference { get; set; } = string.Empty;
-        public object Value { get; set; }
-        public EnumDataType DataType { get; set; }
-
-        public ICommand ClearReferenceCommand { get; private set; }
-
-        public GenericValue(EnumDataType datatype, object? value = null)
-        {
-            DataType = datatype;
-            Value = value ?? GetDefault(datatype);
-
-            ClearReferenceCommand = new DelegateCommand<bool>((clear) =>
-            {
-                if (clear)
-                    ContextReference = string.Empty;
-            });
-        }
-
-        public virtual IGenericElement Clone() => new GenericValue(DataType, Value) { Parent = Parent};
-
-        public override string? ToString()
-        {
-            return DataType switch
-            {
-                EnumDataType.String or
-                EnumDataType.Decimal or
-                EnumDataType.Integer => Value.ToString(),
-                EnumDataType.Boolean => (bool)Value ? "True" : "False",
-                EnumDataType.DateTime => ((DateTime)Value).ToString("yyyy/MM/dd HH:mm"),
-                EnumDataType.TimeSpan => ((TimeSpan)Value).ToString("d:hh:mm:ss"),
-                _ => throw new NotImplementedException($"Value of type {DataType} is not handled."),
-            };
-        }
-
-        public static object GetDefault(EnumDataType dataType)
-        {
-            return dataType switch
-            {
-                EnumDataType.String => "",
-                EnumDataType.Decimal => 0.0m,
-                EnumDataType.Integer => 0,
-                EnumDataType.Boolean => false,
-                EnumDataType.DateTime => DateTime.Now,
-                EnumDataType.TimeSpan => new TimeSpan(),
-                _ => throw new NotImplementedException($"Value of type {dataType} is not handled."),
-            };
-        }
-    }
-
-    public class GenericEnum : GenericValue
-    {
-        public class EnumValue
-        {
-            public int Index { get; private set; }
-            public string Name { get; private set; }
-
-            public EnumValue(int index, string name)
-            {
-                Index = index;
-                Name = name;
-            }
-
-            public override string ToString()
-            {
-                return Name;
-            }
-        }
-
-        public IEnumerable<EnumValue> Availables { get; set; }
-        public GenericEnum(IEnumerable<EnumValue> availables, int value = 0) : base(EnumDataType.Enum, value)
-        {
-            Availables = availables;
-        }
-
-        public override IGenericElement Clone() => new GenericEnum(Availables, Value as int? ?? 0) { Parent = Parent };
-        public override string ToString()
-        {
-            return string.Join(", ", Availables);
-        }
-    }
-
+    /// <summary>
+    /// Property of a <see cref="IGenericParent"/>.
+    /// </summary>
     public class GenericProperty : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        /// <summary>
+        /// Identifier of the property in the parent (can be a string or integeer index).
+        /// </summary>
         public object Identifier { get; set; }
-        public IGenericElement Element { get; }
+        public GenericElement Element { get; }
+
         public ICustomCommand RemoveCommand { get; }
 
         public bool IsRemovable { get; set; } = true;
         public bool IsIdentifierEditable { get; set; } = true;
 
-        public GenericProperty(object identifier, IGenericElement element)
+        public GenericProperty(object identifier, GenericElement element)
         {
             Identifier = identifier;
             Element = element;
@@ -174,15 +35,11 @@ namespace Usuel.Shared.Schema
         }
     }
 
-    public class GenericArray : IGenericParent
+    /// <summary>
+    /// Array of <see cref="GenericElement"/>.
+    /// </summary>
+    public class GenericArray : GenericElement, IGenericParent
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        [JsonIgnore]
-        public IGenericParent? Parent { get; set; }
-        [JsonIgnore]
-        public IEnumerable<IGenericParent> ParentsTree => Parent?.Parent == null ? [] : [.. Parent.ParentsTree, Parent];
-
         [JsonIgnore]
         public IEnumerable<GenericProperty> SchemaProperties => [new GenericProperty("Schema", Schema) { IsRemovable = false, IsIdentifierEditable = false }];
         [JsonIgnore]
@@ -191,21 +48,28 @@ namespace Usuel.Shared.Schema
         public ICustomCommand AddValueCommand { get; }
         public ICustomCommand ChangeSchemaCommand { get; }
 
-        public IGenericElement Schema { get; private set; }
-        public IList<IGenericElement> Values { get; }
+        /// <summary>
+        /// Schema that represent the kind of data that is stored in the values.
+        /// </summary>
+        public GenericElement Schema { get; private set; }
+        public IList<GenericElement> Values { get; }
 
-        public GenericArray(IGenericElement schema, IList<IGenericElement>? values = null)
+        public GenericArray(GenericElement schema, IList<GenericElement>? values = null)
         {
             Schema = schema;
             Values = values ?? [];
 
             ChangeSchemaCommand = new DelegateCommand<EnumDataType>(ChangeSchema);
-            AddValueCommand = new DelegateCommand(Add);
+            AddValueCommand = new DelegateCommand(CreateValue);
             Schema.Parent = this;
             foreach (var value in Values)
                 value.Parent = this;
         }
 
+        /// <summary>
+        /// Change the schema of the array.
+        /// </summary>
+        /// <param name="type"></param>
         public void ChangeSchema(EnumDataType type)
         {
             Values.Clear();
@@ -219,10 +83,21 @@ namespace Usuel.Shared.Schema
             NotifypropertyChanged(nameof(SchemaProperties));
         }
 
-        public void Add()
+        /// <summary>
+        /// Create a value based on the schema.
+        /// </summary>
+        public void CreateValue()
         {
             Values.Add(Schema.Clone());
             NotifypropertyChanged(nameof(ValuesProperties));
+        }
+
+        public override GenericElement Clone() => new GenericArray(Schema, Values.Select(x => x.Clone()).ToList()) { Parent = Parent };
+
+        #region IGenericParent
+        public bool ChangeIdentifier(object oldIdentifier, object newIdentifier)
+        {
+            throw new NotImplementedException("Changing an identifier is not supported for an array.");
         }
 
         public void Remove(object identifier)
@@ -230,38 +105,23 @@ namespace Usuel.Shared.Schema
             Values.RemoveAt((int)identifier);
             NotifypropertyChanged(nameof(ValuesProperties));
         }
-
-        public IGenericElement Clone() => new GenericArray(Schema, Values.Select(x => x.Clone()).ToList()) { Parent = Parent };
-
-        private void NotifypropertyChanged([CallerMemberName] string? name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-
-        public bool ChangeIdentifier(object oldIdentifier, object newIdentifier)
-        {
-            throw new NotImplementedException();
-        }
+        #endregion
     }
 
-    public class GenericObject : IGenericParent
+    /// <summary>
+    /// Object composed of properties of <see cref="GenericElement"/>.
+    /// </summary>
+    public class GenericObject : GenericElement, IGenericParent
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        [JsonIgnore]
-        public IGenericParent? Parent { get; set; }
-        [JsonIgnore]
-        public IEnumerable<IGenericParent> ParentsTree => Parent?.Parent == null ? [] : [.. Parent.ParentsTree, Parent];
         [JsonIgnore]
         public IEnumerable<GenericProperty> SchemaProperties => Properties.Select(x => new GenericProperty(x.Key, x.Value));
         [JsonIgnore]
         public IEnumerable<GenericProperty> ValuesProperties => SchemaProperties;
 
-
-        public Dictionary<string, IGenericElement> Properties { get; }
+        public Dictionary<string, GenericElement> Properties { get; }
         public ICustomCommand CreatePropertyCommand { get; }
 
-        public GenericObject(Dictionary<string, IGenericElement>? properties = null)
+        public GenericObject(Dictionary<string, GenericElement>? properties = null)
         {
             Properties = properties ?? [];
             CreatePropertyCommand = new DelegateCommand<EnumDataType>((type) => CreateProperty("Default", type));
@@ -270,7 +130,7 @@ namespace Usuel.Shared.Schema
                 CreateProperty("Default", EnumDataType.String);
         }
 
-        public void AddProperty(string name, IGenericElement element)
+        public void AddProperty(string name, GenericElement element)
         {
             element.Parent = this;
             Properties.Add(name, element);
@@ -278,9 +138,14 @@ namespace Usuel.Shared.Schema
             NotifypropertyChanged(nameof(ValuesProperties));
         }
 
+        /// <summary>
+        /// Create a property from a specific <see cref="EnumDataType"/>.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="type"></param>
         public void CreateProperty(string name, EnumDataType type)
         {
-            IGenericElement element = type switch
+            GenericElement element = type switch
             {
                 EnumDataType.Object => new GenericObject(),
                 EnumDataType.Array => new GenericArray(new GenericValue(EnumDataType.String)),
@@ -289,16 +154,9 @@ namespace Usuel.Shared.Schema
             AddProperty(GetUniquePropertyName(name), element);
         }
 
-        public void Remove(object identifier)
+        public override GenericElement Clone()
         {
-            Properties.Remove((string)identifier);
-            NotifypropertyChanged(nameof(SchemaProperties));
-            NotifypropertyChanged(nameof(ValuesProperties));
-        }
-
-        public IGenericElement Clone()
-        {
-            Dictionary<string, IGenericElement> properties = [];
+            Dictionary<string, GenericElement> properties = [];
             foreach (var keyValue in Properties)
             {
                 properties.Add(keyValue.Key, keyValue.Value.Clone());
@@ -306,16 +164,11 @@ namespace Usuel.Shared.Schema
             return new GenericObject(properties) { Parent = Parent };
         }
 
-        public bool ChangeIdentifier(object oldIdentifier, object newIdentifier)
-        {
-            if (Properties.ContainsKey((string)newIdentifier))
-                return false;
-
-            Properties[(string)newIdentifier] = Properties[(string)oldIdentifier];
-            Properties.Remove((string)oldIdentifier);
-            return true;
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parentIdentifiers"></param>
+        /// <returns></returns>
         public IEnumerable<GenericReference> GetReferences(IEnumerable<string>? parentIdentifiers = null)
         {
             parentIdentifiers = parentIdentifiers ?? [];
@@ -328,7 +181,7 @@ namespace Usuel.Shared.Schema
                 {
                     references.AddRange(@object.GetReferences(identifiers));
                 }
-                else if (property.Value is GenericArray array)
+                else if (property.Value is GenericArray)
                 {
                     references.Add(new GenericReference(identifier, EnumDataType.Array));
                 }
@@ -361,9 +214,23 @@ namespace Usuel.Shared.Schema
             return uniqueName;
         }
 
-        private void NotifypropertyChanged([CallerMemberName] string? name = null)
+        #region IGenericParent
+        public bool ChangeIdentifier(object oldIdentifier, object newIdentifier)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            if (Properties.ContainsKey((string)newIdentifier))
+                return false;
+
+            Properties[(string)newIdentifier] = Properties[(string)oldIdentifier];
+            Properties.Remove((string)oldIdentifier);
+            return true;
         }
+
+        public void Remove(object identifier)
+        {
+            Properties.Remove((string)identifier);
+            NotifypropertyChanged(nameof(SchemaProperties));
+            NotifypropertyChanged(nameof(ValuesProperties));
+        }
+        #endregion
     }
 }

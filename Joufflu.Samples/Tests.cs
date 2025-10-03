@@ -71,7 +71,7 @@ namespace Joufflu.Samples
 
         public static List<TestClass> Values
         {
-            // Create a new instance because of CollectionViewSource.GetDefaultView
+            // CreateValue a new instance because of CollectionViewSource.GetDefaultView
             get => new List<TestClass>
             {
                 new TestClass("One", 1),

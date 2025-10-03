@@ -347,7 +347,7 @@ namespace Joufflu.Inputs.Format
             Groups.Clear();
             List<object> groups = ParseFormatString(format, globalFormat);
 
-            // Create format for output
+            // CreateValue format for output
             StringBuilder outputFormatBuilder = new StringBuilder();
             int paramIndex = 0;
             for (int i = 0; i < groups.Count; i++)
@@ -406,7 +406,7 @@ namespace Joufflu.Inputs.Format
                 }
                 else
                 {
-                    // Add the literal text to the groups
+                    // CreateValue the literal text to the groups
                     groups.Add(match.Value);
                     index += match.Value.Length;
                 }

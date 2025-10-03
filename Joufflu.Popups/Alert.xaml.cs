@@ -54,7 +54,7 @@ namespace Joufflu.Popups
         {
             CloseCommand = new DelegateCommand(Hide);
 
-            // Create the animations
+            // CreateValue the animations
             DisplayStoryboard = new Storyboard();
             DoubleAnimation displayAnimation = new DoubleAnimation
             {

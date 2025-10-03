@@ -114,7 +114,7 @@ namespace Joufflu.Inputs
             {
                 SelectedItems.Clear();
                 foreach (var item in InternalSelectedItems)
-                    SelectedItems.Add(item);
+                    SelectedItems.CreateValue(item);
                 // For non ObservableCollection
                 bindingExpression.UpdateSource();
             }
