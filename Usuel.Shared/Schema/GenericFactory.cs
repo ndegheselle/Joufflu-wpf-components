@@ -133,36 +133,37 @@ namespace Usuel.Shared.Schema
 
     public class ObjectFactory
     {
-        public static TObject Convert<TObject>(GenericElement element, GenericObject? context)
+        public static TObject Convert<TObject>(GenericElement element, GenericObject? context = null)
         {
             return (TObject)Convert(element, typeof(TObject), context);
         }
 
-        private static object Convert(GenericElement element, Type type,  GenericObject? context)
+        private static object Convert(GenericElement element, Type type, GenericObject? context = null)
         {
+            if (context != null)
+                element.ApplyContext(context);
+
             return element switch
             {
-                GenericEnum genericEnum => ConvertEnum(genericEnum, type, context),
-                GenericValue genericValue => ConvertValue(genericValue, type, context),
-                GenericArray genericArray => ConvertArray(genericArray, type, context),
-                GenericObject genericObject => ConvertObject(genericObject, type, context),
+                GenericEnum genericEnum => ConvertEnum(genericEnum, type),
+                GenericValue genericValue => ConvertValue(genericValue, type),
+                GenericArray genericArray => ConvertArray(genericArray, type),
+                GenericObject genericObject => ConvertObject(genericObject, type),
                 _ => throw new ArgumentException($"Unsupported IGenericElement type: {element.GetType()}")
             };
         }
 
-        private static object ConvertEnum(GenericEnum genericEnum, Type type, GenericObject? context)
+        private static object ConvertEnum(GenericEnum genericEnum, Type type)
         {
-            object? contextValue = ConvertContext(genericEnum.ContextReference, type, context);
-            return contextValue ?? Enum.ToObject(type, genericEnum.Value);
+            return Enum.ToObject(type, genericEnum.Value);
         }
 
-        private static object ConvertValue(GenericValue genericValue, Type type, GenericObject? context)
+        private static object ConvertValue(GenericValue genericValue, Type type)
         {
-            object? contextValue = ConvertContext(genericValue.ContextReference, type, context);
-            return contextValue ?? genericValue.Value;
+            return genericValue.Value;
         }
 
-        private static object ConvertArray(GenericArray genericArray, Type type, GenericObject? context)
+        private static object ConvertArray(GenericArray genericArray, Type type)
         {
             if (!type.IsEnumerable())
                 throw new ArgumentException($"Target type {type} is not an enumerable type.");
@@ -177,13 +178,13 @@ namespace Usuel.Shared.Schema
             var genericType = type.GetGenericArguments()[0];
             foreach (var value in genericArray.Values)
             {
-                addMethod.Invoke(instance, [Convert(value, genericType, context)]);
+                addMethod.Invoke(instance, [Convert(value, genericType)]);
             }
 
             return instance;
         }
 
-        private static object ConvertObject(GenericObject genericObject, Type type, GenericObject? context)
+        private static object ConvertObject(GenericObject genericObject, Type type)
         {
             object instance = Activator.CreateInstance(type) 
                 ?? throw new Exception($"Cannot create type {type}.");
@@ -193,45 +194,12 @@ namespace Usuel.Shared.Schema
                 PropertyInfo propInfo = type.GetProperty(property.Key)
                     ?? throw new ArgumentException($"Property {property.Key} not found in type {type}.");
 
-                object? value = Convert(property.Value, propInfo.PropertyType, context);
+                object? value = Convert(property.Value, propInfo.PropertyType);
                 propInfo.SetValue(instance, value);
             }
 
             return instance;
         }
 
-        // TODO : move to GenericElement
-        [Obsolete]
-        private static GenericElement? ResolveContext(string contextReference, GenericObject? context)
-        {
-            if (context == null)
-                return null;
-            if (string.IsNullOrEmpty(contextReference))
-                return null;
-
-            string[] referenceTree = contextReference.Split(".");
-
-            for(int i = 0; i < referenceTree.Length - 1; i++)
-            {
-                string reference = referenceTree[i];
-                if (!context.Properties.TryGetValue(reference, out var nextElement))
-                    throw new KeyNotFoundException($"Could not find property '{reference}' in '{contextReference}'.");
-
-                if (nextElement is not GenericObject objectElement)
-                    throw new InvalidOperationException($"Property '{reference}' is not an object in '{contextReference}'.");
-
-                context = objectElement;
-            }
-
-            return context.Properties[referenceTree[^1]];
-        }
-
-        private static object? ConvertContext(string contextReference, Type type, GenericObject? context)
-        {
-            GenericElement? element = ResolveContext(contextReference, context);
-            if (element == null)
-                return null;
-            return Convert(element, type, context);
-        }
     }
 }

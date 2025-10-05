@@ -33,6 +33,17 @@ namespace Usuel.Shared.Schema
             });
         }
 
+        /// <summary>
+        /// Apply a context to a generic element and all its childrens, will change all the values by the referenced context element value.
+        /// </summary>
+        /// <param name="context"></param>
+        public void ApplyContext(GenericObject context)
+        {
+            Dictionary<string, GenericReference> contextReferences = context.GetReferences().ToDictionary(x => x.Identifier, x => x);
+            ApplyContext(contextReferences);
+        }
+        public abstract void ApplyContext(Dictionary<string, GenericReference> contextReferences, int depth = 0);
+
         public abstract GenericElement Clone();
         object ICloneable.Clone()
         {

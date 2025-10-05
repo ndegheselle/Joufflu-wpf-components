@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
@@ -94,6 +95,14 @@ namespace Usuel.Shared.Schema
 
         public override GenericElement Clone() => new GenericArray(Schema, Values.Select(x => x.Clone()).ToList()) { Parent = Parent };
 
+        public override void ApplyContext(Dictionary<string, GenericReference> contextReferences, int depth = 0)
+        {
+            foreach (var value in Values)
+            {
+                value.ApplyContext(contextReferences, depth);
+            }
+        }
+
         #region IGenericParent
         public bool ChangeIdentifier(object oldIdentifier, object newIdentifier)
         {
@@ -181,16 +190,20 @@ namespace Usuel.Shared.Schema
                 {
                     references.AddRange(@object.GetReferences(identifiers));
                 }
-                else if (property.Value is GenericArray)
+                else
                 {
-                    references.Add(new GenericReference(identifier, EnumDataType.Array));
-                }
-                else if (property.Value is GenericValue value)
-                {
-                    references.Add(new GenericReference(identifier, value.DataType));
+                    references.Add(new GenericReference(identifier, property.Value));
                 }
             }
             return references;
+        }
+
+        public override void ApplyContext(Dictionary<string, GenericReference> contextReferences, int depth = 0)
+        {
+            foreach (var property in Properties)
+            {
+                property.Value.ApplyContext(contextReferences, depth);
+            }
         }
 
         /// <summary>

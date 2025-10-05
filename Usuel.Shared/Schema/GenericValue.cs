@@ -49,22 +49,29 @@ namespace Usuel.Shared.Schema
     /// </summary>
     public class GenericReference
     {
-        public string Identifier { get; set; }
-        public EnumDataType DataType { get; set; }
+        public string Identifier { get; }
+        public EnumDataType DataType { get; }
+        public GenericElement Element { get; }
 
-        public GenericReference(string identifier, EnumDataType dataType)
+        public GenericReference(string identifier, GenericElement element)
         {
             Identifier = identifier;
-            DataType = dataType;
+            Element = element;
+            DataType = element switch
+            {
+                _ when element is GenericObject => EnumDataType.Object,
+                _ when element is GenericArray => EnumDataType.Array,
+                _ when element is GenericValue value => value.DataType,
+                _ => throw new NotImplementedException($"The element type '{element.GetType()}' is not handled.")
+            };
         }
 
         public override string ToString() => Identifier;
 
         public override bool Equals(object? obj)
         {
-            return (obj is GenericReference other) ? string.Equals(Identifier, other.Identifier) : false;
+            return (obj is GenericReference other) && string.Equals(Identifier, other.Identifier);
         }
-
         public override int GetHashCode() => Identifier.GetHashCode();
     }
 
@@ -96,6 +103,25 @@ namespace Usuel.Shared.Schema
                 EnumDataType.TimeSpan => ((TimeSpan)Value).ToString("d:hh:mm:ss"),
                 _ => throw new NotImplementedException($"Value of type {DataType} is not handled."),
             };
+        }
+
+        public override void ApplyContext(Dictionary<string, GenericReference> contextReferences, int depth = 0)
+        {
+            if (string.IsNullOrEmpty(ContextReference))
+                return;
+
+            // Handle nested context references
+            if (depth > 200)
+                throw new InvalidOperationException($"More than 200 nested context references detected for '{ContextReference}'.");
+            
+            if (contextReferences.TryGetValue(ContextReference.Trim(), out GenericReference? reference) == false)
+                throw new ArgumentException($"Could not find '{ContextReference}' in context.");
+
+            if (reference.Element is not GenericValue valueElement)
+                throw new Exception($"The element '{ContextReference}' is not a value element.");
+
+            valueElement.ApplyContext(contextReferences, depth+1);
+            Value = valueElement.Value;
         }
 
         /// <summary>
