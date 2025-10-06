@@ -38,6 +38,7 @@ namespace Joufflu.Samples
         public EnumTest EnumTest { get; set; }
 
         public string FilePath { get; set; } = "";
+        public DateTime Date { get; set; } = DateTime.Now;
 
         public TestClass()
         {

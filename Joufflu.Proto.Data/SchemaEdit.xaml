@@ -1,5 +1,5 @@
 ﻿<UserControl
-    x:Class="Joufflu.Data.Schema.SchemaEdit"
+    x:Class="Joufflu.Proto.Data.SchemaEdit"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
@@ -9,10 +9,9 @@
     xmlns:converters="clr-namespace:Joufflu.Shared.Converters;assembly=Joufflu.Shared"
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:inputs="clr-namespace:Joufflu.Inputs;assembly=Joufflu.Inputs"
-    xmlns:local="clr-namespace:Joufflu.Data.Schema"
-    xmlns:components="clr-namespace:Joufflu.Data.Schema.Components"
+    xmlns:local="clr-namespace:Joufflu.Proto.Data"
+    xmlns:components="clr-namespace:Joufflu.Proto.Data.Components"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:schema="clr-namespace:Usuel.Shared.Schema;assembly=Usuel.Shared"
     x:Name="ContainerElement"
     mc:Ignorable="d">
     <UserControl.Resources>
@@ -24,7 +23,7 @@
 
             <converters:BooleansConverter x:Key="BooleansConverter" />
 
-            <DataTemplate DataType="{x:Type schema:GenericValue}">
+            <DataTemplate DataType="{x:Type local:GenericValue}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100" />
@@ -34,7 +33,7 @@
                     <ComboBox
                         Name="TypeInput"
                         Margin="2,1"
-                        ItemsSource="{extensions:EnumValuesExtension {x:Type schema:EnumDataType},
+                        ItemsSource="{extensions:EnumValuesExtension {x:Type local:EnumDataType},
                                                                      IgnoreElements=2}"
                         SelectedItem="{Binding DataType, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>
@@ -69,7 +68,7 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type schema:GenericArray}">
+            <DataTemplate DataType="{x:Type local:GenericArray}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100" />
@@ -93,7 +92,7 @@
                         <StackPanel Width="80">
                             <Button
                                 Command="{Binding ChangeSchemaCommand}"
-                                CommandParameter="{x:Static schema:EnumDataType.String}"
+                                CommandParameter="{x:Static local:EnumDataType.String}"
                                 Style="{StaticResource ItemButton}">
                                 <StackPanel Orientation="Horizontal">
                                     <fonts:Icon Text="{x:Static fonts:IconFont.Quotes}" />
@@ -102,7 +101,7 @@
                             </Button>
                             <Button
                                 Command="{Binding ChangeSchemaCommand}"
-                                CommandParameter="{x:Static schema:EnumDataType.Array}"
+                                CommandParameter="{x:Static local:EnumDataType.Array}"
                                 Style="{StaticResource ItemButton}">
                                 <StackPanel Orientation="Horizontal">
                                     <fonts:Icon Text="{x:Static fonts:IconFont.BracketsSquare}" />
@@ -111,7 +110,7 @@
                             </Button>
                             <Button
                                 Command="{Binding ChangeSchemaCommand}"
-                                CommandParameter="{x:Static schema:EnumDataType.Object}"
+                                CommandParameter="{x:Static local:EnumDataType.Object}"
                                 Style="{StaticResource ItemButton}">
                                 <StackPanel Orientation="Horizontal">
                                     <fonts:Icon Text="{x:Static fonts:IconFont.BracketsCurly}" />
@@ -138,7 +137,7 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type schema:GenericObject}">
+            <DataTemplate DataType="{x:Type local:GenericObject}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100" />
@@ -161,7 +160,7 @@
                         <StackPanel Width="80">
                             <Button
                                 Command="{Binding CreatePropertyCommand}"
-                                CommandParameter="{x:Static schema:EnumDataType.String}"
+                                CommandParameter="{x:Static local:EnumDataType.String}"
                                 Style="{StaticResource ItemButton}">
                                 <StackPanel Orientation="Horizontal">
                                     <fonts:Icon Text="{x:Static fonts:IconFont.Quotes}" />
@@ -170,7 +169,7 @@
                             </Button>
                             <Button
                                 Command="{Binding CreatePropertyCommand}"
-                                CommandParameter="{x:Static schema:EnumDataType.Array}"
+                                CommandParameter="{x:Static local:EnumDataType.Array}"
                                 Style="{StaticResource ItemButton}">
                                 <StackPanel Orientation="Horizontal">
                                     <fonts:Icon Text="{x:Static fonts:IconFont.BracketsSquare}" />
@@ -179,7 +178,7 @@
                             </Button>
                             <Button
                                 Command="{Binding CreatePropertyCommand}"
-                                CommandParameter="{x:Static schema:EnumDataType.Object}"
+                                CommandParameter="{x:Static local:EnumDataType.Object}"
                                 Style="{StaticResource ItemButton}">
                                 <StackPanel Orientation="Horizontal">
                                     <fonts:Icon Text="{x:Static fonts:IconFont.BracketsCurly}" />
@@ -206,7 +205,7 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
 
-            <DataTemplate x:Key="SharedSchemaTemplate" DataType="{x:Type schema:GenericProperty}">
+            <DataTemplate x:Key="SharedSchemaTemplate" DataType="{x:Type local:GenericProperty}">
                 <Grid Height="26">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
@@ -275,12 +274,12 @@
 
             <local:GenericTemplateSelector x:Key="GenericTemplateSelector">
                 <local:GenericTemplateSelector.ParentTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type schema:GenericProperty}" ItemsSource="{Binding Element.SchemaProperties}">
+                    <HierarchicalDataTemplate DataType="{x:Type local:GenericProperty}" ItemsSource="{Binding Element.SchemaProperties}">
                         <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
                     </HierarchicalDataTemplate>
                 </local:GenericTemplateSelector.ParentTemplate>
                 <local:GenericTemplateSelector.ElementTemplate>
-                    <DataTemplate DataType="{x:Type schema:GenericProperty}">
+                    <DataTemplate DataType="{x:Type local:GenericProperty}">
                         <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
                     </DataTemplate>
                 </local:GenericTemplateSelector.ElementTemplate>

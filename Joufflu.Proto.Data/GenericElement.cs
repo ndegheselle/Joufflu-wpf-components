@@ -2,8 +2,9 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Windows.Input;
+using Usuel.Shared;
 
-namespace Usuel.Shared.Schema
+namespace Joufflu.Proto.Data
 {
     public interface IGenericElement : ICloneable
     {

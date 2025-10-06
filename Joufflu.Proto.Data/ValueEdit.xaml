@@ -1,5 +1,5 @@
 ﻿<UserControl
-    x:Class="Joufflu.Data.Schema.ValueEdit"
+    x:Class="Joufflu.Proto.Data.ValueEdit"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
@@ -9,10 +9,9 @@
     xmlns:converters="clr-namespace:Joufflu.Shared.Converters;assembly=Joufflu.Shared"
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:inputs="clr-namespace:Joufflu.Inputs;assembly=Joufflu.Inputs"
-    xmlns:local="clr-namespace:Joufflu.Data.Schema"
-    xmlns:components="clr-namespace:Joufflu.Data.Schema.Components"
+    xmlns:local="clr-namespace:Joufflu.Proto.Data"
+    xmlns:components="clr-namespace:Joufflu.Proto.Data.Components"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:schema="clr-namespace:Usuel.Shared.Schema;assembly=Usuel.Shared"
     x:Name="ContainerElement"
     mc:Ignorable="d">
     <UserControl.Resources>
@@ -28,37 +27,37 @@
 
             <local:ValueTemplateSelector x:Key="ValueTemplateSelector">
                 <local:ValueTemplateSelector.StringTemplate>
-                    <DataTemplate DataType="{x:Type schema:GenericValue}">
+                    <DataTemplate DataType="{x:Type local:GenericValue}">
                         <TextBox Text="{Binding Value, Mode=TwoWay}" />
                     </DataTemplate>
                 </local:ValueTemplateSelector.StringTemplate>
                 <local:ValueTemplateSelector.BooleanTemplate>
-                    <DataTemplate DataType="{x:Type schema:GenericValue}">
+                    <DataTemplate DataType="{x:Type local:GenericValue}">
                         <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" />
                     </DataTemplate>
                 </local:ValueTemplateSelector.BooleanTemplate>
                 <local:ValueTemplateSelector.IntegerTemplate>
-                    <DataTemplate DataType="{x:Type schema:GenericValue}">
+                    <DataTemplate DataType="{x:Type local:GenericValue}">
                         <inputs:NumericUpDown Value="{Binding Value, Mode=TwoWay}" />
                     </DataTemplate>
                 </local:ValueTemplateSelector.IntegerTemplate>
                 <local:ValueTemplateSelector.DecimalTemplate>
-                    <DataTemplate DataType="{x:Type schema:GenericValue}">
+                    <DataTemplate DataType="{x:Type local:GenericValue}">
                         <inputs:DecimalUpDown Value="{Binding Value, Mode=TwoWay}" />
                     </DataTemplate>
                 </local:ValueTemplateSelector.DecimalTemplate>
                 <local:ValueTemplateSelector.DateTimeTemplate>
-                    <DataTemplate DataType="{x:Type schema:GenericValue}">
+                    <DataTemplate DataType="{x:Type local:GenericValue}">
                         <DatePicker SelectedDate="{Binding Value, Mode=TwoWay}" />
                     </DataTemplate>
                 </local:ValueTemplateSelector.DateTimeTemplate>
                 <local:ValueTemplateSelector.TimeSpanTemplate>
-                    <DataTemplate DataType="{x:Type schema:GenericValue}">
+                    <DataTemplate DataType="{x:Type local:GenericValue}">
                         <inputs:TimeSpanPicker Value="{Binding Value, Mode=TwoWay}" />
                     </DataTemplate>
                 </local:ValueTemplateSelector.TimeSpanTemplate>
                 <local:ValueTemplateSelector.EnumTemplate>
-                    <DataTemplate DataType="{x:Type schema:GenericEnum}">
+                    <DataTemplate DataType="{x:Type local:GenericEnum}">
                         <ComboBox
                             SelectedValuePath="Index"
                             SelectedValue="{Binding Value, Mode=TwoWay}"
@@ -73,7 +72,7 @@
                 </local:ValueTemplateSelector.EnumTemplate>
             </local:ValueTemplateSelector>
 
-            <DataTemplate DataType="{x:Type schema:GenericValue}">
+            <DataTemplate DataType="{x:Type local:GenericValue}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="28" />
@@ -159,7 +158,7 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type schema:GenericArray}">
+            <DataTemplate DataType="{x:Type local:GenericArray}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="28" />
@@ -192,7 +191,7 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type schema:GenericObject}">
+            <DataTemplate DataType="{x:Type local:GenericObject}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="28" />
@@ -205,7 +204,7 @@
                 </Grid>
             </DataTemplate>
 
-            <DataTemplate x:Key="SharedSchemaTemplate" DataType="{x:Type schema:GenericProperty}">
+            <DataTemplate x:Key="SharedSchemaTemplate" DataType="{x:Type local:GenericProperty}">
                 <Grid Height="26">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
@@ -231,7 +230,7 @@
                     </Button>
                 </Grid>
                 <DataTemplate.Triggers>
-                    <DataTrigger Binding="{Binding Element.Parent, Converter={StaticResource TypeConverter}}" Value="{x:Type schema:GenericObject}">
+                    <DataTrigger Binding="{Binding Element.Parent, Converter={StaticResource TypeConverter}}" Value="{x:Type local:GenericObject}">
                         <Setter TargetName="RemoveButton" Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding IsRemovable}" Value="False">
@@ -245,12 +244,12 @@
 
             <local:GenericTemplateSelector x:Key="GenericTemplateSelector">
                 <local:GenericTemplateSelector.ParentTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type schema:GenericProperty}" ItemsSource="{Binding Element.ValuesProperties}">
+                    <HierarchicalDataTemplate DataType="{x:Type local:GenericProperty}" ItemsSource="{Binding Element.ValuesProperties}">
                         <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
                     </HierarchicalDataTemplate>
                 </local:GenericTemplateSelector.ParentTemplate>
                 <local:GenericTemplateSelector.ElementTemplate>
-                    <DataTemplate DataType="{x:Type schema:GenericProperty}">
+                    <DataTemplate DataType="{x:Type local:GenericProperty}">
                         <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
                     </DataTemplate>
                 </local:GenericTemplateSelector.ElementTemplate>

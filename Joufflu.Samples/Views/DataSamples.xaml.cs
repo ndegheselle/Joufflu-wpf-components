@@ -1,11 +1,8 @@
 ﻿using Joufflu.Data.DnD;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
-using Usuel.Shared.Schema;
 
 namespace Joufflu.Samples.Views
 {
@@ -59,15 +56,11 @@ namespace Joufflu.Samples.Views
 
         public CustomDropHandler DropHandler { get; private set; }
 
-        public GenericObject GenericObject { get; private set; }
-        public IEnumerable<GenericReference> References { get; private set; }
-
         public DataSamples()
         {
             DropHandler = new CustomDropHandler();
             DragHandler = new CustomDragHandler(this);
-            GenericObject = GenericFactory.ConvertObject(Tests.ValueWithSub);
-            References = GenericObject.GetReferences();
+
             InitializeComponent();
             PagingDataGrid.ItemsSource = Tests.Values.Take(5);
         }
@@ -75,11 +68,6 @@ namespace Joufflu.Samples.Views
         #region UI events
         private void Paging_PagingChange(int pageNumber, int capacity)
         { PagingDataGrid.ItemsSource = Tests.Values.Skip((pageNumber - 1) * capacity).Take(capacity); }
-
-        void HandleMouseMove(object sender, MouseEventArgs e)
-        {
-            Debug.WriteLine(e.GetPosition(this));
-        }
         #endregion
     }
 }

@@ -3,9 +3,8 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Usuel.Shared.Schema;
 
-namespace Joufflu.Data.Schema
+namespace Joufflu.Proto.Data
 {
     #region Template selector
 

@@ -52,7 +52,7 @@ namespace Joufflu.Inputs
 
         protected override void OnItemsSourceChanged(IEnumerable oldValue, IEnumerable newValue)
         {
-            if (newValue != oldValue)
+            if (newValue != oldValue && newValue != null)
             {
                 // XXX : could use new ListCollectionView((IList)newValue) to avoid conflicts on the DefaultView
                 // XXX : actualy if the same list is used on two ComboBoxSearch there will be conflicts

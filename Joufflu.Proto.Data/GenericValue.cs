@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Usuel.Shared.Schema
+namespace Joufflu.Proto.Data
 {
     public enum EnumDataType
     {
@@ -70,7 +70,7 @@ namespace Usuel.Shared.Schema
 
         public override bool Equals(object? obj)
         {
-            return (obj is GenericReference other) && string.Equals(Identifier, other.Identifier);
+            return obj is GenericReference other && string.Equals(Identifier, other.Identifier);
         }
         public override int GetHashCode() => Identifier.GetHashCode();
     }

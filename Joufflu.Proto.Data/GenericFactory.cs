@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace Usuel.Shared.Schema
+namespace Joufflu.Proto.Data
 {
     public class GenericFactoryException : Exception
     {
@@ -200,6 +200,5 @@ namespace Usuel.Shared.Schema
 
             return instance;
         }
-
     }
 }

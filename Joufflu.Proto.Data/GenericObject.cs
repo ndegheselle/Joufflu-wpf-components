@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using Usuel.Shared;
 
-namespace Usuel.Shared.Schema
+namespace Joufflu.Proto.Data
 {
     /// <summary>
     /// Property of a <see cref="IGenericParent"/>.
