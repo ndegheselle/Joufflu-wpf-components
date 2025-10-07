@@ -12,7 +12,7 @@ namespace Joufflu.Samples
 
     public class TestClass : ErrorValidationModel
     {
-        private string _name;
+        private string _name = "default";
         public string Name
         {
             get => _name; 
@@ -31,7 +31,7 @@ namespace Joufflu.Samples
             }
         }
 
-        public int Value { get; set; }
+        public int Value { get; set; } = 20;
 
         public bool IsTest { get; set; }
 

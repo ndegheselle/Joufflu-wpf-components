@@ -1,4 +1,5 @@
 ﻿using Joufflu.Data.DnD;
+using NJsonSchema;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -37,9 +38,14 @@ namespace Joufflu.Samples.Views
                 Height = 64,
                 Width = 64
             };
-            border.Child = new TextBlock() { Text = testClass.Name, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center };
+            border.Child = new TextBlock()
+            {
+                Text = testClass.Name,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
 
-            return border; 
+            return border;
         }
     }
 
@@ -60,6 +66,24 @@ namespace Joufflu.Samples.Views
         {
             DropHandler = new CustomDropHandler();
             DragHandler = new CustomDragHandler(this);
+
+            // Get schema
+            // Display
+            // Bind to value
+            // Return json
+
+            /*
+            var serializerOptions = new JsonSerializerOptions(JsonSerializerOptions.Default)
+            {
+                Converters = { new JsonStringEnumConverter() },
+                RespectNullableAnnotations = true,
+                TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
+            };
+            JsonNode schemaJson = serializerOptions.GetJsonSchemaAsNode(typeof(TestClassWithSub));
+            */
+
+            var schema = JsonSchema.FromType<TestClass>();
+            var tata = schema.ToSampleJson();
 
             InitializeComponent();
             PagingDataGrid.ItemsSource = Tests.Values.Take(5);
