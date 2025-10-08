@@ -62,6 +62,8 @@ namespace Joufflu.Samples.Views
 
         public CustomDropHandler DropHandler { get; private set; }
 
+        public JsonSchema Schema { get; private set; }
+
         public DataSamples()
         {
             DropHandler = new CustomDropHandler();
@@ -82,8 +84,8 @@ namespace Joufflu.Samples.Views
             JsonNode schemaJson = serializerOptions.GetJsonSchemaAsNode(typeof(TestClassWithSub));
             */
 
-            var schema = JsonSchema.FromType<TestClass>();
-            var tata = schema.ToSampleJson();
+            Schema = JsonSchema.FromType<TestClassWithSub>();
+            var first = Schema.ActualProperties.Values.First();
 
             InitializeComponent();
             PagingDataGrid.ItemsSource = Tests.Values.Take(5);

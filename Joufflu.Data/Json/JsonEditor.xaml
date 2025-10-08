@@ -1,12 +1,60 @@
-﻿<UserControl x:Class="Joufflu.Data.Json.JsonEditor"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Joufflu.Data.Json"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+﻿<UserControl
+    x:Class="Joufflu.Data.Json.JsonEditor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Joufflu.Data.Json"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:schema="clr-namespace:NJsonSchema;assembly=NJsonSchema"
+    x:Name="ContainerElement"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+
+            <DataTemplate x:Key="SharedSchemaTemplate" DataType="{x:Type schema:JsonSchemaProperty}">
+                <Grid Height="26">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Name" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="24" />
+                    </Grid.ColumnDefinitions>
+                    <ContentControl Grid.Column="1" Content="{Binding Element}" />
+                    <Button
+                        Name="RemoveButton"
+                        Grid.Column="2"
+                        Margin="0,0,1,0"
+                        Command="{Binding RemoveCommand}"
+                        Style="{StaticResource IconButton}"
+                        ToolTip="Remove">
+                        <fonts:Icon Text="{x:Static fonts:IconFont.Trash}" />
+                    </Button>
+                </Grid>
+            </DataTemplate>
+
+            <local:PropertyTemplateSelector x:Key="PropertyTemplateSelector">
+                <local:PropertyTemplateSelector.ObjectTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type schema:JsonSchemaProperty}" ItemsSource="{Binding ActualProperties.Values}">
+                        <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
+                    </HierarchicalDataTemplate>
+                </local:PropertyTemplateSelector.ObjectTemplate>
+                <local:PropertyTemplateSelector.ArrayTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type schema:JsonSchemaProperty}" ItemsSource="{Binding ActualProperties.Values}">
+                        <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
+                    </HierarchicalDataTemplate>
+                </local:PropertyTemplateSelector.ArrayTemplate>
+                <local:PropertyTemplateSelector.ElementTemplate>
+                    <DataTemplate DataType="{x:Type schema:JsonSchemaProperty}">
+                        <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
+                    </DataTemplate>
+                </local:PropertyTemplateSelector.ElementTemplate>
+            </local:PropertyTemplateSelector>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <TreeView
+        DataContext="{Binding ElementName=ContainerElement}"
+        Grid.IsSharedSizeScope="True"
+        ItemTemplateSelector="{StaticResource PropertyTemplateSelector}"
+        ItemsSource="{Binding Schema.ActualProperties.Values}" />
 </UserControl>
