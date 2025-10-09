@@ -39,6 +39,7 @@ namespace Joufflu.Samples
 
         public string FilePath { get; set; } = "";
         public DateTime Date { get; set; } = DateTime.Now;
+        public TimeSpan Duration { get; set; } = TimeSpan.FromSeconds(1);
 
         public TestClass()
         {

@@ -1,38 +1,53 @@
 ﻿using System.ComponentModel;
+using System.Drawing.Printing;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using Usuel.Shared;
 
 namespace Joufflu.Proto.Data
 {
-    /// <summary>
-    /// Property of a <see cref="IGenericParent"/>.
-    /// </summary>
-    public class GenericProperty : INotifyPropertyChanged
+    public class GenericIdentifier<TIdentifier> : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        /// <summary>
-        /// Identifier of the property in the parent (can be a string or integeer index).
-        /// </summary>
-        public object Identifier { get; set; }
-        public GenericElement Element { get; }
-
-        public ICustomCommand RemoveCommand { get; }
-
+        public TIdentifier Identifier { get; set; }
         public bool IsRemovable { get; set; } = true;
         public bool IsIdentifierEditable { get; set; } = true;
 
-        public GenericProperty(object identifier, GenericElement element)
+        public GenericElement Element { get; }
+        public ICustomCommand RemoveCommand { get; }
+
+        public GenericIdentifier(TIdentifier identifier, GenericElement element)
         {
             Identifier = identifier;
             Element = element;
             RemoveCommand = new DelegateCommand(() => Element.Parent?.Remove(Identifier), () => IsRemovable);
         }
 
-        private void NotifypropertyChanged([CallerMemberName] string? name = null)
+        protected void NotifypropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public override string? ToString()
+        {
+            return Identifier?.ToString();
+        }
+    }
+
+    /// <summary>
+    /// Property of a <see cref="IGenericParent"/>.
+    /// </summary>
+    public class GenericProperty : GenericIdentifier<string>
+    {
+        public GenericProperty(string identifier, GenericElement element) : base(identifier, element)
+        {}
+    }
+
+    public class GenericIndex : GenericIdentifier<int>
+    {
+        public GenericIndex(int identifier, GenericElement element) : base(identifier, element)
+        {
         }
     }
 

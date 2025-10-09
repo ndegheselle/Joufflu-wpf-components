@@ -21,15 +21,6 @@ namespace Joufflu.Proto.Data
     public interface IGenericParent : IGenericElement, INotifyPropertyChanged
     {
         /// <summary>
-        /// List of the properties of the schema of the parent.
-        /// </summary>
-        IEnumerable<GenericProperty> SchemaProperties { get; }
-        /// <summary>
-        /// Liste of the values of the parent (can be identical to <see cref="SchemaProperties"/>).
-        /// </summary>
-        IEnumerable<GenericProperty> ValuesProperties { get; }
-
-        /// <summary>
         /// Change an identifier to a new value.
         /// </summary>
         /// <param name="oldIdentifier"></param>
@@ -45,7 +36,7 @@ namespace Joufflu.Proto.Data
     }
 
     /// <summary>
-    /// Reference to another element (identifier can be nested with comma separated).
+    /// Reference to another element (identifier can be nested with dot separator).
     /// </summary>
     public class GenericReference
     {

@@ -6,14 +6,16 @@ namespace Joufflu.Proto.Data
     #region Template selector
     public class GenericTemplateSelector : DataTemplateSelector
     {
-        public DataTemplate? ParentTemplate { get; set; }
+        public DataTemplate? ObjectTemplate { get; set; }
+        public DataTemplate? ArrayTemplate { get; set; }
         public DataTemplate? ElementTemplate { get; set; }
 
         public override DataTemplate? SelectTemplate(object item, DependencyObject container)
         {
             return item switch
             {
-                _ when item is GenericProperty prop && prop.Element is IGenericParent => ParentTemplate,
+                _ when item is GenericProperty prop && prop.Element is GenericObject => ObjectTemplate,
+                _ when item is GenericProperty prop && prop.Element is GenericArray => ArrayTemplate,
                 _ when item is GenericProperty prop && prop.Element is GenericElement => ElementTemplate,
                 _ => base.SelectTemplate(item, container)
             };

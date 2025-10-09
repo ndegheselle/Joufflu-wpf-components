@@ -1,6 +1,11 @@
 ﻿using Joufflu.Data.DnD;
 using NJsonSchema;
 using System.Collections.ObjectModel;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Schema;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -74,7 +79,6 @@ namespace Joufflu.Samples.Views
             // Bind to value
             // Return json
 
-            /*
             var serializerOptions = new JsonSerializerOptions(JsonSerializerOptions.Default)
             {
                 Converters = { new JsonStringEnumConverter() },
@@ -82,13 +86,6 @@ namespace Joufflu.Samples.Views
                 TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
             };
             JsonNode schemaJson = serializerOptions.GetJsonSchemaAsNode(typeof(TestClassWithSub));
-            */
-
-            Schema = JsonSchema.FromType<TestClassWithSub>();
-            var first = Schema.ActualProperties.Values.First();
-
-            InitializeComponent();
-            PagingDataGrid.ItemsSource = Tests.Values.Take(5);
         }
 
         #region UI events
