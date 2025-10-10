@@ -1,27 +1,26 @@
 ﻿using System.ComponentModel;
-using System.Drawing.Printing;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using Usuel.Shared;
 
 namespace Joufflu.Proto.Data
 {
+    /// <summary>
+    /// Generic identifier that can either be a property or index.
+    /// </summary>
+    /// <typeparam name="TIdentifier"></typeparam>
     public class GenericIdentifier<TIdentifier> : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public TIdentifier Identifier { get; set; }
-        public bool IsRemovable { get; set; } = true;
-        public bool IsIdentifierEditable { get; set; } = true;
-
         public GenericElement Element { get; }
-        public ICustomCommand RemoveCommand { get; }
+        public ICustomCommand? RemoveCommand { get; protected set; }
 
         public GenericIdentifier(TIdentifier identifier, GenericElement element)
         {
             Identifier = identifier;
             Element = element;
-            RemoveCommand = new DelegateCommand(() => Element.Parent?.Remove(Identifier), () => IsRemovable);
         }
 
         protected void NotifypropertyChanged([CallerMemberName] string? name = null)
@@ -29,25 +28,53 @@ namespace Joufflu.Proto.Data
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        public override string? ToString()
+        public override string? ToString() => Identifier?.ToString();
+
+        public override bool Equals(object? obj)
         {
-            return Identifier?.ToString();
+            return obj is GenericReference other && string.Equals(Identifier, other.Identifier);
+        }
+        public override int GetHashCode() => Identifier!.GetHashCode();
+    }
+
+    /// <summary>
+    /// Property of a <see cref="GenericObject"/>.
+    /// </summary>
+    public class GenericProperty : GenericIdentifier<string>
+    {
+        public GenericObject Parent => Element.Parent as GenericObject ?? throw new Exception("The property should have a Object parent.");
+
+        public bool IsIdentifierEditable { get; set; } = true;
+        public bool IsRemovable { get; set; } = true;
+
+        public GenericProperty(string identifier, GenericElement element) : base(identifier, element)
+        {
+            RemoveCommand = new DelegateCommand(() => Parent.Remove(Identifier), () => IsRemovable);
+        }
+
+        public bool Rename(string newName)
+        {
+            // Check if unique
+            if (Parent.DoesPropertyExist(newName) == false)
+            {
+                return false;
+            }
+            Parent.RenameProperty(Identifier, newName);
+            Identifier = newName;
+            return true;
         }
     }
 
     /// <summary>
-    /// Property of a <see cref="IGenericParent"/>.
+    /// Index of a <see cref="GenericArray"/>.
     /// </summary>
-    public class GenericProperty : GenericIdentifier<string>
-    {
-        public GenericProperty(string identifier, GenericElement element) : base(identifier, element)
-        {}
-    }
-
     public class GenericIndex : GenericIdentifier<int>
     {
+        public GenericArray Parent => Element.Parent as GenericArray ?? throw new Exception("The index should have a Array parent.");
+
         public GenericIndex(int identifier, GenericElement element) : base(identifier, element)
         {
+            RemoveCommand = new DelegateCommand(() => Parent.RemoveAt(Identifier));
         }
     }
 
@@ -56,10 +83,11 @@ namespace Joufflu.Proto.Data
     /// </summary>
     public class GenericArray : GenericElement, IGenericParent
     {
+        // XXX : Having a GenericProperty in a GenericArray can cause problem if the user try to remove the element
         [JsonIgnore]
-        public IEnumerable<GenericProperty> SchemaProperties => [new GenericProperty("Schema", Schema) { IsRemovable = false, IsIdentifierEditable = false }];
+        public IEnumerable<GenericProperty> MetadataProperties => [new GenericProperty("Schema", Schema) { IsRemovable = false, IsIdentifierEditable = false }];
         [JsonIgnore]
-        public IEnumerable<GenericProperty> ValuesProperties => Values.Select((val, index) => new GenericProperty(index, val) { IsIdentifierEditable = false });
+        public IEnumerable<GenericIndex> IndexedValues => Values.Select((val, index) => new GenericIndex(index, val));
 
         public ICustomCommand AddValueCommand { get; }
         public ICustomCommand ChangeSchemaCommand { get; }
@@ -96,7 +124,7 @@ namespace Joufflu.Proto.Data
                 _ => new GenericValue(type),
             };
             Schema.Parent = this;
-            NotifypropertyChanged(nameof(SchemaProperties));
+            NotifypropertyChanged(nameof(MetadataProperties));
         }
 
         /// <summary>
@@ -105,7 +133,13 @@ namespace Joufflu.Proto.Data
         public void CreateValue()
         {
             Values.Add(Schema.Clone());
-            NotifypropertyChanged(nameof(ValuesProperties));
+            NotifypropertyChanged(nameof(IndexedValues));
+        }
+
+        public void RemoveAt(int index)
+        {
+            Values.RemoveAt(index);
+            NotifypropertyChanged(nameof(IndexedValues));
         }
 
         public override GenericElement Clone() => new GenericArray(Schema, Values.Select(x => x.Clone()).ToList()) { Parent = Parent };
@@ -117,19 +151,6 @@ namespace Joufflu.Proto.Data
                 value.ApplyContext(contextReferences, depth);
             }
         }
-
-        #region IGenericParent
-        public bool ChangeIdentifier(object oldIdentifier, object newIdentifier)
-        {
-            throw new NotImplementedException("Changing an identifier is not supported for an array.");
-        }
-
-        public void Remove(object identifier)
-        {
-            Values.RemoveAt((int)identifier);
-            NotifypropertyChanged(nameof(ValuesProperties));
-        }
-        #endregion
     }
 
     /// <summary>
@@ -138,9 +159,7 @@ namespace Joufflu.Proto.Data
     public class GenericObject : GenericElement, IGenericParent
     {
         [JsonIgnore]
-        public IEnumerable<GenericProperty> SchemaProperties => Properties.Select(x => new GenericProperty(x.Key, x.Value));
-        [JsonIgnore]
-        public IEnumerable<GenericProperty> ValuesProperties => SchemaProperties;
+        public IEnumerable<GenericProperty> ValuesProperties => Properties.Select(x => new GenericProperty(x.Key, x.Value));
 
         public Dictionary<string, GenericElement> Properties { get; }
         public ICustomCommand CreatePropertyCommand { get; }
@@ -158,7 +177,6 @@ namespace Joufflu.Proto.Data
         {
             element.Parent = this;
             Properties.Add(name, element);
-            NotifypropertyChanged(nameof(SchemaProperties));
             NotifypropertyChanged(nameof(ValuesProperties));
         }
 
@@ -221,6 +239,26 @@ namespace Joufflu.Proto.Data
             }
         }
 
+        public bool DoesPropertyExist(string name)
+        {
+            return Properties.ContainsKey(name);
+        }
+
+        public void RenameProperty(string oldName, string newName)
+        {
+            if (Properties.ContainsKey(newName))
+                return;
+
+            Properties[newName] = Properties[oldName];
+            Properties.Remove(oldName);
+        }
+
+        public void Remove(string property)
+        {
+            Properties.Remove(property);
+            NotifypropertyChanged(nameof(ValuesProperties));
+        }
+
         /// <summary>
         /// Gets a unique property name by appending a numeric extension if the name already exists.
         /// </summary>
@@ -241,24 +279,5 @@ namespace Joufflu.Proto.Data
 
             return uniqueName;
         }
-
-        #region IGenericParent
-        public bool ChangeIdentifier(object oldIdentifier, object newIdentifier)
-        {
-            if (Properties.ContainsKey((string)newIdentifier))
-                return false;
-
-            Properties[(string)newIdentifier] = Properties[(string)oldIdentifier];
-            Properties.Remove((string)oldIdentifier);
-            return true;
-        }
-
-        public void Remove(object identifier)
-        {
-            Properties.Remove((string)identifier);
-            NotifypropertyChanged(nameof(SchemaProperties));
-            NotifypropertyChanged(nameof(ValuesProperties));
-        }
-        #endregion
     }
 }

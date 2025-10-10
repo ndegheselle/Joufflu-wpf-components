@@ -19,24 +19,11 @@ namespace Joufflu.Proto.Data
     /// Eelement with childrens.
     /// </summary>
     public interface IGenericParent : IGenericElement, INotifyPropertyChanged
-    {
-        /// <summary>
-        /// Change an identifier to a new value.
-        /// </summary>
-        /// <param name="oldIdentifier"></param>
-        /// <param name="newIdentifier"></param>
-        /// <returns>Return false if the newIdentifier is already used.</returns>
-        bool ChangeIdentifier(object oldIdentifier, object newIdentifier);
-
-        /// <summary>
-        /// Remove an item with a specific identifier.
-        /// </summary>
-        /// <param name="identifier"></param>
-        void Remove(object identifier);
-    }
+    {}
 
     /// <summary>
     /// Reference to another element (identifier can be nested with dot separator).
+    /// XXX : very similar to GenericPropery, maybe fuse them ?
     /// </summary>
     public class GenericReference
     {

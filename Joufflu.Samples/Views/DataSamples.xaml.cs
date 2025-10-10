@@ -1,4 +1,6 @@
 ﻿using Joufflu.Data.DnD;
+using Joufflu.Proto.Data;
+using Joufflu.Proto.Data.Builders;
 using NJsonSchema;
 using System.Collections.ObjectModel;
 using System.Text.Json;
@@ -67,25 +69,14 @@ namespace Joufflu.Samples.Views
 
         public CustomDropHandler DropHandler { get; private set; }
 
-        public JsonSchema Schema { get; private set; }
+        public GenericObject Root { get; private set; }
 
         public DataSamples()
         {
             DropHandler = new CustomDropHandler();
             DragHandler = new CustomDragHandler(this);
 
-            // Get schema
-            // Display
-            // Bind to value
-            // Return json
-
-            var serializerOptions = new JsonSerializerOptions(JsonSerializerOptions.Default)
-            {
-                Converters = { new JsonStringEnumConverter() },
-                RespectNullableAnnotations = true,
-                TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
-            };
-            JsonNode schemaJson = serializerOptions.GetJsonSchemaAsNode(typeof(TestClassWithSub));
+            Root = BuilderFromType.ConvertObject(Tests.Value);
         }
 
         #region UI events

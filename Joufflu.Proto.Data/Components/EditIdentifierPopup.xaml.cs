@@ -49,16 +49,14 @@ namespace Joufflu.Proto.Data.Components
                 this.IsOpen = false;
                 return;
             }
-                
 
             // Check if unique
-            if (Property.Element.Parent?.ChangeIdentifier(Property.Identifier, Identifier) == false)
+            if (Property.Rename(Identifier) == false)
             {
                 MessageError = $"'{Identifier}' is already used.";
                 return;
             }
 
-            Property.Identifier = Identifier;
             this.IsOpen = false;
         }
     }

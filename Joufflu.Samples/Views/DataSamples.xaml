@@ -7,7 +7,7 @@
     xmlns:data="clr-namespace:Joufflu.Data;assembly=Joufflu.Data"
     xmlns:dnd="clr-namespace:Joufflu.Data.DnD;assembly=Joufflu.Data"
     xmlns:local="clr-namespace:Joufflu.Samples.Views"
-    xmlns:json="clr-namespace:Joufflu.Data.Json;assembly=Joufflu.Data"
+    xmlns:schema="clr-namespace:Joufflu.Proto.Data;assembly=Joufflu.Proto.Data"
     xmlns:main="clr-namespace:Joufflu.Samples"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="ContainerElement"
@@ -119,7 +119,7 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <json:JsonEditor Schema="{Binding Schema}" />
+            <schema:SchemaEdit Root="{Binding }" />
 
         </Grid>
     </Grid>

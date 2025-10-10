@@ -17,8 +17,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Joufflu.Data;component/Schema/Components/SchemaTreeView.xaml" />
-                <ResourceDictionary Source="/Joufflu.Data;component/Schema/Components/Separators.xaml" />
+                <ResourceDictionary Source="/Joufflu.Proto.Data;component/Components/SchemaTreeView.xaml" />
+                <ResourceDictionary Source="/Joufflu.Proto.Data;component/Components/Separators.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <converters:TypeConverter x:Key="TypeConverter" />
