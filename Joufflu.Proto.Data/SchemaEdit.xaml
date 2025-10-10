@@ -4,13 +4,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
     xmlns:collections="clr-namespace:System.Collections.Generic;assembly=System.Runtime"
+    xmlns:components="clr-namespace:Joufflu.Proto.Data.Components"
+    xmlns:converters="clr-namespace:Joufflu.Shared.Converters;assembly=Joufflu.Shared"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:extensions="clr-namespace:Joufflu.Shared.Extensions;assembly=Joufflu.Shared"
-    xmlns:converters="clr-namespace:Joufflu.Shared.Converters;assembly=Joufflu.Shared"
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts;assembly=Joufflu.Shared"
     xmlns:inputs="clr-namespace:Joufflu.Inputs;assembly=Joufflu.Inputs"
     xmlns:local="clr-namespace:Joufflu.Proto.Data"
-    xmlns:components="clr-namespace:Joufflu.Proto.Data.Components"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="ContainerElement"
     mc:Ignorable="d">
@@ -43,14 +43,14 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <TextBlock 
-                        Opacity="0.6"
-                        Margin="2,0,0,0"
-                        VerticalAlignment="Center"
+                    <TextBlock
                         Name="ValueDisplay"
                         Grid.Column="1"
-                        ToolTip="Default value"
-                        Text="{Binding}" />
+                        Margin="2,0,0,0"
+                        VerticalAlignment="Center"
+                        Opacity="0.6"
+                        Text="{Binding}"
+                        ToolTip="Default value" />
                 </Grid>
                 <DataTemplate.Triggers>
                     <DataTrigger Value="False">
@@ -81,9 +81,9 @@
                         Type="Array" />
 
                     <inputs:Dropdown
+                        Name="EditSchemaButton"
                         Grid.Column="2"
                         HorizontalAlignment="Right"
-                        Name="EditSchemaButton"
                         BorderThickness="0"
                         ToolTip="Change type">
                         <inputs:Dropdown.Header>
@@ -205,7 +205,7 @@
                 </DataTemplate.Triggers>
             </DataTemplate>
 
-            <DataTemplate x:Key="SharedSchemaTemplate" DataType="{x:Type local:GenericProperty}">
+            <DataTemplate x:Key="SchemaPropertyTemplate" DataType="{x:Type local:GenericProperty}">
                 <Grid Height="26">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
@@ -220,12 +220,12 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock
                                 Name="NameText"
-                                Text="{Binding Identifier}"
-                                VerticalAlignment="Center" />
+                                VerticalAlignment="Center"
+                                Text="{Binding Identifier}" />
                             <Button
-                                Margin="2,0,0,0"
-                                Grid.Column="1"
                                 Name="EditButton"
+                                Grid.Column="1"
+                                Margin="2,0,0,0"
                                 Click="EditIdentifierClick"
                                 Style="{StaticResource IconButtonSmall}"
                                 ToolTip="Edit">
@@ -273,14 +273,19 @@
             </DataTemplate>
 
             <local:GenericTemplateSelector x:Key="GenericTemplateSelector">
-                <local:GenericTemplateSelector.ParentTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type local:GenericProperty}" ItemsSource="{Binding Element.SchemaProperties}">
-                        <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
+                <local:GenericTemplateSelector.ObjectTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type local:GenericProperty}" ItemsSource="{Binding Element.ValuesProperties}">
+                        <ContentPresenter ContentTemplate="{StaticResource SchemaPropertyTemplate}" />
                     </HierarchicalDataTemplate>
-                </local:GenericTemplateSelector.ParentTemplate>
+                </local:GenericTemplateSelector.ObjectTemplate>
+                <local:GenericTemplateSelector.ArrayTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type local:GenericProperty}" ItemsSource="{Binding Element.MetadataProperties}">
+                        <ContentPresenter ContentTemplate="{StaticResource SchemaPropertyTemplate}" />
+                    </HierarchicalDataTemplate>
+                </local:GenericTemplateSelector.ArrayTemplate>
                 <local:GenericTemplateSelector.ElementTemplate>
                     <DataTemplate DataType="{x:Type local:GenericProperty}">
-                        <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
+                        <ContentPresenter ContentTemplate="{StaticResource SchemaPropertyTemplate}" />
                     </DataTemplate>
                 </local:GenericTemplateSelector.ElementTemplate>
             </local:GenericTemplateSelector>

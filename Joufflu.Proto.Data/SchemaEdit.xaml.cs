@@ -14,9 +14,9 @@ namespace Joufflu.Proto.Data
         {
             return item switch
             {
-                _ when item is GenericProperty prop && prop.Element is GenericObject => ObjectTemplate,
-                _ when item is GenericProperty prop && prop.Element is GenericArray => ArrayTemplate,
-                _ when item is GenericProperty prop && prop.Element is GenericElement => ElementTemplate,
+                _ when item is IGenericIdentifier prop && prop.Element is GenericObject => ObjectTemplate,
+                _ when item is IGenericIdentifier prop && prop.Element is GenericArray => ArrayTemplate,
+                _ when item is IGenericIdentifier prop && prop.Element is GenericElement => ElementTemplate,
                 _ => base.SelectTemplate(item, container)
             };
         }

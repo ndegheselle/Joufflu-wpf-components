@@ -243,11 +243,11 @@
             </DataTemplate>
 
             <local:GenericTemplateSelector x:Key="GenericTemplateSelector">
-                <local:GenericTemplateSelector.ParentTemplate>
+                <local:GenericTemplateSelector.ObjectTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type local:GenericProperty}" ItemsSource="{Binding Element.ValuesProperties}">
                         <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
                     </HierarchicalDataTemplate>
-                </local:GenericTemplateSelector.ParentTemplate>
+                </local:GenericTemplateSelector.ObjectTemplate>
                 <local:GenericTemplateSelector.ElementTemplate>
                     <DataTemplate DataType="{x:Type local:GenericProperty}">
                         <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />

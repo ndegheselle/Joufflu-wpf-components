@@ -5,11 +5,17 @@ using Usuel.Shared;
 
 namespace Joufflu.Proto.Data
 {
+    public interface IGenericIdentifier
+    {
+        public GenericElement Element { get; }
+        public ICustomCommand? RemoveCommand { get; }
+    }
+
     /// <summary>
     /// Generic identifier that can either be a property or index.
     /// </summary>
     /// <typeparam name="TIdentifier"></typeparam>
-    public class GenericIdentifier<TIdentifier> : INotifyPropertyChanged
+    public class GenericIdentifier<TIdentifier> : IGenericIdentifier, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
