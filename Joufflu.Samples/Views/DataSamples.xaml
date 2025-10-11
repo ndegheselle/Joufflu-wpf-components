@@ -23,6 +23,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock FontWeight="Bold" Margin="0,6,0,2">Pagging</TextBlock>
+
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition />
@@ -119,7 +120,8 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
-            <schema:SchemaEdit Root="{Binding }" />
+            <schema:SchemaEdit Root="{Binding Root}" />
+            <schema:ValueEdit Grid.Column="1" Root="{Binding Root}" />
 
         </Grid>
     </Grid>

@@ -42,7 +42,7 @@ namespace Joufflu.Proto.Data.Builders
         public static GenericEnum ConvertEnum(Type type, object? data)
         {
             return new GenericEnum(
-                Enum.GetValues(type).Cast<Enum>().Select((x, i) => new GenericEnum.EnumValue(i, x.ToString())),
+                Enum.GetValues(type).Cast<Enum>().Select((x, i) => new GenericEnumValue(i, x.ToString())),
                 data as int? ?? 0
                 );
         }

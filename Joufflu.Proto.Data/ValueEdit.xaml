@@ -204,7 +204,7 @@
                 </Grid>
             </DataTemplate>
 
-            <DataTemplate x:Key="SharedSchemaTemplate" DataType="{x:Type local:GenericProperty}">
+            <DataTemplate DataType="{x:Type local:GenericProperty}">
                 <Grid Height="26">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition SharedSizeGroup="Name" />
@@ -212,10 +212,21 @@
                         <ColumnDefinition Width="24" />
                     </Grid.ColumnDefinitions>
                     <components:Separators Element="{Binding Element}">
-                        <TextBlock
-                            Name="NameText"
-                            Text="{Binding Identifier}"
-                            VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding Identifier}" VerticalAlignment="Center" />
+                    </components:Separators>
+                    <ContentControl Grid.Column="1" Content="{Binding Element}" />
+                </Grid>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type local:GenericIndex}">
+                <Grid Height="26">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition SharedSizeGroup="Name" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="24" />
+                    </Grid.ColumnDefinitions>
+                    <components:Separators Element="{Binding Element}">
+                        <TextBlock Text="{Binding Identifier}" VerticalAlignment="Center" />
                     </components:Separators>
 
                     <ContentControl Grid.Column="1" Content="{Binding Element}" />
@@ -230,12 +241,6 @@
                     </Button>
                 </Grid>
                 <DataTemplate.Triggers>
-                    <DataTrigger Binding="{Binding Element.Parent, Converter={StaticResource TypeConverter}}" Value="{x:Type local:GenericObject}">
-                        <Setter TargetName="RemoveButton" Property="Visibility" Value="Collapsed" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding IsRemovable}" Value="False">
-                        <Setter TargetName="RemoveButton" Property="Visibility" Value="Collapsed" />
-                    </DataTrigger>
                     <DataTrigger Binding="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType={x:Type local:ValueEdit}}}" Value="True">
                         <Setter TargetName="RemoveButton" Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
@@ -244,13 +249,18 @@
 
             <local:GenericTemplateSelector x:Key="GenericTemplateSelector">
                 <local:GenericTemplateSelector.ObjectTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type local:GenericProperty}" ItemsSource="{Binding Element.ValuesProperties}">
-                        <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
+                    <HierarchicalDataTemplate DataType="{x:Type local:GenericProperty}" ItemsSource="{Binding Element.WrappedProperties}">
+                        <ContentPresenter Content="{Binding}" />
                     </HierarchicalDataTemplate>
                 </local:GenericTemplateSelector.ObjectTemplate>
+                <local:GenericTemplateSelector.ArrayTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type local:GenericIndex}" ItemsSource="{Binding Element.IndexedValues}">
+                        <ContentPresenter Content="{Binding}" />
+                    </HierarchicalDataTemplate>
+                </local:GenericTemplateSelector.ArrayTemplate>
                 <local:GenericTemplateSelector.ElementTemplate>
-                    <DataTemplate DataType="{x:Type local:GenericProperty}">
-                        <ContentPresenter ContentTemplate="{StaticResource SharedSchemaTemplate}" />
+                    <DataTemplate>
+                        <ContentPresenter Content="{Binding}" />
                     </DataTemplate>
                 </local:GenericTemplateSelector.ElementTemplate>
             </local:GenericTemplateSelector>
@@ -262,5 +272,6 @@
         Grid.IsSharedSizeScope="True"
         ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
         ItemTemplateSelector="{StaticResource GenericTemplateSelector}"
-        ItemsSource="{Binding Root.ValuesProperties}" />
+        ItemsSource="{Binding Root.WrappedProperties}" />
+
 </UserControl>

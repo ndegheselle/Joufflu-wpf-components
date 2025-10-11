@@ -274,7 +274,7 @@
 
             <local:GenericTemplateSelector x:Key="GenericTemplateSelector">
                 <local:GenericTemplateSelector.ObjectTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type local:GenericProperty}" ItemsSource="{Binding Element.ValuesProperties}">
+                    <HierarchicalDataTemplate DataType="{x:Type local:GenericProperty}" ItemsSource="{Binding Element.WrappedProperties}">
                         <ContentPresenter ContentTemplate="{StaticResource SchemaPropertyTemplate}" />
                     </HierarchicalDataTemplate>
                 </local:GenericTemplateSelector.ObjectTemplate>
@@ -298,7 +298,7 @@
             Grid.IsSharedSizeScope="True"
             ItemContainerStyle="{StaticResource SchemaTreeViewItem}"
             ItemTemplateSelector="{StaticResource GenericTemplateSelector}"
-            ItemsSource="{Binding Root.SchemaProperties}" />
+            ItemsSource="{Binding Root.WrappedProperties}" />
 
         <components:EditIdentifierPopup x:Name="EditIdentifierPopup" />
     </Grid>

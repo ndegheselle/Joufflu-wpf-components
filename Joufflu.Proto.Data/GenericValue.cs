@@ -2,57 +2,6 @@
 
 namespace Joufflu.Proto.Data
 {
-    public enum EnumDataType
-    {
-        Object,
-        Array,
-        Enum,
-        String,
-        Integer,
-        Decimal,
-        Boolean,
-        DateTime,
-        TimeSpan
-    }
-
-    /// <summary>
-    /// Eelement with childrens.
-    /// </summary>
-    public interface IGenericParent : IGenericElement, INotifyPropertyChanged
-    {}
-
-    /// <summary>
-    /// Reference to another element (identifier can be nested with dot separator).
-    /// XXX : very similar to GenericPropery, maybe fuse them ?
-    /// </summary>
-    public class GenericReference
-    {
-        public string Identifier { get; }
-        public EnumDataType DataType { get; }
-        public GenericElement Element { get; }
-
-        public GenericReference(string identifier, GenericElement element)
-        {
-            Identifier = identifier;
-            Element = element;
-            DataType = element switch
-            {
-                _ when element is GenericObject => EnumDataType.Object,
-                _ when element is GenericArray => EnumDataType.Array,
-                _ when element is GenericValue value => value.DataType,
-                _ => throw new NotImplementedException($"The element type '{element.GetType()}' is not handled.")
-            };
-        }
-
-        public override string ToString() => Identifier;
-
-        public override bool Equals(object? obj)
-        {
-            return obj is GenericReference other && string.Equals(Identifier, other.Identifier);
-        }
-        public override int GetHashCode() => Identifier.GetHashCode();
-    }
-
     /// <summary>
     /// Element that store a primitive value.
     /// </summary>
@@ -67,21 +16,7 @@ namespace Joufflu.Proto.Data
             Value = value ?? GetDefault(datatype);
         }
 
-        public override GenericElement Clone() => new GenericValue(DataType, Value) { Parent = Parent };
-
-        public override string? ToString()
-        {
-            return DataType switch
-            {
-                EnumDataType.String or
-                EnumDataType.Decimal or
-                EnumDataType.Integer => Value.ToString(),
-                EnumDataType.Boolean => (bool)Value ? "True" : "False",
-                EnumDataType.DateTime => ((DateTime)Value).ToString("yyyy/MM/dd HH:mm"),
-                EnumDataType.TimeSpan => ((TimeSpan)Value).ToString("d:hh:mm:ss"),
-                _ => throw new NotImplementedException($"Value of type {DataType} is not handled."),
-            };
-        }
+        #region Contexte
 
         public override void ApplyContext(Dictionary<string, GenericReference> contextReferences, int depth = 0)
         {
@@ -91,7 +26,7 @@ namespace Joufflu.Proto.Data
             // Handle nested context references
             if (depth > 200)
                 throw new InvalidOperationException($"More than 200 nested context references detected for '{ContextReference}'.");
-            
+
             if (contextReferences.TryGetValue(ContextReference.Trim(), out GenericReference? reference) == false)
                 throw new ArgumentException($"Could not find '{ContextReference}' in context.");
 
@@ -100,6 +35,25 @@ namespace Joufflu.Proto.Data
 
             valueElement.ApplyContext(contextReferences, depth+1);
             Value = valueElement.Value;
+        }
+
+        #endregion
+
+        public override GenericElement Clone() => new GenericValue(DataType, Value) { Parent = Parent };
+
+        public override string? ToString()
+        {
+            return DataType switch
+            {
+                EnumDataType.Enum or
+                EnumDataType.String or
+                EnumDataType.Decimal or
+                EnumDataType.Integer => Value.ToString(),
+                EnumDataType.Boolean => (bool)Value ? "True" : "False",
+                EnumDataType.DateTime => ((DateTime)Value).ToString("yyyy/MM/dd HH:mm"),
+                EnumDataType.TimeSpan => ((TimeSpan)Value).ToString(@"dd\:hh\:mm\:ss"),
+                _ => throw new NotImplementedException($"Value of type {DataType} is not handled."),
+            };
         }
 
         /// <summary>
@@ -124,44 +78,42 @@ namespace Joufflu.Proto.Data
     }
 
     /// <summary>
+    /// Enum value with index and name.
+    /// </summary>
+    public class GenericEnumValue
+    {
+        public int Index { get; private set; }
+        public string Name { get; private set; }
+
+        public GenericEnumValue(int index, string name)
+        {
+            Index = index;
+            Name = name;
+        }
+
+        public override string ToString()
+        {
+            return Name;
+        }
+    }
+
+    /// <summary>
     /// Element that represent an enum value.
     /// </summary>
     public class GenericEnum : GenericValue
     {
         /// <summary>
-        /// Enum value with index and name.
-        /// </summary>
-        public class EnumValue
-        {
-            public int Index { get; private set; }
-            public string Name { get; private set; }
-
-            public EnumValue(int index, string name)
-            {
-                Index = index;
-                Name = name;
-            }
-
-            public override string ToString()
-            {
-                return Name;
-            }
-        }
-
-        /// <summary>
         /// List of availables enum values.
         /// </summary>
-        public IEnumerable<EnumValue> Availables { get; set; }
-
-        public GenericEnum(IEnumerable<EnumValue> availables, int value = 0) : base(EnumDataType.Enum, value)
+        public IEnumerable<GenericEnumValue> Availables { get; set; } = [];
+        public GenericEnum(IEnumerable<GenericEnumValue> availables, int value = 0) : base(EnumDataType.Enum, value)
         {
             Availables = availables;
         }
 
+        public GenericEnum(int value = 0) : base(EnumDataType.Enum, value)
+        {}
+
         public override GenericElement Clone() => new GenericEnum(Availables, Value as int? ?? 0) { Parent = Parent };
-        public override string ToString()
-        {
-            return string.Join(", ", Availables);
-        }
     }
 }

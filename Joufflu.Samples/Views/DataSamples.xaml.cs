@@ -1,13 +1,7 @@
 ﻿using Joufflu.Data.DnD;
 using Joufflu.Proto.Data;
 using Joufflu.Proto.Data.Builders;
-using NJsonSchema;
 using System.Collections.ObjectModel;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Text.Json.Schema;
-using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -76,12 +70,16 @@ namespace Joufflu.Samples.Views
             DropHandler = new CustomDropHandler();
             DragHandler = new CustomDragHandler(this);
 
-            Root = BuilderFromType.ConvertObject(Tests.Value);
+            Root = BuilderFromType.ConvertObject(Tests.ValueWithSub);
+
+            InitializeComponent();
         }
 
         #region UI events
         private void Paging_PagingChange(int pageNumber, int capacity)
-        { PagingDataGrid.ItemsSource = Tests.Values.Skip((pageNumber - 1) * capacity).Take(capacity); }
+        { 
+            PagingDataGrid.ItemsSource = Tests.Values.Skip((pageNumber - 1) * capacity).Take(capacity); 
+        }
         #endregion
     }
 }

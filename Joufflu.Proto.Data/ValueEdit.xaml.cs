@@ -54,6 +54,9 @@ namespace Joufflu.Proto.Data
             Dictionary<EnumDataType, List<GenericReference>> availableReferencesPerType = (Dictionary<EnumDataType, List<GenericReference>>)values[
                 1];
 
+            if (availableReferencesPerType.ContainsKey(datatype) ==false)
+                return new List<GenericReference>();
+
             // XXX : maybe types like string should accept other types references
             return availableReferencesPerType[datatype];
         }
