@@ -1,7 +1,10 @@
 ﻿using System.Reflection;
 
-namespace Joufflu.Proto.Data.Builders
+namespace Joufflu.Data.Shared.Builders
 {
+    /// <summary>
+    /// Convert a Generic element to it's corresponding type instance.
+    /// </summary>
     public class BuilderToObject
     {
         public static TObject Convert<TObject>(GenericElement element, GenericObject? context = null)

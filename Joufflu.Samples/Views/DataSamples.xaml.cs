@@ -1,6 +1,6 @@
 ﻿using Joufflu.Data.DnD;
-using Joufflu.Proto.Data;
-using Joufflu.Proto.Data.Builders;
+using Joufflu.Data.Shared;
+using Joufflu.Data.Shared.Builders;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;

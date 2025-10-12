@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Joufflu.Proto.Data
+namespace Joufflu.Data.Shared
 {
     /// <summary>
     /// Element that store a primitive value.

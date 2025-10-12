@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Usuel.Shared;
 
-namespace Joufflu.Proto.Data
+namespace Joufflu.Data.Shared
 {
      /// <summary>
      /// Array of <see cref="GenericElement"/>.

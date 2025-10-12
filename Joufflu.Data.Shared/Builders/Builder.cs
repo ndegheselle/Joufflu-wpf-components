@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace Joufflu.Proto.Data.Builders
+namespace Joufflu.Data.Shared.Builders
 {
     public class GenericBuilderException : Exception
     {

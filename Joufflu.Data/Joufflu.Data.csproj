@@ -10,10 +10,11 @@
   <ItemGroup>
     <PackageReference Include="AdonisUI" Version="1.17.1" />
     <PackageReference Include="AdonisUI.ClassicTheme" Version="1.17.1" />
-    <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
+    <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Joufflu.Data.Shared\Joufflu.Data.Shared.csproj" />
     <ProjectReference Include="..\Joufflu.Inputs\Joufflu.Inputs.csproj" />
     <ProjectReference Include="..\Joufflu.Shared\Joufflu.Shared.csproj" />
     <ProjectReference Include="..\Usuel.Shared\Usuel.Shared.csproj" />

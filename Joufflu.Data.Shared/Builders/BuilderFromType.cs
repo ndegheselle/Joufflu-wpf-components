@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Reflection;
 
-namespace Joufflu.Proto.Data.Builders
+namespace Joufflu.Data.Shared.Builders
 {
     /// <summary>
     /// Convert a type to a GenericElement

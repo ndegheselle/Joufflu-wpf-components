@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using System.Windows.Input;
 using Usuel.Shared;
 
-namespace Joufflu.Proto.Data
+namespace Joufflu.Data.Shared
 {
     public enum EnumDataType
     {

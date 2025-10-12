@@ -20,7 +20,6 @@
     <ProjectReference Include="..\Joufflu.Inputs\Joufflu.Inputs.csproj" />
     <ProjectReference Include="..\Joufflu.Layouts\Joufflu.Layouts.csproj" />
     <ProjectReference Include="..\Joufflu.Popups\Joufflu.Popups.csproj" />
-    <ProjectReference Include="..\Joufflu.Proto.Data\Joufflu.Proto.Data.csproj" />
   </ItemGroup>
 
 </Project>

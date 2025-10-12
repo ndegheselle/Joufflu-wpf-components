@@ -1,7 +1,8 @@
-﻿using System.Windows;
+﻿using Joufflu.Data.Shared;
+using System.Windows;
 using System.Windows.Controls;
 
-namespace Joufflu.Proto.Data.Components
+namespace Joufflu.Data.Schema.Components
 {
     public class Separators : ContentControl
     {

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using Usuel.Shared;
 
-namespace Joufflu.Proto.Data
+namespace Joufflu.Data.Shared
 {
     public interface IGenericIdentifier
     {

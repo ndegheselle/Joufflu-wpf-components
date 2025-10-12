@@ -6,6 +6,7 @@
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/Colors.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/DefaultStyles/TabControl.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/DefaultStyles/TreeView.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/DefaultStyles/DatePicker.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/NamedStyles/IconButton.xaml" />
     </ResourceDictionary.MergedDictionaries>
 

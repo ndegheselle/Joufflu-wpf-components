@@ -1,10 +1,12 @@
-﻿using System.ComponentModel;
+﻿using Joufflu.Data.Shared;
+using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace Joufflu.Proto.Data
+namespace Joufflu.Data.Schema
 {
     #region Template selector
     public class ValueTemplateSelector : DataTemplateSelector
@@ -119,6 +121,11 @@ namespace Joufflu.Proto.Data
             }
 
             AvailableReferencesPerType = references;
+        }
+
+        protected void NotifypropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }

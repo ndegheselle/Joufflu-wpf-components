@@ -1,8 +1,10 @@
-﻿using System.ComponentModel;
+﻿using Joufflu.Data.Shared;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 
-namespace Joufflu.Proto.Data.Components
+namespace Joufflu.Data.Schema.Components
 {
     /// <summary>
     /// Logique d'interaction pour EditIdentifierPopup.xaml
@@ -34,6 +36,12 @@ namespace Joufflu.Proto.Data.Components
             IsOpen = true;
         }
 
+        protected void NotifypropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        #region UI events
         private void Button_Cancel(object sender, System.Windows.RoutedEventArgs e)
         {
             this.IsOpen = false;
@@ -59,5 +67,6 @@ namespace Joufflu.Proto.Data.Components
 
             this.IsOpen = false;
         }
+        #endregion
     }
 }

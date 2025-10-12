@@ -1,7 +1,8 @@
-﻿using System.Windows;
+﻿using Joufflu.Data.Shared;
+using System.Windows;
 using System.Windows.Controls;
 
-namespace Joufflu.Proto.Data
+namespace Joufflu.Data.Schema
 {
     #region Template selector
     public class GenericTemplateSelector : DataTemplateSelector

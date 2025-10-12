@@ -10,4 +10,8 @@
     <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" PrivateAssets="All" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Usuel.Shared\Usuel.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

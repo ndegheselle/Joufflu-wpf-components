@@ -1,10 +1,11 @@
-﻿using Joufflu.Shared.Resources.Fonts;
+﻿using Joufflu.Data.Shared;
+using Joufflu.Shared.Resources.Fonts;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Joufflu.Proto.Data.Components
+namespace Joufflu.Data.Schema.Components
 {
     public partial class IconDataType : UserControl, INotifyPropertyChanged
     {
