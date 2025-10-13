@@ -8,7 +8,7 @@ namespace Joufflu.Shared.Converters
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             BooleanConverter lConverterBool = new BooleanConverter();
-            bool lVisible = (bool)lConverterBool.Convert(value, targetType, parameter, culture);
+            bool lVisible = lConverterBool.Convert(value, targetType, parameter, culture) as bool? ?? false;
             return lVisible ? Visibility.Visible : Visibility.Collapsed;
         }
 

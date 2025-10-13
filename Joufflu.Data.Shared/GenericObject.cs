@@ -62,7 +62,7 @@ namespace Joufflu.Data.Shared
         public bool Rename(string newName)
         {
             // Check if unique
-            if (Parent.DoesPropertyExist(newName) == false)
+            if (Parent.DoesPropertyExist(newName) == true)
             {
                 return false;
             }
