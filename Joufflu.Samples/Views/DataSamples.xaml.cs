@@ -1,6 +1,8 @@
 ﻿using Joufflu.Data.DnD;
 using Joufflu.Data.Shared;
 using Joufflu.Data.Shared.Builders;
+using NJsonSchema;
+using System;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -71,6 +73,9 @@ namespace Joufflu.Samples.Views
             DragHandler = new CustomDragHandler(this);
 
             Root = BuilderFromType.ConvertObject(Tests.ValueWithSub);
+
+            var schema = JsonSchema.FromType<TestClassWithSub>();
+            var schemaData = schema.ToJson();
 
             InitializeComponent();
         }
