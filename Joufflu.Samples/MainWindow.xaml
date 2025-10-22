@@ -31,7 +31,6 @@
                 <TabItem Header="Popups" Visibility="Collapsed">
                     <views:PopupsSamples />
                 </TabItem>
-
                 <TabItem Header="Layouts" Visibility="Collapsed">
                     <GroupBox Header="Flexible grid">
                         <layouts:FlexibleGrid
@@ -53,6 +52,9 @@
                             <Button Content="Button 9" />
                         </layouts:FlexibleGrid>
                     </GroupBox>
+                </TabItem>
+                <TabItem Header="History" Visibility="Collapsed">
+                    <views:HistorySample />
                 </TabItem>
             </TabControl>
         </Grid>

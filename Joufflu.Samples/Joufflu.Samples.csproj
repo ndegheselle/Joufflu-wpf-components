@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\HistorySample.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AdonisUI" Version="1.17.1" />
     <PackageReference Include="AdonisUI.ClassicTheme" Version="1.17.1" />
     <PackageReference Include="NJsonSchema" Version="11.5.1" />
@@ -20,6 +24,7 @@
     <ProjectReference Include="..\Joufflu.Inputs\Joufflu.Inputs.csproj" />
     <ProjectReference Include="..\Joufflu.Layouts\Joufflu.Layouts.csproj" />
     <ProjectReference Include="..\Joufflu.Popups\Joufflu.Popups.csproj" />
+    <ProjectReference Include="..\Usuel.History\Usuel.History.csproj" />
   </ItemGroup>
 
 </Project>
