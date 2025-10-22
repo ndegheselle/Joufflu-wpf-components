@@ -76,7 +76,6 @@ namespace Usuel.History
 
         public List<IHistoryAction> Stack => _undoStack.ToList();
 
-        private IHistoryAction? _currentAction;
         private Stack<IHistoryAction> _undoStack = [];
         private Stack<IHistoryAction> _redoStack = [];
 
@@ -84,6 +83,12 @@ namespace Usuel.History
         {
             UndoCommand = new DelegateCommand(Undo, () => IsUndoAvailable);
             RedoCommand = new DelegateCommand(Redo, () => IsRedoAvailable);
+        }
+
+        public void SetReverse(IReversibleCommand command1, IReversibleCommand command2)
+        {
+            command1.Reverse = command2;
+            command2.Reverse = command1;
         }
 
         public void Add(IReversibleCommand command, object? parameter = null)
@@ -99,15 +104,6 @@ namespace Usuel.History
             IsRedoAvailable = _redoStack.Count!=0;
             IsUndoAvailable = _undoStack.Count!=0;
             NotifyPropertyChanged(nameof(Stack));
-        }
-
-        public void BeginAction(IHistoryAction action)
-        {
-            _currentAction = action;
-        }
-        public void EndAction()
-        {
-            _currentAction = null;
         }
 
         public void Undo()

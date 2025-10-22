@@ -17,6 +17,7 @@ namespace Joufflu.Samples.Views
         public IReversibleCommand AddRandomCharCommand { get; }
         public IReversibleCommand RemoveLastCharCommand { get; }
         public IReversibleCommand AddMultipleRandomCharCommand { get; }
+        public IReversibleCommand RemoveMultipleLastCharCommand { get; }
 
         public HistorySample()
         {
@@ -24,11 +25,11 @@ namespace Joufflu.Samples.Views
 
             AddRandomCharCommand = new ReversibleCommand(Handler, AddRandomChar, name: "AddRandomChar");
             RemoveLastCharCommand = new ReversibleCommand(Handler, RemoveLastChar, name: "RemoveLastChar");
-            AddMultipleRandomCharCommand = new ReversibleCommand(Handler, AddMultipleRandomChar, name: "AddMultipleRandomChar") { IsBatched = true };
+            AddMultipleRandomCharCommand = new ReversibleCommand(Handler, AddMultipleRandomChar, name: "AddMultipleRandomChar");
+            RemoveMultipleLastCharCommand = new ReversibleCommand(Handler, RemoveMultipleLastChar, name: "RemoveMultipleLastChar");
 
-            RemoveLastCharCommand.Reverse = AddRandomCharCommand;
-            AddRandomCharCommand.Reverse = RemoveLastCharCommand;
-
+            Handler.SetReverse(AddRandomCharCommand, RemoveLastCharCommand);
+            Handler.SetReverse(AddMultipleRandomCharCommand, RemoveMultipleLastCharCommand);
 
             InitializeComponent();
         }
@@ -52,7 +53,15 @@ namespace Joufflu.Samples.Views
         {
             for (int i = 0; i < 10; i++)
             {
-                AddRandomCharCommand.Execute(withHistory: false);
+                AddRandomChar();
+            }
+        }
+
+        private void RemoveMultipleLastChar()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                RemoveLastChar();
             }
         }
     }

@@ -9,6 +9,7 @@ namespace Usuel.History
         /// Command that does the exact oposit of this command.
         /// </summary>
         public IReversibleCommand? Reverse { get; set; }
+
         /// <summary>
         /// Execute the command.
         /// </summary>
@@ -68,6 +69,35 @@ namespace Usuel.History
             base.Execute(parameter);
             if (withHistory)
                 _handler.Add(this, parameter);
+        }
+    }
+
+    public class BatchCommand : IReversibleCommand
+    {
+        public string Name { get; }
+
+        public IReversibleCommand? Reverse { get; set; }
+
+        public event EventHandler? CanExecuteChanged;
+
+        public bool CanExecute(object? parameter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Execute(object? parameter = null, bool withHistory = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Execute(object? parameter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RaiseCanExecuteChanged()
+        {
+            throw new NotImplementedException();
         }
     }
 }
