@@ -42,8 +42,8 @@
             </GroupBox>
             <StackPanel
                 Grid.Row="1"
-                Height="24"
-                Margin="4,6"
+                Height="26"
+                Margin="4"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
                 Orientation="Horizontal">

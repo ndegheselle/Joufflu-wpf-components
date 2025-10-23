@@ -134,8 +134,8 @@ namespace Usuel.History
             // Ignore the command that don't have any undo command
             if (action.CanReverse == false)
                 return;
-            action.ExecuteReverse();
-            _undoStack.Push(action);
+            var reverseAction = action.ExecuteReverse();
+            _undoStack.Push(reverseAction);
             IsUndoAvailable = _undoStack.Count!=0;
             NotifyPropertyChanged(nameof(Stack));
         }
