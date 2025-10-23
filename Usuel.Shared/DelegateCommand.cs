@@ -21,7 +21,6 @@ namespace Usuel.Shared
         }
 
         public bool CanExecute(object? parameter) => _condition?.Invoke() ?? true;
-
         public virtual void Execute(object? parameter) => _action();
 
         public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, new EventArgs());
@@ -40,26 +39,11 @@ namespace Usuel.Shared
             _condition = executeCondition;
         }
 
-        public bool CanExecute(object? parameter)
-        {
-            if (parameter is T value)
-            {
-                return _condition?.Invoke(value) ?? true;
-            }
-            return _condition?.Invoke(default!) ?? true;
-        }
+        public bool CanExecute(object? parameter) => CanExecute(parameter is T value ? value : default!);
+        public bool CanExecute(T parameter) => _condition?.Invoke(parameter) ?? true;
 
-        public virtual void Execute(object? parameter)
-        {
-            if (parameter is T value)
-            {
-                _action(value);
-            }
-            else
-            {
-                _action(default!);
-            }
-        }
+        public virtual void Execute(object? parameter) => Execute(parameter is T value ? value : default!);
+        public void Execute(T parameter) => _action(parameter);
 
         public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, new EventArgs());
     }

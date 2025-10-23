@@ -37,7 +37,6 @@ namespace Usuel.History
         }
 
         public override void Execute(object? parameter = null) => Execute(parameter, true);
-
         public void Execute(object? parameter = null, bool withHistory = true)
         {
             base.Execute(parameter);
@@ -63,41 +62,11 @@ namespace Usuel.History
         }
 
         public override void Execute(object? parameter = null) => Execute(parameter, true);
-
         public void Execute(object? parameter = null, bool withHistory = true)
         {
             base.Execute(parameter);
             if (withHistory)
                 _handler.Add(this, parameter);
-        }
-    }
-
-    public class BatchCommand : IReversibleCommand
-    {
-        public string Name { get; }
-
-        public IReversibleCommand? Reverse { get; set; }
-
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Execute(object? parameter = null, bool withHistory = true)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Execute(object? parameter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RaiseCanExecuteChanged()
-        {
-            throw new NotImplementedException();
         }
     }
 }
