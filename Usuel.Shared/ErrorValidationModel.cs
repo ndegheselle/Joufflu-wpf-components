@@ -18,7 +18,7 @@ namespace Usuel.Shared
             return _errorsByPropertyName.ContainsKey(propertyName) ? _errorsByPropertyName[propertyName] : [];
         }
 
-        private void NotifyErrorsChanged([CallerMemberName]string? propertyName = null)
+        private void NotifyErrorsChanged(string? propertyName = null)
         {
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
@@ -52,8 +52,8 @@ namespace Usuel.Shared
         {
             if (propertyName == null)
             {
-                _errorsByPropertyName.Clear();
-                NotifyErrorsChanged();
+                foreach (var value in _errorsByPropertyName)
+                    ClearErrors(value.Key);
                 return;
             }
 
