@@ -4,6 +4,7 @@
     xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/Colors.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/DefaultStyles/Expander.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/DefaultStyles/TabControl.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/DefaultStyles/TreeView.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/DefaultStyles/DatePicker.xaml" />
