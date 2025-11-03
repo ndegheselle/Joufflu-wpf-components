@@ -122,7 +122,6 @@
 
             <schema:SchemaEdit Root="{Binding Root}" />
             <schema:ValueEdit Grid.Column="1" Root="{Binding Root}" />
-
         </Grid>
     </Grid>
 </UserControl>

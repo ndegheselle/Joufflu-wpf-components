@@ -71,7 +71,7 @@ namespace Joufflu.Data.Shared
                 EnumDataType.Integer => 0,
                 EnumDataType.Boolean => false,
                 EnumDataType.DateTime => DateTime.Now,
-                EnumDataType.TimeSpan => new TimeSpan(),
+                EnumDataType.TimeSpan => TimeSpan.Zero,
                 _ => throw new NotImplementedException($"Value of type {dataType} is not handled."),
             };
         }

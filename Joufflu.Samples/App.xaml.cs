@@ -1,6 +1,4 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
+﻿using System.Windows;
 
 namespace Joufflu.Samples
 {
@@ -10,5 +8,4 @@ namespace Joufflu.Samples
     public partial class App : Application
     {
     }
-
 }
