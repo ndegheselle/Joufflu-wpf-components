@@ -54,7 +54,7 @@
                                                         <fonts:Icon.Style>
                                                             <Style TargetType="{x:Type fonts:Icon}" BasedOn="{StaticResource {x:Type fonts:Icon}}">
                                                                 <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Content.Options.Title, TargetNullValue=''}" Value="">
+                                                                    <DataTrigger Binding="{Binding Content.Options.Title, TargetNullValue='', FallbackValue=''}" Value="">
                                                                         <Setter Property="Visibility" Value="Collapsed" />
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
@@ -63,7 +63,7 @@
                                                     </fonts:Icon>
                                                     <TextBlock
                                                         FontWeight="Bold"
-                                                        Text="{Binding Content.Options.Title}"
+                                                        Text="{Binding Content.Options.Title, FallbackValue=''}"
                                                         VerticalAlignment="Center" />
 
                                                 </StackPanel>
