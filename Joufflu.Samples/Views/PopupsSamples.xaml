@@ -6,10 +6,18 @@
     xmlns:local="clr-namespace:Joufflu.Samples.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    <UniformGrid HorizontalAlignment="Left" VerticalAlignment="Top">
-        <Button Margin="1" Click="ShowAlert_Click">Show alert</Button>
-        <Button Margin="1" Click="ShowModal_Click">Show modal</Button>
-        <Button Margin="1" Click="ShowMultiple_Click">Show multiple modal</Button>
-        <Button Margin="1" Click="ShowLoading_Click">Loading</Button>
-    </UniformGrid>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+    
+        <UniformGrid HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Button Margin="1" Click="ShowAlert_Click">Show alert</Button>
+            <Button Margin="1" Click="ShowModal_Click">Show modal</Button>
+            <Button Margin="1" Click="ShowMultiple_Click">Show multiple modal</Button>
+            <Button Margin="1" Click="ShowLoading_Click">Loading</Button>
+        </UniformGrid>
+    </Grid>
 </UserControl>

@@ -74,9 +74,30 @@ namespace Joufflu.Samples.Views
 
             Root = BuilderFromType.ConvertObject(Tests.ValueWithSub);
 
-            var schema = JsonSchema.FromType<TestClassWithSub>();
-            var schemaData = schema.ToJson();
-
+            var schema1 = JsonSchema.FromSampleJson("""
+                                      {
+                                      	"tata": "string",
+                                      	"boobo": true
+                                      }
+                                      """);
+            var schema2 = JsonSchema.FromSampleJson("""
+                                                    {
+                                                    	"tata": 54,
+                                                    	"somethingelse": ["toto"]
+                                                    }
+                                                    """);
+            
+            var mergedSchema = new JsonSchema
+            {
+                Description = "Merged schema allowing either schema1 or schema2",
+            };
+            
+            mergedSchema.AllOf.Add(schema1);
+            mergedSchema.AllOf.Add(schema2);
+            
+            var schemaJson = mergedSchema.ToJson();
+            var schemaSample = mergedSchema.ToSampleJson().ToString();
+            
             InitializeComponent();
         }
 

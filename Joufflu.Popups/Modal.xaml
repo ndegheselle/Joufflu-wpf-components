@@ -28,7 +28,10 @@
                                     <RowDefinition Height="auto" />
                                 </Grid.RowDefinitions>
 
-                                <Grid Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}">
+                                <Border 
+                                    CornerRadius="{DynamicResource {x:Static adonisUi:Dimensions.CornerRadius}}"
+                                    Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1BackgroundBrush}}">
+                                    <Grid >
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition />
                                         <ColumnDefinition Width="auto" />
@@ -86,6 +89,8 @@
                                         Height="23"
                                         Command="{Binding HideCommand}" />
                                 </Grid>
+                                </Border>
+                                
                                 <ContentPresenter Grid.Row="1" />
                             </Grid>
                         </Border>

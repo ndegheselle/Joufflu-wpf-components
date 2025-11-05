@@ -1,7 +1,8 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts">
+    xmlns:fonts="clr-namespace:Joufflu.Shared.Resources.Fonts"
+    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/Colors.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/DefaultStyles/Expander.xaml" />
@@ -10,7 +11,7 @@
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/DefaultStyles/DatePicker.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/NamedStyles/IconButton.xaml" />
     </ResourceDictionary.MergedDictionaries>
-
+    <CornerRadius x:Key="{x:Static adonisUi:Dimensions.CornerRadius}">2</CornerRadius>
     <FontFamily x:Key="Phosphor">/Joufflu.Shared;Component/Resources/Fonts/Phosphor.ttf#Phosphor</FontFamily>
     <Style
         x:Key="{x:Type fonts:Icon}"
