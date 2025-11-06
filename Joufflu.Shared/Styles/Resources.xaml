@@ -11,7 +11,7 @@
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/DefaultStyles/DatePicker.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Joufflu.Shared;component/Styles/NamedStyles/IconButton.xaml" />
     </ResourceDictionary.MergedDictionaries>
-    <CornerRadius x:Key="{x:Static adonisUi:Dimensions.CornerRadius}">2</CornerRadius>
+    <CornerRadius x:Key="{x:Static adonisUi:Dimensions.CornerRadius}">4</CornerRadius>
     <FontFamily x:Key="Phosphor">/Joufflu.Shared;Component/Resources/Fonts/Phosphor.ttf#Phosphor</FontFamily>
     <Style
         x:Key="{x:Type fonts:Icon}"

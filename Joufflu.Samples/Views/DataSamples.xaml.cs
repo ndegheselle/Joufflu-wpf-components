@@ -91,9 +91,15 @@ namespace Joufflu.Samples.Views
             {
                 Description = "Merged schema allowing either schema1 or schema2",
             };
-            
-            mergedSchema.AllOf.Add(schema1);
-            mergedSchema.AllOf.Add(schema2);
+
+            mergedSchema.Properties.Add("previous", new JsonSchemaProperty
+            {
+                AnyOf = { schema1 }
+            });
+            mergedSchema.Properties.Add("context", new JsonSchemaProperty
+            {
+                AnyOf = { schema2 }
+            });
             
             var schemaJson = mergedSchema.ToJson();
             var schemaSample = mergedSchema.ToSampleJson().ToString();
