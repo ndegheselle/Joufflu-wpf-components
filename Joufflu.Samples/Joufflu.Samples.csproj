@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Bariole\Bariole.csproj" />
     <ProjectReference Include="..\Joufflu.Data\Joufflu.Data.csproj" />
     <ProjectReference Include="..\Joufflu.Inputs\Joufflu.Inputs.csproj" />
     <ProjectReference Include="..\Joufflu.Layouts\Joufflu.Layouts.csproj" />

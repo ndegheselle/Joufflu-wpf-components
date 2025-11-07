@@ -56,6 +56,9 @@
                 <TabItem Header="History" Visibility="Collapsed">
                     <views:HistorySample />
                 </TabItem>
+                <TabItem Header="Prototypes">
+                    <views:ProtoypesSamples />
+                </TabItem>
             </TabControl>
         </Grid>
 
