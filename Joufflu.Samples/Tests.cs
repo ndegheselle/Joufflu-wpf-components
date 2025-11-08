@@ -1,4 +1,6 @@
-﻿using System.Reflection.Emit;
+﻿using System.Collections;
+using System.ComponentModel;
+using System.Reflection.Emit;
 using Usuel.Shared;
 
 namespace Joufflu.Samples
@@ -10,7 +12,7 @@ namespace Joufflu.Samples
         Two,
     }
 
-    public class TestClass : ErrorValidationModel
+    public class TestClass : INotifyDataErrorInfo
     {
         private string _name = "default";
         public string Name
@@ -18,13 +20,13 @@ namespace Joufflu.Samples
             get => _name; 
             set
             {
-                ClearErrors();
+                Errors.Clear();
                 if (_name == value)
                     return;
 
                 if (value == "wrong")
                 {
-                    AddError("Name can't be wrong.");
+                    Errors.Add("Name can't be wrong.");
                     return;
                 }
                 _name = value;
@@ -57,6 +59,16 @@ namespace Joufflu.Samples
         public override bool Equals(object? obj) { return obj is TestClass value && Name == value.Name; }
 
         public override int GetHashCode() { return Name.GetHashCode(); }
+
+        public ErrorValidation Errors { get; } = new ErrorValidation();
+        public IEnumerable GetErrors(string? propertyName) => Errors.GetErrors(propertyName);
+
+        public bool HasErrors => Errors.HasErrors;
+        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged
+        {
+            add => Errors.ErrorsChanged += value;
+            remove => Errors.ErrorsChanged -= value;
+        }
     }
 
     public class TestClassWithSub

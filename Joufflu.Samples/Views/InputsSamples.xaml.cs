@@ -42,9 +42,9 @@ namespace Joufflu.Samples.Views
 
         private void ButtonCheckFile_Click(object sender, RoutedEventArgs e)
         {
-            Tests.Value.ClearErrors();
+            Tests.Value.Errors.Clear();
             if (string.IsNullOrEmpty(Tests.Value.FilePath))
-                Tests.Value.AddError("No file selected", nameof(TestClass.FilePath));
+                Tests.Value.Errors.Add("No file selected", nameof(TestClass.FilePath));
         }
 
         private void SearchInput_SearchChanged(string text)
