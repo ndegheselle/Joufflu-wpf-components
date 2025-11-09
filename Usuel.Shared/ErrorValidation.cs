@@ -26,10 +26,10 @@ namespace Usuel.Shared
 
         public void Add(string error, [CallerMemberName] string? propertyName = null)
         {
-            Add(propertyName, [error]);
+            Add([error], propertyName);
         }
 
-        public void Add(string? propertyName, List<string> errors)
+        public void Add(IEnumerable<string> errors, [CallerMemberName] string? propertyName = null)
         {
             if (propertyName == null)
                 return;
@@ -45,7 +45,7 @@ namespace Usuel.Shared
         {
             foreach (var error in errors)
             {
-                Add(error.Key, error.Value);
+                Add(error.Value, error.Key);
             }
         }
 
@@ -62,6 +62,19 @@ namespace Usuel.Shared
             {
                 NotifyErrorsChanged(propertyName);
             }
+        }
+    }
+
+    public class BaseErrorModel : INotifyDataErrorInfo
+    {
+        public ErrorValidation Errors { get; } = new ErrorValidation();
+        public IEnumerable GetErrors(string? propertyName) => Errors.GetErrors(propertyName);
+
+        public bool HasErrors => Errors.HasErrors;
+        public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged
+        {
+            add => Errors.ErrorsChanged += value;
+            remove => Errors.ErrorsChanged -= value;
         }
     }
 }
