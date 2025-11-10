@@ -18,20 +18,19 @@ namespace Joufflu.Shared.Converters
         {
             bool result = false;
 
-            if (value is bool)
-                result = (bool)value;
-            else if (value is string)
-                result = !string.IsNullOrEmpty(value as string);
-            else if (value is int)
-                result = (int)value > 0;
-            else if (value is ICollection)
-                result = ((ICollection)value).Count > 0;
+            if (value is bool b)
+                result = b;
+            else if (value is string s)
+                result = !string.IsNullOrEmpty(s);
+            else if (value is int i)
+                result = i > 0;
+            else if (value is ICollection collection)
+                result = collection.Count > 0;
             else
                 result = value != null;
 
-            // For exemple if the parameter is "false", and the the value is null, the result will be true.
-            bool target;
-            if (!bool.TryParse(parameter?.ToString(), out target))
+            // For exemple if the parameter is "false", and the value is null, the result will be true.
+            if (!bool.TryParse(parameter?.ToString(), out var target))
                 target = true;
 
             return result == target;
