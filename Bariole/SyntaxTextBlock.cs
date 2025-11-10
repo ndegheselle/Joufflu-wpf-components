@@ -3,9 +3,19 @@ using System.Windows.Media;
 
 namespace Bariole;
 
-// Interesting : https://github.com/danipen/TextMateSharp
+// For more complexe / faster ? https://github.com/tree-sitter/tree-sitter
+// Could be a good stard : https://github.com/danipen/TextMateSharp
 public class SyntaxTextBlock : FrameworkElement
 {
+    public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
+        nameof(Text), typeof(string), typeof(SyntaxTextBlock), new PropertyMetadata(default(string)));
+
+    public string Text
+    {
+        get { return (string)GetValue(TextProperty); }
+        set { SetValue(TextProperty, value); }
+    }
+    
     protected override void OnRender(DrawingContext drawingContext)
     {
         base.OnRender(drawingContext);
