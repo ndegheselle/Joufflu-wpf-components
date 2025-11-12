@@ -7,4 +7,20 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Compile Remove="Vendors\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Vendors\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Page Remove="Vendors\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Vendors\**" />
+    </ItemGroup>
+
 </Project>
