@@ -12,6 +12,8 @@ namespace Joufflu.Samples
     {
         public MainWindow()
         {
+            string tata = "afaf".ToString();
+
             InitializeComponent();
             // Foreach tab in MainContainer create a ListBoxItem and add it to the ListBox
             foreach (TabItem tab in MainContainer.Items)
