@@ -108,7 +108,7 @@ namespace Joufflu.Data.DnD
             }
             catch(InvalidOperationException)
             {
-                // FIXME : check why this exception can happend (TextBox in dnd:drag element ?)
+                // FIXME : check why this exception can happen (TextBox in dnd:drag element ?)
             }
             finally
             {
