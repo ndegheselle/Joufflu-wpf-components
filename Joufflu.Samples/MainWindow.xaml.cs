@@ -1,6 +1,5 @@
 ﻿using AdonisUI.Controls;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows.Controls;
 
 namespace Joufflu.Samples
@@ -12,8 +11,6 @@ namespace Joufflu.Samples
     {
         public MainWindow()
         {
-            string tata = "afaf".ToString();
-
             InitializeComponent();
             // Foreach tab in MainContainer create a ListBoxItem and add it to the ListBox
             foreach (TabItem tab in MainContainer.Items)
